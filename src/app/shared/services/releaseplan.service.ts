@@ -35,6 +35,7 @@ export class ReleasePlanService {
   addReleasePlan(newReleasePlan: ReleasePlanInterface) {
     // Check if it already exists
     if (this.releasePlans.findIndex(x => x.id === newReleasePlan.id) === -1) {
+      newReleasePlan.id = (this.releasePlans.length + 1).toString();
       this.releasePlans.push(newReleasePlan);
     }
   }
