@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { ReleasePlanService } from '../shared/services/releaseplan.service';
+import { ReleasePlanInterface } from '../shared/interfaces/releaseplan.interface';
 
 @Component({
   selector: 'app-summary',
@@ -7,9 +9,12 @@ import { Component, OnInit } from '@angular/core';
 })
 export class SummaryComponent implements OnInit {
 
-  constructor() { }
+  releasePlans: ReleasePlanInterface[];
+
+  constructor(private releasePlanService: ReleasePlanService) { }
 
   ngOnInit(): void {
+    this.releasePlans = this.releasePlanService.getReleasePlans();
   }
 
 }

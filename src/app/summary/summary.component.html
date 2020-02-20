@@ -1,1 +1,7 @@
-<p>summary works!</p>
+<div>Current Release Plans </div>
+<div *ngFor="let releasePlan of releasePlans">
+  <a [routerLink]="['/detail', releasePlan.id]">
+    Click here to go to release plan
+    {{ releasePlan.name }}
+  </a>
+</div>

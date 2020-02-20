@@ -23,8 +23,8 @@ export class NodeService {
   ];
   constructor() { }
 
-  getNodes() {
-    return this.nodes.slice();
+  getNodes(releasePlanId: string) {
+    return this.nodes.filter(x => x.releasePlanId === releasePlanId);
   }
 
   getNodeById(id: string) {

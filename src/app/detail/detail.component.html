@@ -1,1 +1,9 @@
-<p>detail works!</p>
+<div>
+  Release Plan {{ releasePlan?.name }}
+</div>
+
+<div *ngFor="let node of nodes">
+  <div>
+    {{ node?.name }}
+  </div>
+</div>
