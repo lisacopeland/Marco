@@ -3,6 +3,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ReleasePlanInterface } from '../shared/interfaces/releaseplan.interface';
 import { ReleasePlanService } from '../shared/services/releaseplan.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-releaseplanedit',
@@ -18,6 +19,7 @@ export class ReleasePlanEditDialogComponent implements OnInit {
 
   constructor(
     private releasePlanService: ReleasePlanService,
+    private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<ReleasePlanEditDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: ReleasePlanInterface) {}
 
@@ -37,6 +39,12 @@ export class ReleasePlanEditDialogComponent implements OnInit {
   }
 
   onSubmit() {
+    if (this.planForm.invalid) {
+      this.snackBar.open('Please fill in required fields', '', {
+        duration: 2000,
+      });
+      return;
+    }
     if (this.editMode) {
       this.releasePlan.name = this.planForm.value.name;
       this.releasePlanService.editReleasePlan(this.releasePlan);

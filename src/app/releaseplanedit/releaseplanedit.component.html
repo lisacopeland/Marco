@@ -3,11 +3,13 @@
 <mat-dialog-content>
   <mat-form-field>
     <mat-label>Release Plan Name</mat-label>
-    <input matInput placeholder="Ex. Pizza" formControlName="name">
+    <input
+      matInput
+      placeholder="Ex. Pla Name" formControlName="name" required>
   </mat-form-field>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button (click)="onClose()">Cancel</button>
+  <button mat-button type="button" (click)="onClose()">Cancel</button>
   <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
   <button mat-button type="submit">Save</button>
 </mat-dialog-actions>

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ReleasePlanInterface } from '../interfaces/releaseplan.interface';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -12,9 +13,17 @@ export class ReleasePlanService {
       name: 'Release Plan 1'
     }
   ];
+
+  private releasePlansChanged: BehaviorSubject<ReleasePlanInterface[]> = new BehaviorSubject(this.releasePlans);
+
   constructor() { }
 
+  getReleasePlanObservable(): Observable<ReleasePlanInterface[]> {
+    return this.releasePlansChanged.asObservable();
+  }
+
   getReleasePlans(): ReleasePlanInterface[] {
+    this.releasePlansChanged.next(this.releasePlans);
     return this.releasePlans.slice();
   }
 
@@ -37,6 +46,7 @@ export class ReleasePlanService {
     if (this.releasePlans.findIndex(x => x.id === newReleasePlan.id) === -1) {
       newReleasePlan.id = (this.releasePlans.length + 1).toString();
       this.releasePlans.push(newReleasePlan);
+      this.releasePlansChanged.next(this.releasePlans);
     }
   }
 
@@ -45,11 +55,15 @@ export class ReleasePlanService {
 
     if (idx !== -1) {
       this.releasePlans.splice(idx, 1);
+      this.releasePlansChanged.next(this.releasePlans);
     }
   }
 
   editReleasePlan(newReleasePlan) {
     const idx = this.releasePlans.findIndex(x => x.id === newReleasePlan.id);
-    this.releasePlans[idx] = newReleasePlan;
+    if (idx !== -1) {
+      this.releasePlans[idx] = newReleasePlan;
+      this.releasePlansChanged.next(this.releasePlans);
+    }
   }
 }
