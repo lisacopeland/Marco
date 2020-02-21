@@ -5,6 +5,8 @@ import { ReleasePlanService } from '../shared/services/releaseplan.service';
 import { ReleasePlanInterface } from '../shared/interfaces/releaseplan.interface';
 import { NodeService } from '../shared/services/node.service';
 import { NodeInterface } from '../shared/interfaces/node.interface';
+import { ReleasePlanEditDialogComponent } from '../releaseplanedit/releaseplanedit.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-detail',
@@ -17,6 +19,7 @@ export class DetailComponent implements OnInit {
 
   constructor(private route: ActivatedRoute,
               private nodeService: NodeService,
+              public dialog: MatDialog,
               private releasePlanService: ReleasePlanService) { }
 
   ngOnInit(): void {
@@ -24,6 +27,34 @@ export class DetailComponent implements OnInit {
       this.releasePlan = this.releasePlanService.getReleasePlanById(params.get('id'));
       this.nodes = this.nodeService.getNodes(this.releasePlan.id);
     });
+  }
+
+  onEdit() {
+    const dialogRef = this.dialog.open(ReleasePlanEditDialogComponent, {
+      width: '500px',
+      data: this.releasePlan
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log('the releaseplan was updated');
+        this.releasePlan = result;
+      } else {
+        console.log('the release plan was not updated');
+      }
+    });
+  }
+
+  onAddNode() {
+
+  }
+
+  onDelNode() {
+
+  }
+
+  onDeletePlan() {
+
   }
 
 }

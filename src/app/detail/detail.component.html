@@ -1,9 +1,20 @@
-<div>
-  Release Plan {{ releasePlan?.name }}
-</div>
-
-<div *ngFor="let node of nodes">
-  <div>
-    {{ node?.name }}
+<section class="page-layout" fxLayout="column">
+  <div fxLayout="row" class="page-header" fxLayoutAlign="space-between center">
+    <h1 class="mat-h1">Release Plan {{ releasePlan?.name }}</h1>
+    <button mat-raised-button color="primary" (click)="onEdit()">Edit plan info</button>
   </div>
-</div>
+  <mat-card class="card-content">
+    <mat-card-title>
+      Nodes
+    </mat-card-title>
+
+    <mat-card-content>
+    <div *ngFor="let node of nodes">
+      <div>
+        {{ node?.name }}
+      </div>
+    </div>
+    </mat-card-content>
+  </mat-card>
+
+</section>

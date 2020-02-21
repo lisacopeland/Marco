@@ -10,13 +10,15 @@ import { SummaryComponent } from './summary/summary.component';
 import { DetailComponent } from './detail/detail.component';
 import { ReleasePlanEditDialogComponent } from './releaseplanedit/releaseplanedit.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { AboutComponent } from './about/about.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     SummaryComponent,
     DetailComponent,
-    ReleasePlanEditDialogComponent
+    ReleasePlanEditDialogComponent,
+    AboutComponent
   ],
   imports: [
     BrowserModule,

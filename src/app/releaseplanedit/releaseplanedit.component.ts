@@ -12,7 +12,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class ReleasePlanEditDialogComponent implements OnInit {
 
-  editTitle = 'Add New';
+  editTitle = 'Add New Release Plan';
   planForm: FormGroup;
   releasePlan: ReleasePlanInterface;
   editMode = false;
@@ -25,16 +25,21 @@ export class ReleasePlanEditDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.editMode = this.data !== null;
-    this.releasePlan = (this.editMode) ? this.data :
-    { id: '',
-      name: '',
-    };
+    if (this.editMode) {
+      this.releasePlan = this.data;
+      this.editTitle = 'Editing ' + this.releasePlan.name;
+    } else {
+      this.releasePlan = {
+        id: '',
+        name: '',
+      };
+    }
     this.initForm();
   }
 
   initForm() {
     this.planForm = new FormGroup({
-      name: new FormControl('', [Validators.required, Validators.minLength(2)])
+      name: new FormControl(this.releasePlan.name, [Validators.required, Validators.minLength(2)])
     });
   }
 
@@ -55,7 +60,7 @@ export class ReleasePlanEditDialogComponent implements OnInit {
       };
       this.releasePlanService.addReleasePlan(releasePlan);
     }
-    this.onClose();
+    this.dialogRef.close(this.releasePlan);
   }
 
   onClose(): void {
