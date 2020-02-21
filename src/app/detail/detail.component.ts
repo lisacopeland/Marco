@@ -59,10 +59,6 @@ export class DetailComponent implements OnInit {
 
   }
 
-  onDelNode() {
-
-  }
-
   onDeletePlan() {
 
   }
