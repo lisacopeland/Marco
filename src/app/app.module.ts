@@ -11,6 +11,7 @@ import { DetailComponent } from './detail/detail.component';
 import { ReleasePlanEditDialogComponent } from './releaseplanedit/releaseplanedit.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AboutComponent } from './about/about.component';
+import { NodeDetailDialogComponent } from './nodedetail/nodedetail.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { AboutComponent } from './about/about.component';
     SummaryComponent,
     DetailComponent,
     ReleasePlanEditDialogComponent,
-    AboutComponent
+    AboutComponent,
+    NodeDetailDialogComponent
   ],
   imports: [
     BrowserModule,
