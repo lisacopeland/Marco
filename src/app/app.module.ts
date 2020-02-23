@@ -6,7 +6,7 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from './material/material.module';
 import { FlexLayoutModule } from '@angular/flex-layout';
-import { SummaryComponent } from './summary/summary.component';
+// import { SummaryComponent } from './summary/summary.component';
 import { DetailComponent } from './detail/detail.component';
 import { ReleasePlanEditDialogComponent } from './releaseplanedit/releaseplanedit.component';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -16,7 +16,7 @@ import { NodeDashboardComponent } from './nodedetail/nodedetail.component';
 @NgModule({
   declarations: [
     AppComponent,
-    SummaryComponent,
+    // SummaryComponent,
     DetailComponent,
     ReleasePlanEditDialogComponent,
     AboutComponent,
