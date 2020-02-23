@@ -1,11 +1,11 @@
 <h2 mat-dialog-title>{{ editTitle }}</h2>
-<form [formGroup]="planForm" (ngSubmit)="onSubmit()">
+<form [formGroup]="productForm" (ngSubmit)="onSubmit()">
 <mat-dialog-content>
   <mat-form-field>
-    <mat-label>Release Plan Name</mat-label>
+    <mat-label>Product Name</mat-label>
     <input
       matInput
-      placeholder="Ex. Pla Name" formControlName="name" required>
+      placeholder="Ex. Product Name" formControlName="description" required>
   </mat-form-field>
 </mat-dialog-content>
 <mat-dialog-actions>

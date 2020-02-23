@@ -12,4 +12,8 @@ export class DeploymentsComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  onAdd() {
+
+  }
+
 }

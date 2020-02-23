@@ -1,0 +1,16 @@
+<h2 mat-dialog-title>{{ editTitle }}</h2>
+<form [formGroup]="planForm" (ngSubmit)="onSubmit()">
+<mat-dialog-content>
+  <mat-form-field>
+    <mat-label>Description</mat-label>
+    <input
+      matInput
+      placeholder="Ex. My ReleasePlan" formControlName="name" required>
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button type="button" (click)="onClose()">Cancel</button>
+  <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
+  <button mat-button type="submit">Save</button>
+</mat-dialog-actions>
+</form>

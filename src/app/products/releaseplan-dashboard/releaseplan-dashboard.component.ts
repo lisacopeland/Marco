@@ -1,10 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, ParamMap } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
-import { ReleasePlanService } from '../shared/services/releaseplan.service';
-import { ReleasePlanInterface } from '../shared/interfaces/releaseplan.interface';
-import { NodeService } from '../shared/services/node.service';
-import { NodeInterface } from '../shared/interfaces/node.interface';
+import { ReleasePlanService } from '@services/releaseplan.service';
+import { ReleasePlanInterface } from '@interfaces/releaseplan.interface';
+import { NodeService } from '@services/node.service';
+import { NodeInterface } from '@interfaces/node.interface';
 import { ReleasePlanEditDialogComponent } from '../releaseplanedit/releaseplanedit.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
@@ -12,11 +12,11 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 
 @Component({
-  selector: 'app-detail',
-  templateUrl: './detail.component.html',
-  styleUrls: ['./detail.component.scss']
+  selector: 'app-releaseplan-dashboard',
+  templateUrl: './releaseplan-dashboard.component.html',
+  styleUrls: ['./releaseplan-dashboard.component.scss']
 })
-export class DetailComponent implements OnInit {
+export class ReleasePlanDashboardComponent implements OnInit {
   releasePlan: ReleasePlanInterface;
   nodes: NodeInterface[];
   displayedColumns: string[] = ['id', 'name', 'hasPredecessors', 'dashboard'];
@@ -31,7 +31,10 @@ export class DetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params: ParamMap) => {
-      this.releasePlan = this.releasePlanService.getReleasePlanById(params.get('id'));
+      // const id = params.get('id');
+      // console.log('id is ' + id);
+      const id = '1';
+      this.releasePlan = this.releasePlanService.getReleasePlanById(id);
       this.nodes = this.nodeService.getNodes(this.releasePlan.id);
       this.dataSource = new MatTableDataSource<NodeInterface>(this.nodes);
       this.dataSource.paginator = this.paginator;
@@ -42,7 +45,10 @@ export class DetailComponent implements OnInit {
   onEdit() {
     const dialogRef = this.dialog.open(ReleasePlanEditDialogComponent, {
       width: '500px',
-      data: this.releasePlan
+      data: {
+        productId: this.releasePlan.productId,
+        releasePlan: this.releasePlan
+      }
     });
 
     dialogRef.afterClosed().subscribe(result => {

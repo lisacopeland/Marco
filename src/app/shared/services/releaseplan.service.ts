@@ -10,8 +10,19 @@ export class ReleasePlanService {
   releasePlans: ReleasePlanInterface[] = [
     {
       id: '1',
-      name: 'Release Plan 1'
-    }
+      name: 'Release Plan 1 for Product 1',
+      productId: '1'
+    },
+    {
+      id: '2',
+      name: 'Release Plan 1 for Product 2',
+      productId: '2'
+    },
+    {
+      id: '3',
+      name: 'Release Plan 2 for Product 3',
+      productId: '2'
+    },
   ];
 
   private releasePlansChanged: BehaviorSubject<ReleasePlanInterface[]> = new BehaviorSubject(this.releasePlans);
@@ -25,6 +36,10 @@ export class ReleasePlanService {
   getReleasePlans(): ReleasePlanInterface[] {
     this.releasePlansChanged.next(this.releasePlans);
     return this.releasePlans.slice();
+  }
+
+  getReleasePlansByProductId(id: string) {
+    return this.releasePlans.filter(x => x.productId === id).slice();
   }
 
   getReleasePlanById(id: string): ReleasePlanInterface {
