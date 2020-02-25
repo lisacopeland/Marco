@@ -11,6 +11,7 @@ import { ReleasePlanDashboardComponent } from './releaseplan-dashboard/releasepl
 import { NodeDashboardComponent } from './nodedashboard/nodedashboard.component';
 import { ProductDashboardComponent } from './product-dashboard/product-dashboard.component';
 import { ProductEditDialogComponent } from './productedit/productedit.component';
+import { AlertDialogModule } from '../alert-dialog/alert-dialog.module';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { ProductEditDialogComponent } from './productedit/productedit.component'
     ReactiveFormsModule,
     FlexLayoutModule,
     MaterialModule,
-    ProductsRoutingModule
+    ProductsRoutingModule,
+    AlertDialogModule
   ],
   entryComponents: [
     ReleasePlanEditDialogComponent,

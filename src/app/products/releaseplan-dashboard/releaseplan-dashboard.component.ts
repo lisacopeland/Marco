@@ -10,6 +10,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
+import { AlertDialogComponent } from 'src/app/alert-dialog/alert-dialog.component';
 
 @Component({
   selector: 'app-releaseplan-dashboard',
@@ -26,6 +27,7 @@ export class ReleasePlanDashboardComponent implements OnInit {
   @ViewChild(MatSort, {static: true}) sort: MatSort;
 
   constructor(private route: ActivatedRoute,
+              private router: Router,
               private nodeService: NodeService,
               public dialog: MatDialog,
               private releasePlanService: ReleasePlanService) { }
@@ -69,7 +71,22 @@ export class ReleasePlanDashboardComponent implements OnInit {
   }
 
   onDelete() {
-
+    const dialogRef = this.dialog.open(AlertDialogComponent, {
+      width: '400px',
+      data: {
+        header: 'Delete Release Plan',
+        cancelTooltip: 'Return to dashboard',
+        message: 'All nodes will be deleted. Are you sure you want to delete this release plan?',
+        buttons: ['Yes', 'No']
+      }
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === 'Yes') {
+        console.log('result was yes');
+        this.releasePlanService.delReleasePlan(this.releasePlanId);
+        this.router.navigateByUrl('/products', { queryParams: { id: this.releasePlan.productId }});
+      }
+    });
   }
 
 }

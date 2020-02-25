@@ -11,7 +11,8 @@ import { MatSort } from '@angular/material/sort';
 import { ProductService } from '@shared/services/product.service';
 import { ProductInterface } from '@shared/interfaces/product.interface';
 import { ProductEditDialogComponent } from '../productedit/productedit.component';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AlertDialogComponent } from 'src/app/alert-dialog/alert-dialog.component';
 
 @Component({
   selector: 'app-productdashboard',
@@ -29,6 +30,7 @@ export class ProductDashboardComponent implements OnInit, OnDestroy {
   @ViewChild(MatSort, {static: true}) sort: MatSort;
 
   constructor(private route: ActivatedRoute,
+              private router: Router,
               private productService: ProductService,
               private releasePlanService: ReleasePlanService,
               public dialog: MatDialog) { }
@@ -82,7 +84,22 @@ export class ProductDashboardComponent implements OnInit, OnDestroy {
   }
 
   onDelete() {
-
+    const dialogRef = this.dialog.open(AlertDialogComponent, {
+      width: '400px',
+      data: {
+        header: 'Delete Product',
+        cancelTooltip: 'Return to dashboard',
+        message: 'All release plans and nodes will be deleted. Are you sure you want to delete this product?',
+        buttons: ['Yes', 'No']
+      }
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === 'Yes') {
+        console.log('result was yes');
+        this.productService.delProduct(this.productId);
+        this.router.navigateByUrl('/products');
+      }
+    });
   }
 
   ngOnDestroy() {

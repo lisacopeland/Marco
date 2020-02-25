@@ -1,0 +1,19 @@
+<div mat-dialog-title fxLayout="row" fxLayoutAlign="space-between center">
+  <h1 class="mat-h1">{{ headerText }}</h1>
+  <button
+    mat-icon-button
+    matTooltip="toolTipText"
+    matTooltipShowDelay="1000"
+    (click)="onCancel()"
+    color="primary">
+    <mat-icon color="primary">cancel</mat-icon>
+  </button>
+</div>
+<p>{{ alertData?.message }}</p>
+<div mat-dialog-actions fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="10px">
+  <button
+    *ngFor="let dialogButton of dialogButtons"
+    mat-raised-button
+    color="primary"
+    (click)="onButtonClick(dialogButton)">{{ dialogButton }}</button>
+</div>
