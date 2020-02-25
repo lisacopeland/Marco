@@ -7,6 +7,7 @@ import { ProductInterface } from '@shared/interfaces/product.interface';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { takeUntil } from 'rxjs/operators';
+import { ProductEditDialogComponent } from './productedit/productedit.component';
 
 @Component({
   selector: 'app-products',
@@ -16,7 +17,7 @@ import { takeUntil } from 'rxjs/operators';
 export class ProductsComponent implements OnInit, OnDestroy {
 
   unsubscribe$: Subject<boolean> = new Subject();
-  displayedColumns: string[] = ['productId', 'description', 'dashboard'];
+  displayedColumns: string[] = ['productId', 'name', 'description', 'dashboard'];
   dataSource: MatTableDataSource<ProductInterface>;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -27,15 +28,21 @@ export class ProductsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.productService.getProductObservable()
     .pipe(takeUntil(this.unsubscribe$))
-    .subscribe(releasePlans => {
-      this.dataSource = new MatTableDataSource<ProductInterface>(releasePlans);
+    .subscribe(products => {
+      this.dataSource = new MatTableDataSource<ProductInterface>(products);
       this.dataSource.paginator = this.paginator;
       this.dataSource.sort = this.sort;
     });
   }
 
   onAdd() {
+    const dialogRef = this.dialog.open(ProductEditDialogComponent, {
+      width: '500px',
+    });
 
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+    });
   }
 
   ngOnDestroy() {

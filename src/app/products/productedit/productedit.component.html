@@ -5,8 +5,13 @@
     <mat-label>Product Name</mat-label>
     <input
       matInput
-      placeholder="Ex. Product Name" formControlName="description" required>
+      placeholder="Name" formControlName="name">
   </mat-form-field>
+  <mat-form-field>
+    <mat-label>Product Description</mat-label>
+    <input matInput placeholder="Description" formControlName="description">
+  </mat-form-field>
+
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button type="button" (click)="onClose()">Cancel</button>

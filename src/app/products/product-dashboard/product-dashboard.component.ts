@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { ReleasePlanService } from '@services/releaseplan.service';
 import { ReleasePlanInterface } from '@interfaces/releaseplan.interface';
 import { MatDialog } from '@angular/material/dialog';
-import { ReleasePlanEditDialogComponent } from '../releaseplanedit/releaseplanedit.component';
+import { PlanEditDialogComponent } from '../releaseplanedit/releaseplanedit.component';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { MatTableDataSource } from '@angular/material/table';
@@ -24,7 +24,7 @@ export class ProductDashboardComponent implements OnInit, OnDestroy {
   unsubscribe$: Subject<boolean> = new Subject();
   product: ProductInterface;
   productId = '';
-  displayedColumns: string[] = ['id', 'name', 'dashboard'];
+  displayedColumns: string[] = ['planId', 'name', 'description', 'tags', 'dashboard'];
   dataSource: MatTableDataSource<ReleasePlanInterface>;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -36,19 +36,16 @@ export class ProductDashboardComponent implements OnInit, OnDestroy {
               public dialog: MatDialog) { }
 
   ngOnInit(): void {
-    // Pretend like you are passed the id of the product, and then get the release plans for
-    // that product
-
     this.route.queryParams
       .subscribe(params => {
         this.productId = params.id;
         console.log('product id is ' + this.productId);
         if (this.productId) {
           this.product = this.productService.getProductById(this.productId);
-          this.releasePlanService.getReleasePlanObservable()
+          this.releasePlanService.getPlanObservable()
             .pipe(takeUntil(this.unsubscribe$))
-            .subscribe(releasePlans => {
-              this.dataSource = new MatTableDataSource<ReleasePlanInterface>(releasePlans.filter(x => x.productId === this.productId));
+            .subscribe(Plans => {
+              this.dataSource = new MatTableDataSource<ReleasePlanInterface>(Plans.filter(x => x.parentId === this.productId));
               this.dataSource.paginator = this.paginator;
               this.dataSource.sort = this.sort;
             });
@@ -57,11 +54,11 @@ export class ProductDashboardComponent implements OnInit, OnDestroy {
   }
 
   onAdd() {
-    const dialogRef = this.dialog.open(ReleasePlanEditDialogComponent, {
+    const dialogRef = this.dialog.open(PlanEditDialogComponent, {
       width: '500px',
       data: {
         productId: this.product.productId,
-        releasePlan: null
+        Plan: null
       }
     });
 

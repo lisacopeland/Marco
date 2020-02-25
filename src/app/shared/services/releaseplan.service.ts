@@ -1,27 +1,47 @@
 import { Injectable } from '@angular/core';
 import { ReleasePlanInterface } from '../interfaces/releaseplan.interface';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { environment } from '@environments/environment';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReleasePlanService {
+  apiUrl = environment.apiUrl;
 
   releasePlans: ReleasePlanInterface[] = [
     {
-      id: '1',
-      name: 'Release Plan 1 for Product 1',
-      productId: '1'
+      planId: 'product1.plan1',
+      name: 'plan1',
+      parentId: 'product1',
+      description: 'Release Plan 1 for Product 1',
+      startNodeId: 'product1.plan1.node1',
+      deploymentId: '',
+      tags: [],
+      selfLink: this.apiUrl + '/product/product1/plans/plan1',
+      planNodeLink: this.apiUrl + '/product/product1/plans/plan1/nodes'
     },
     {
-      id: '2',
-      name: 'Release Plan 1 for Product 2',
-      productId: '2'
+      planId: 'product1.plan2',
+      name: 'plan2',
+      parentId: 'product1',
+      description: 'Release Plan 2 for Product 1',
+      startNodeId: 'product1.plan2.node1',
+      deploymentId: '',
+      tags: [],
+      selfLink: this.apiUrl + '/product/product1/plans/plan2',
+      planNodeLink: this.apiUrl + '/product/product1/plans/plan2/nodes'
     },
     {
-      id: '3',
-      name: 'Release Plan 2 for Product 3',
-      productId: '2'
+      planId: 'product2.plan1',
+      name: 'plan1',
+      parentId: 'product2',
+      description: 'Release Plan 1 for Product 2',
+      startNodeId: '', // Null for new plan
+      deploymentId: '',
+      tags: [],
+      selfLink: this.apiUrl + '/product/product2/plans/plan1',
+      planNodeLink: this.apiUrl + '/product/product2/plans/plan1/nodes'
     },
   ];
 
@@ -29,44 +49,40 @@ export class ReleasePlanService {
 
   constructor() { }
 
-  getReleasePlanObservable(): Observable<ReleasePlanInterface[]> {
+  getPlanObservable(): Observable<ReleasePlanInterface[]> {
     return this.releasePlansChanged.asObservable();
   }
 
-  getReleasePlans(): ReleasePlanInterface[] {
+  getPlans(): ReleasePlanInterface[] {
     this.releasePlansChanged.next(this.releasePlans);
     return this.releasePlans.slice();
   }
 
-  getReleasePlansByProductId(id: string) {
-    return this.releasePlans.filter(x => x.productId === id).slice();
+  getPlansByProductId(id: string) {
+    return this.releasePlans.filter(x => x.parentId === id).slice();
   }
 
-  getReleasePlanById(id: string): ReleasePlanInterface {
-    return this.releasePlans.find(x => x.id === id);
+  getPlanById(id: string): ReleasePlanInterface {
+    return this.releasePlans.find(x => x.planId === id);
   }
 
-  checkForCircular(releasePlan: ReleasePlanInterface): boolean {
-    // Check the releasePlan for circular dependency
-    if (releasePlan) {
-      // If there is a circular dependancy return true else return false
-      // walk the release plan and see if any ReleasePlan is a predecessor of a further down one
-    } else {
-      return false;
-    }
+  // Returns true if the name is taken, false if otherwise
+  checkNameNotTaken(planId: string): Observable<boolean | null> {
+    const result = (this.releasePlans.find(x => x.planId === planId) === undefined) ? true : false;
+    return of(result);
   }
 
-  addReleasePlan(newReleasePlan: ReleasePlanInterface) {
+  addPlan(newPlan: ReleasePlanInterface) {
     // Check if it already exists
-    if (this.releasePlans.findIndex(x => x.id === newReleasePlan.id) === -1) {
-      newReleasePlan.id = (this.releasePlans.length + 1).toString();
-      this.releasePlans.push(newReleasePlan);
+    if (this.releasePlans.findIndex(x => x.planId === newPlan.planId) === -1) {
+      newPlan.planId = newPlan.parentId + '.' + newPlan.name;
+      this.releasePlans.push(newPlan);
       this.releasePlansChanged.next(this.releasePlans);
     }
   }
 
-  delReleasePlan(ReleasePlanId: string) {
-    const idx = this.releasePlans.findIndex(x => x.id === ReleasePlanId);
+  delPlan(PlanId: string) {
+    const idx = this.releasePlans.findIndex(x => x.planId === PlanId);
 
     if (idx !== -1) {
       this.releasePlans.splice(idx, 1);
@@ -74,10 +90,10 @@ export class ReleasePlanService {
     }
   }
 
-  editReleasePlan(newReleasePlan) {
-    const idx = this.releasePlans.findIndex(x => x.id === newReleasePlan.id);
+  editPlan(newPlan) {
+    const idx = this.releasePlans.findIndex(x => x.planId === newPlan.planId);
     if (idx !== -1) {
-      this.releasePlans[idx] = newReleasePlan;
+      this.releasePlans[idx] = newPlan;
       this.releasePlansChanged.next(this.releasePlans);
     }
   }

@@ -2,10 +2,18 @@
 <form [formGroup]="planForm" (ngSubmit)="onSubmit()">
 <mat-dialog-content>
   <mat-form-field>
+    <mat-label>Name</mat-label>
+    <input matInput placeholder="Name" formControlName="name">
+  </mat-form-field>
+  <mat-form-field>
     <mat-label>Description</mat-label>
     <input
       matInput
-      placeholder="Ex. My ReleasePlan" formControlName="name" required>
+      placeholder="Ex. My Plan" formControlName="description" required>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Tag</mat-label>
+    <input matInput placeholder="Ex. My Plan" formControlName="tags" required>
   </mat-form-field>
 </mat-dialog-content>
 <mat-dialog-actions>

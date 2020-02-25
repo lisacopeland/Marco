@@ -1,18 +1,15 @@
-export interface NodeInterface {
-  name: string;
-  id: string;
-  predecessors: string[];
-  releasePlanId: string;
-}
+// Format of nodeID: productName.planName:planNodeName
 
 export interface PlanNodeInterface {
-  planNodeId: string;
-  nodeType: 'Milestone' | 'Task';
-  description: string;
-  predecessors: string[];
-  delayedStartTimerDurationMins: number;
-  delayedStartTimerTrigger: '';
-  planId: string;
+  planNodeId: string;             // Unique ID for this node
+  planNodeName: string;           // Must be unique for this plan
+  nodeType: 'Milestone' | 'Task'; // Node type - cannot be changed
+  description: string;            // Description of this node
+  predecessors: string[];         // Ids of the predecessors of this node
+  delayedStartTimerDurationMins: number; // Dunno
+  delayedStartTimerTrigger: '';          // Dunno
+  parentId: string;               // productName.planName
+  selfLink: string;               // url for PUT(this object), DELETE(this object)
 }
 
 export interface PlanMilestoneInterface extends PlanNodeInterface {

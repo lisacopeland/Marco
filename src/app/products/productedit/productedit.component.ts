@@ -1,9 +1,11 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormGroup, FormControl, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ProductInterface } from '@shared/interfaces/product.interface';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ProductService } from '@shared/services/product.service';
+import { Observable } from 'rxjs';
+import { delay, map, catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-productedit',
@@ -29,19 +31,41 @@ export class ProductEditDialogComponent implements OnInit {
     if (this.editMode) {
       this.product = this.data;
       this.editTitle = 'Editing ' + this.product.description;
-    } else {
-      this.product = {
-        description: '',
-        productId: this.productId
-      };
     }
     this.initForm();
   }
 
   initForm() {
     this.productForm = new FormGroup({
-      description: new FormControl(this.product.description, [Validators.required, Validators.minLength(2)])
+      name: new FormControl(''),
+      description: new FormControl('', [Validators.required, Validators.minLength(2)]),
     });
+    if (this.editMode) {
+      this.productForm.patchValue({
+        name: this.product.name,
+        description: this.product.description
+      });
+      this.productForm.get('name').disable();
+    } else {
+      this.productForm.get('name').setValidators(Validators.required);
+      this.productForm.get('name').setAsyncValidators([
+        this.validateNameAvailability.bind(this)]);
+    }
+  }
+
+  validateNameAvailability(control: AbstractControl): Observable<ValidationErrors | null> {
+    return this.productService.checkNameNotTaken(control.value)
+      .pipe(
+        delay(1000),
+        map(res => {
+          if (res) {
+            this.productForm.get('name').setErrors({ nameTaken: true });
+            return;
+          }
+          return null;
+        }),
+        catchError(() => null)
+      );
   }
 
   onSubmit() {
@@ -59,8 +83,11 @@ export class ProductEditDialogComponent implements OnInit {
       });
     } else {
       const product = {
+        productId: this.productForm.value.name,
         description: this.productForm.value.description,
-        productId: null
+        name: this.productForm.value.name,
+        selfLink: '',
+        planLink: ''
       };
       this.productService.addProduct(product);
       this.snackBar.open('Product successfully added', '', {
