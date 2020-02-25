@@ -54,12 +54,18 @@ export class ProductEditDialogComponent implements OnInit {
     if (this.editMode) {
       this.product.description = this.productForm.value.description;
       this.productService.editProduct(this.product);
+      this.snackBar.open('Product successfully updated', '', {
+        duration: 2000,
+      });
     } else {
       const product = {
         description: this.productForm.value.description,
         productId: null
       };
       this.productService.addProduct(product);
+      this.snackBar.open('Product successfully added', '', {
+        duration: 2000,
+      });
     }
     this.dialogRef.close(this.product);
   }

@@ -61,6 +61,9 @@ export class ReleasePlanEditDialogComponent implements OnInit {
     if (this.editMode) {
       this.releasePlan.name = this.planForm.value.name;
       this.releasePlanService.editReleasePlan(this.releasePlan);
+      this.snackBar.open('Release plan successfully updated', '', {
+        duration: 2000,
+      });
     } else {
       const releasePlan = {
         name: this.planForm.value.name,
@@ -68,6 +71,9 @@ export class ReleasePlanEditDialogComponent implements OnInit {
         productId: this.productId
       };
       this.releasePlanService.addReleasePlan(releasePlan);
+      this.snackBar.open('Release plan successfully added', '', {
+        duration: 2000,
+      });
     }
     this.dialogRef.close(this.releasePlan);
   }
