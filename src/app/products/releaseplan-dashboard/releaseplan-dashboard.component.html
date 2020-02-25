@@ -1,12 +1,26 @@
 <section class="page-layout" fxLayout="column">
   <div fxLayout="row" class="page-header" fxLayoutAlign="space-between center">
     <h1 class="mat-h1">Release Plan {{ releasePlan?.name }}</h1>
-    <button mat-raised-button color="primary" (click)="onEdit()">Edit plan info</button>
-  </div>
+    <button mat-icon-button [matMenuTriggerFor]="planMenu">
+      <mat-icon>more_vert</mat-icon>
+    </button>  </div>
+
+  <mat-menu #planMenu="matMenu">
+    <button mat-menu-item (click)="onAddNode()">Add Node</button>
+    <button mat-menu-item (click)="onEdit()">Edit</button>
+    <button mat-menu-item (click)="onDelete()">Delete</button>
+    <button mat-menu-item [routerLink]="'/products/productdashboard'" [queryParams]="{id: releasePlan?.productId}"
+    >Return to Product Dashboard</button>
+  </mat-menu>
+
   <mat-card class="card-content">
-    <mat-card-title>
-      Nodes
-    </mat-card-title>
+
+    <div fxLayout="row" fxLayoutAlign="space-between center">
+      <h1 class="mat-h1">Nodes</h1>
+      <button mat-icon-button color="primary" matTooltip="Add a node to the release plan" (click)="onAddNode()">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
 
     <mat-card-content>
     <table class="table-styling" mat-table matSort [dataSource]="dataSource">

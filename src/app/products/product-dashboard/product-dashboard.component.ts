@@ -11,6 +11,7 @@ import { MatSort } from '@angular/material/sort';
 import { ProductService } from '@shared/services/product.service';
 import { ProductInterface } from '@shared/interfaces/product.interface';
 import { ProductEditDialogComponent } from '../productedit/productedit.component';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-productdashboard',
@@ -21,27 +22,36 @@ export class ProductDashboardComponent implements OnInit, OnDestroy {
 
   unsubscribe$: Subject<boolean> = new Subject();
   product: ProductInterface;
+  productId = '';
   displayedColumns: string[] = ['id', 'name', 'dashboard'];
   dataSource: MatTableDataSource<ReleasePlanInterface>;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
 
-  constructor(private productService: ProductService,
+  constructor(private route: ActivatedRoute,
+              private productService: ProductService,
               private releasePlanService: ReleasePlanService,
               public dialog: MatDialog) { }
 
   ngOnInit(): void {
     // Pretend like you are passed the id of the product, and then get the release plans for
     // that product
-    const productId = '2';
-    this.product = this.productService.getProductById(productId);
-    this.releasePlanService.getReleasePlanObservable()
-    .pipe(takeUntil(this.unsubscribe$))
-    .subscribe(releasePlans => {
-      this.dataSource = new MatTableDataSource<ReleasePlanInterface>(releasePlans.filter(x => x.productId === productId));
-      this.dataSource.paginator = this.paginator;
-      this.dataSource.sort = this.sort;
-    });
+
+    this.route.queryParams
+      .subscribe(params => {
+        this.productId = params.id;
+        console.log('product id is ' + this.productId);
+        if (this.productId) {
+          this.product = this.productService.getProductById(this.productId);
+          this.releasePlanService.getReleasePlanObservable()
+            .pipe(takeUntil(this.unsubscribe$))
+            .subscribe(releasePlans => {
+              this.dataSource = new MatTableDataSource<ReleasePlanInterface>(releasePlans.filter(x => x.productId === this.productId));
+              this.dataSource.paginator = this.paginator;
+              this.dataSource.sort = this.sort;
+            });
+        }
+      });
   }
 
   onAdd() {

@@ -18,6 +18,7 @@ import { MatSort } from '@angular/material/sort';
 })
 export class ReleasePlanDashboardComponent implements OnInit {
   releasePlan: ReleasePlanInterface;
+  releasePlanId: string;
   nodes: NodeInterface[];
   displayedColumns: string[] = ['id', 'name', 'hasPredecessors', 'dashboard'];
   dataSource: MatTableDataSource<NodeInterface>;
@@ -30,16 +31,18 @@ export class ReleasePlanDashboardComponent implements OnInit {
               private releasePlanService: ReleasePlanService) { }
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe((params: ParamMap) => {
-      // const id = params.get('id');
-      // console.log('id is ' + id);
-      const id = '1';
-      this.releasePlan = this.releasePlanService.getReleasePlanById(id);
-      this.nodes = this.nodeService.getNodes(this.releasePlan.id);
-      this.dataSource = new MatTableDataSource<NodeInterface>(this.nodes);
-      this.dataSource.paginator = this.paginator;
-      this.dataSource.sort = this.sort;
-    });
+    this.route.queryParams
+      .subscribe(params => {
+        this.releasePlanId = params.id;
+        console.log('plan id is ' + this.releasePlanId);
+        if (this.releasePlanId) {
+          this.releasePlan = this.releasePlanService.getReleasePlanById(this.releasePlanId);
+          this.nodes = this.nodeService.getNodes(this.releasePlan.id);
+          this.dataSource = new MatTableDataSource<NodeInterface>(this.nodes);
+          this.dataSource.paginator = this.paginator;
+          this.dataSource.sort = this.sort;
+        }
+      });
   }
 
   onEdit() {
@@ -65,7 +68,7 @@ export class ReleasePlanDashboardComponent implements OnInit {
 
   }
 
-  onDeletePlan() {
+  onDelete() {
 
   }
 
