@@ -11,11 +11,12 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { AlertDialogComponent } from 'src/app/alert-dialog/alert-dialog.component';
+import { NodeEditDialogComponent } from '../nodeedit/nodeedit.component';
 
 @Component({
   selector: 'app-plan-dashboard',
-  templateUrl: './plan-dashboard.component.html',
-  styleUrls: ['./plan-dashboard.component.scss']
+  templateUrl: './releaseplan-dashboard.component.html',
+  styleUrls: ['./releaseplan-dashboard.component.scss']
 })
 export class PlanDashboardComponent implements OnInit {
   releasePlan: ReleasePlanInterface;
@@ -67,7 +68,15 @@ export class PlanDashboardComponent implements OnInit {
   }
 
   onAddNode() {
+    const dialogRef = this.dialog.open(NodeEditDialogComponent, {
+      width: '500px',
+      data: {
+        parentId: this.releasePlan.planId
+      }
+    });
 
+    dialogRef.afterClosed().subscribe(result => {
+    });
   }
 
   onDelete() {

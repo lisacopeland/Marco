@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { PlanNodeInterface } from '../interfaces/node.interface';
 import { environment } from '@environments/environment';
+import { Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -53,6 +54,12 @@ export class NodeService {
     return this.nodes.find(x => x.planNodeId === id);
   }
 
+  // Returns true if the name is taken, false if otherwise
+  checkNameNotTaken(nodeId: string): Observable<boolean | null> {
+    const result = (this.nodes.find(x => x.planNodeId === nodeId) === undefined) ? true : false;
+    return of(result);
+  }
+
   addNode(newNode: PlanNodeInterface) {
     // Check if it already exists
     if (this.nodes.findIndex(x => x.planNodeId === newNode.planNodeId) === -1) {
@@ -63,7 +70,6 @@ export class NodeService {
 
   delNode(nodeId: string) {
     const idx = this.nodes.findIndex(x => x.planNodeId === nodeId);
-
     if (idx !== -1) {
       this.nodes.splice(idx, 1);
     }

@@ -1,1 +1,34 @@
-<p>nodeedit works!</p>
+<h2 mat-dialog-title>{{ editTitle }}</h2>
+<form [formGroup]="nodeForm" (ngSubmit)="onSubmit()">
+  <mat-dialog-content>
+    <mat-form-field>
+      <mat-label>Name</mat-label>
+      <input matInput placeholder="Name" formControlName="name">
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Description</mat-label>
+      <input matInput placeholder="Ex. My Plan" formControlName="description" required>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Node Type</mat-label>
+      <mat-select formControlName="type">
+        <mat-option *ngFor="let nodeType of nodeTypes" [value]="nodeType">
+          {{nodeType}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Delayed Start Timer Duration</mat-label>
+      <input matInput type="number" placeholder="0" formControlName="delayedStartTimerDurationMins">
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Delayed Start Timer Trigger</mat-label>
+      <input matInput placeholder="" formControlName="delayedStartTimerTrigger">
+    </mat-form-field>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-button type="button" (click)="onClose()">Cancel</button>
+    <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
+    <button mat-button type="submit">Save</button>
+  </mat-dialog-actions>
+</form>

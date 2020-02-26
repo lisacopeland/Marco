@@ -14,8 +14,8 @@ export interface PlanEditData {
 
 @Component({
   selector: 'app-planedit',
-  templateUrl: './planedit.component.html',
-  styleUrls: ['./planedit.component.scss']
+  templateUrl: './releaseplanedit.component.html',
+  styleUrls: ['./releaseplanedit.component.scss']
 })
 export class PlanEditDialogComponent implements OnInit {
 
