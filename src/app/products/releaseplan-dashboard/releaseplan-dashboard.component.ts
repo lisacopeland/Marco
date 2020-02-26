@@ -71,7 +71,8 @@ export class PlanDashboardComponent implements OnInit {
     const dialogRef = this.dialog.open(NodeEditDialogComponent, {
       width: '500px',
       data: {
-        parentId: this.releasePlan.planId
+        parentId: this.releasePlan.planId,
+        node: null
       }
     });
 

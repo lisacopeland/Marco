@@ -1,7 +1,11 @@
 <section fxLayout="column" class="page-layout">
   <div fxLayout="row" class="page-header" fxLayoutAlign="space-between center">
     <h1 class="mat-h1">Products</h1>
-    <button mat-raised-button color="primary" (click)="onAdd()">Add new</button>
+    <button
+      mat-icon-button
+      color="primary"
+      matTooltip="Add a new product"
+      (click)="onAdd()"><mat-icon>add</mat-icon></button>
   </div>
 
   <mat-card class="card-content">

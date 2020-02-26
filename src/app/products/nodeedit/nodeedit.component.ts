@@ -37,7 +37,7 @@ export class NodeEditDialogComponent implements OnInit {
     this.editMode = this.data.node !== null;
     if (this.editMode) {
       this.node = this.data.node;
-      this.editTitle = 'Editing ' + this.node.description;
+      this.editTitle = 'Editing ' + this.node.planNodeName;
     }
     this.initForm();
   }
@@ -45,8 +45,8 @@ export class NodeEditDialogComponent implements OnInit {
   initForm() {
     this.nodeForm = new FormGroup({
       name: new FormControl(''),
-      description: new FormControl(this.node.description, [Validators.required, Validators.minLength(2)]),
-      type: new FormControl(''),
+      description: new FormControl('', [Validators.required, Validators.minLength(2)]),
+      nodeType: new FormControl(this.nodeTypes[0]),
       delayedStartTimerDurationMins: new FormControl(0),
       delayedStartTimerTrigger: new FormControl('')
     });
@@ -54,7 +54,7 @@ export class NodeEditDialogComponent implements OnInit {
       this.nodeForm.patchValue({
         name: this.node.planNodeName,
         description: this.node.description,
-        type: this.node.nodeType
+        nodeType: this.node.nodeType
       });
       this.nodeForm.get('name').disable();
       this.nodeForm.get('nodeType').disable();

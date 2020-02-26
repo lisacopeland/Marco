@@ -57,8 +57,8 @@ export class ProductDashboardComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(PlanEditDialogComponent, {
       width: '500px',
       data: {
-        productId: this.product.productId,
-        Plan: null
+        parentId: this.product.productId,
+        releasePlan: null
       }
     });
 

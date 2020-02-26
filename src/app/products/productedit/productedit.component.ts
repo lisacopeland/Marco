@@ -26,9 +26,9 @@ export class ProductEditDialogComponent implements OnInit {
               @Inject(MAT_DIALOG_DATA) public data: ProductInterface) { }
 
   ngOnInit(): void {
-    this.productId = this.data.productId;
     this.editMode = this.data !== null;
     if (this.editMode) {
+      this.productId = this.data.productId;
       this.product = this.data;
       this.editTitle = 'Editing ' + this.product.description;
     }

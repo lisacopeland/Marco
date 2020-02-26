@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-// import * as environment from '@environments/environment';
+import { environment } from '@environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -7,9 +7,9 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  title = 'marco';
+  title = 'Marco';
 
   ngOnInit() {
-    console.log('production is ');
+    console.log('production is ' + environment.production);
   }
 }

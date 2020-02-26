@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { ProductInterface } from '../interfaces/product.interface';
 import { BehaviorSubject, Observable, throwError, of } from 'rxjs';
 import { environment } from '@environments/environment';
-import { HttpErrorResponse, HttpClient } from '@angular/common/http';
+import { HttpErrorResponse, HttpClient, HttpHeaders } from '@angular/common/http';
 import { take, map, catchError } from 'rxjs/operators';
 
 @Injectable({
@@ -51,8 +51,14 @@ export class ProductService {
   }
 
   getProductsHttp() {
+
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'text/plain'
+      })
+    };
     return this.http
-      .get<ProductInterface>(environment.apiUrl + '/product')
+      .get<ProductInterface>(environment.apiUrl + '/product', httpOptions)
       .pipe(
         take(1),
         map(data => {
@@ -82,7 +88,7 @@ export class ProductService {
   addProduct(newProduct: ProductInterface) {
     // Check if it already exists
     if (this.products.findIndex(x => x.productId === newProduct.productId) === -1) {
-      newProduct.productId = (this.products.length + 1).toString();
+      newProduct.productId = newProduct.name;
       this.products.push(newProduct);
       this.productsChanged.next(this.products);
     }
