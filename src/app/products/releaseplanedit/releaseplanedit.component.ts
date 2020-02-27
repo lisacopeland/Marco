@@ -67,7 +67,7 @@ export class PlanEditDialogComponent implements OnInit {
       .pipe(
         delay(1000),
         map(res => {
-          if (res) {
+          if (!res) {
             this.releasePlanForm.get('name').setErrors({ nameTaken: true });
             return;
           }

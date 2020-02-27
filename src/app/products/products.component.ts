@@ -26,7 +26,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
               public dialog: MatDialog) { }
 
   ngOnInit(): void {
-    // this.getProducts();
+    this.getProducts();
     this.productService.getProductObservable()
     .pipe(takeUntil(this.unsubscribe$))
     .subscribe(products => {
@@ -38,10 +38,18 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   getProducts() {
     this.productService.getProductsHttp()
-      .subscribe(data => {
-        console.log('data got was ' + data);
-      }, error => {
-        console.log('got error: ' + error);
+      .subscribe(products => {
+        this.dataSource = new MatTableDataSource<ProductInterface>(products);
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
+        this.productService.getProductObservable()
+          .pipe(takeUntil(this.unsubscribe$))
+          .subscribe(changedProducts => {
+            this.dataSource = new MatTableDataSource<ProductInterface>(changedProducts);
+            this.dataSource.paginator = this.paginator;
+            this.dataSource.sort = this.sort;
+          });
+
       });
   }
 

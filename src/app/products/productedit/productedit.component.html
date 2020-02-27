@@ -8,10 +8,15 @@
     <input
       matInput
       placeholder="Name" formControlName="name">
+      <mat-hint>Must be unique</mat-hint>
+      <mat-error *ngIf="productForm.get('name').hasError('required')">This is required</mat-error>
+      <mat-error *ngIf="productForm.get('name').hasError('nameTaken')">This name is taken</mat-error>
   </mat-form-field>
   <mat-form-field class="input-75">
     <mat-label>Product Description</mat-label>
     <input matInput placeholder="Description" formControlName="description">
+    <div *ngIf="productForm.get('description').hasError('required')">This is required</div>
+
   </mat-form-field>
 </mat-dialog-content>
 <mat-dialog-actions class="form-footer">

@@ -50,6 +50,7 @@ export class ProductEditDialogComponent implements OnInit {
       this.productForm.get('name').setValidators(Validators.required);
       this.productForm.get('name').setAsyncValidators([
         this.validateNameAvailability.bind(this)]);
+      this.onNameChanges();
     }
   }
 
@@ -58,7 +59,7 @@ export class ProductEditDialogComponent implements OnInit {
       .pipe(
         delay(1000),
         map(res => {
-          if (res) {
+          if (!res) {
             this.productForm.get('name').setErrors({ nameTaken: true });
             return;
           }
@@ -68,8 +69,26 @@ export class ProductEditDialogComponent implements OnInit {
       );
   }
 
+  onNameChanges(): void {
+    this.productForm.get('name').valueChanges.subscribe(val => {
+      if (this.productForm.get('name').hasError('nameTaken')) {
+        console.log('name is taken!');
+      }
+    });
+  }
+
+  getErrorMessage() {
+    if (this.productForm.get(name).hasError('required')) {
+      return 'You must enter a value';
+    } else if (this.productForm.get(name).hasError('nameTaken')) {
+      return 'This name is taken';
+    } else {
+      return 'invalid';
+    }
+  }
+
   onSubmit() {
-    if (this.productForm.invalid) {
+    if (this.productForm.status === 'INVALID') {
       this.snackBar.open('Please fill in required fields', '', {
         duration: 2000,
       });
@@ -89,10 +108,18 @@ export class ProductEditDialogComponent implements OnInit {
         selfLink: '',
         planLink: ''
       };
-      this.productService.addProduct(product);
+/*       this.productService.addProduct(product);
       this.snackBar.open('Product successfully added', '', {
         duration: 2000,
-      });
+      }); */
+      this.productService.addProductHttp(product)
+        .subscribe(() => {
+          this.snackBar.open('Product successfully added', '', {
+            duration: 2000,
+          });
+        }, error => {
+          console.log('error adding product ' + error);
+        });
     }
     this.dialogRef.close(this.product);
   }

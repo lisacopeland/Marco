@@ -52,19 +52,25 @@ export class ProductService {
 
   getProductsHttp() {
 
+    interface GetResponse {
+      products: ProductInterface[];
+    }
+
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'text/plain'
       })
     };
     return this.http
-      .get<ProductInterface>(environment.apiUrl + '/product', httpOptions)
+      .get<GetResponse>(environment.apiUrl + '/product', httpOptions)
       .pipe(
         take(1),
         map(data => {
           console.log('from HTTP call');
           console.log(JSON.stringify(data));
-          return data;
+          this.products = data.products;
+          this.productsChanged.next(this.products);
+          return this.products.slice();
         }),
         catchError(this.handleError)
       );
@@ -79,10 +85,31 @@ export class ProductService {
     return this.products.find(x => x.productId === id);
   }
 
-  // Returns true if the name is taken, false if otherwise
+  // Returns true if the name is not taken, false if otherwise
   checkNameNotTaken(productId: string): Observable<boolean | null> {
     const result = (this.products.find(x => x.productId === productId) === undefined) ? true : false;
     return of(result);
+  }
+
+  addProductHttp(newProduct: ProductInterface) {
+
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'text/plain'
+      })
+    };
+    const body = JSON.stringify(newProduct);
+    return this.http
+      .post<ProductInterface>(environment.apiUrl + '/product', body, httpOptions)
+      .pipe(
+        take(1),
+        map(data => {
+          console.log('from HTTP call');
+          console.log(JSON.stringify(data));
+          return data;
+        }),
+        catchError(this.handleError)
+      );
   }
 
   addProduct(newProduct: ProductInterface) {

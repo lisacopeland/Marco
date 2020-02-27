@@ -72,7 +72,7 @@ export class NodeEditDialogComponent implements OnInit {
       .pipe(
         delay(1000),
         map(res => {
-          if (res) {
+          if (!res) {
             this.nodeForm.get('name').setErrors({ nameTaken: true });
             return;
           }
