@@ -17,6 +17,7 @@ import { ProductEditDialogComponent } from './productedit/productedit.component'
 export class ProductsComponent implements OnInit, OnDestroy {
 
   unsubscribe$: Subject<boolean> = new Subject();
+  hasData = false;
   displayedColumns: string[] = ['productId', 'name', 'description', 'dashboard'];
   dataSource: MatTableDataSource<ProductInterface>;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -27,29 +28,17 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.getProducts();
-    this.productService.getProductObservable()
-    .pipe(takeUntil(this.unsubscribe$))
-    .subscribe(products => {
-      this.dataSource = new MatTableDataSource<ProductInterface>(products);
-      this.dataSource.paginator = this.paginator;
-      this.dataSource.sort = this.sort;
-    });
   }
 
   getProducts() {
-    this.productService.getProductsHttp()
-      .subscribe(products => {
-        this.dataSource = new MatTableDataSource<ProductInterface>(products);
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
-        this.productService.getProductObservable()
-          .pipe(takeUntil(this.unsubscribe$))
-          .subscribe(changedProducts => {
-            this.dataSource = new MatTableDataSource<ProductInterface>(changedProducts);
-            this.dataSource.paginator = this.paginator;
-            this.dataSource.sort = this.sort;
-          });
-
+    this.productService.getProductSource()
+      .subscribe((data: any) => {
+        if (data && (Object.keys(data).length !== 0)) {
+          this.dataSource = new MatTableDataSource<ProductInterface>(data);
+          this.dataSource.paginator = this.paginator;
+          this.dataSource.sort = this.sort;
+          this.hasData = true;
+        }
       });
   }
 
@@ -57,9 +46,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(ProductEditDialogComponent, {
       width: '500px',
     });
-
     dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
     });
   }
 

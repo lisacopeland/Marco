@@ -7,8 +7,9 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
 import { delay, map, catchError } from 'rxjs/operators';
 
-export interface NodeEditData {
+export interface NodeEditDataInterface {
   parentId: string;
+  nodeLink: string;
   node: PlanNodeInterface;
 }
 
@@ -22,6 +23,7 @@ export class NodeEditDialogComponent implements OnInit {
   editTitle = 'Add New Node';
   nodeForm: FormGroup;
   node: PlanNodeInterface;
+  nodeLink: string;
   parentId: string;
   editMode = false;
   nodeTypes = ['Milestone', 'Task'];
@@ -30,14 +32,15 @@ export class NodeEditDialogComponent implements OnInit {
     private nodeService: NodeService,
     private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<NodeEditDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: NodeEditData) { }
+    @Inject(MAT_DIALOG_DATA) public data: NodeEditDataInterface) { }
 
   ngOnInit(): void {
     this.parentId = this.data.parentId;
+    this.nodeLink = this.data.nodeLink;
     this.editMode = this.data.node !== null;
     if (this.editMode) {
       this.node = this.data.node;
-      this.editTitle = 'Editing ' + this.node.planNodeName;
+      this.editTitle = 'Editing ' + this.node.name;
     }
     this.initForm();
   }
@@ -52,7 +55,7 @@ export class NodeEditDialogComponent implements OnInit {
     });
     if (this.editMode) {
       this.nodeForm.patchValue({
-        name: this.node.planNodeName,
+        name: this.node.name,
         description: this.node.description,
         nodeType: this.node.nodeType
       });
@@ -99,19 +102,21 @@ export class NodeEditDialogComponent implements OnInit {
       });
     } else {
       const node = {
-        planNodeId: '',
-        planNodeName: this.nodeForm.value.name,
+        id: this.parentId + ':' + this.nodeForm.value.name,
+        name: this.nodeForm.value.name,
         nodeType: this.nodeForm.value.nodeType,
         parentId: this.parentId,
         description: this.nodeForm.value.description,
         predecessors: [],
         delayedStartTimerDurationMins: this.nodeForm.value.delayedStartTimerDurationMins,
         delayedStartTimerTrigger: this.nodeForm.value.delayedStartTimerTrigger,
-        selfLink: ''
+        selfLink: this.nodeLink + this.nodeForm.value.name
       };
-      this.nodeService.addNode(node);
-      this.snackBar.open('Node successfully added', '', {
-        duration: 2000,
+      this.nodeService.addNode(this.nodeLink, node)
+      .subscribe(() => {
+        this.snackBar.open('Node successfully added', '', {
+          duration: 2000,
+        });
       });
     }
     this.dialogRef.close(this.node);

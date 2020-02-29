@@ -2,9 +2,9 @@ import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { ReleasePlanService } from '@services/releaseplan.service';
 import { ReleasePlanInterface } from '@interfaces/releaseplan.interface';
 import { MatDialog } from '@angular/material/dialog';
-import { PlanEditDialogComponent } from '../releaseplanedit/releaseplanedit.component';
+import { PlanEditDialogComponent, PlanEditDataInterface } from '../releaseplanedit/releaseplanedit.component';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, switchMap } from 'rxjs/operators';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -13,6 +13,7 @@ import { ProductInterface } from '@shared/interfaces/product.interface';
 import { ProductEditDialogComponent } from '../productedit/productedit.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertDialogComponent } from 'src/app/alert-dialog/alert-dialog.component';
+import { environment } from '@environments/environment';
 
 @Component({
   selector: 'app-productdashboard',
@@ -36,30 +37,42 @@ export class ProductDashboardComponent implements OnInit, OnDestroy {
               public dialog: MatDialog) { }
 
   ngOnInit(): void {
+
     this.route.queryParams
       .subscribe(params => {
         this.productId = params.id;
         console.log('product id is ' + this.productId);
         if (this.productId) {
-          this.product = this.productService.getProductById(this.productId);
-          this.releasePlanService.getPlanObservable()
-            .pipe(takeUntil(this.unsubscribe$))
-            .subscribe(Plans => {
-              this.dataSource = new MatTableDataSource<ReleasePlanInterface>(Plans.filter(x => x.parentId === this.productId));
-              this.dataSource.paginator = this.paginator;
-              this.dataSource.sort = this.sort;
-            });
+          this.productService.getProductHttp(this.productId)
+            .pipe(
+              switchMap(product => {
+                this.product = product;
+                return this.releasePlanService.getReleasePlanSource(this.product.releasePlanLink);
+              }))
+            .subscribe((data: any) => {
+              if (data && (Object.keys(data).length !== 0)) {
+                this.dataSource = new MatTableDataSource<ReleasePlanInterface>(data);
+                this.dataSource.paginator = this.paginator;
+                this.dataSource.sort = this.sort;
+              }
+            }, error => {
+                if (!environment.production) {
+                  console.log('got error getting data' + error);
+                }
+          });
         }
       });
   }
 
   onAdd() {
+    const editData: PlanEditDataInterface = {
+      parentId: this.productId,
+      planLink: this.product.releasePlanLink,
+      releasePlan: null
+    };
     const dialogRef = this.dialog.open(PlanEditDialogComponent, {
       width: '500px',
-      data: {
-        parentId: this.product.productId,
-        releasePlan: null
-      }
+      data: editData
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -93,8 +106,10 @@ export class ProductDashboardComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe((result) => {
       if (result === 'Yes') {
         console.log('result was yes');
-        this.productService.delProduct(this.productId);
-        this.router.navigateByUrl('/products');
+        this.productService.delProduct(this.product)
+          .subscribe(() => {
+            this.router.navigateByUrl('/products');
+          });
       }
     });
   }

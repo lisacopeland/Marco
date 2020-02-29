@@ -1,82 +1,186 @@
 import { Injectable } from '@angular/core';
 import { PlanNodeInterface } from '../interfaces/node.interface';
 import { environment } from '@environments/environment';
-import { Observable, of } from 'rxjs';
+import { Observable, of, BehaviorSubject, throwError } from 'rxjs';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { map, catchError, take } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NodeService {
   apiUrl = environment.apiUrl;
+  private nodeSource = new BehaviorSubject<{}>({});
+  nodeLookup = this.nodeSource.asObservable();
+  nodes: PlanNodeInterface[];
 
-  nodes: PlanNodeInterface[] = [
-    {
-      planNodeId: 'product1.plan1.node1',
-      parentId: 'product1.plan1',
-      planNodeName: 'node1',
-      description: 'Description of Node1',
-      nodeType: 'Milestone',
-      predecessors: [],
-      delayedStartTimerDurationMins: 0,
-      delayedStartTimerTrigger: '',
-      selfLink: this.apiUrl + '/product/product1/plans/plan1/nodes/node1'
-    },
-    {
-      planNodeId: 'product1.plan1.node2',
-      parentId: 'product1.plan1',
-      planNodeName: 'node2',
-      description: 'Description of Node2',
-      nodeType: 'Milestone',
-      predecessors: [],
-      delayedStartTimerDurationMins: 0,
-      delayedStartTimerTrigger: '',
-      selfLink: this.apiUrl + '/product/product1/plans/plan1/nodes/node2'
-    },
-    {
-      planNodeId: 'product1.plan2.node1',
-      parentId: 'product1.plan2',
-      planNodeName: 'node1',
-      description: 'Description of Node1 for plan2',
-      nodeType: 'Milestone',
-      predecessors: [],
-      delayedStartTimerDurationMins: 0,
-      delayedStartTimerTrigger: '',
-      selfLink: this.apiUrl + '/product/product1/plans/plan2/nodes/node1'
+  constructor(private http: HttpClient) { }
+
+  getNodesHttp(nodeLink: string) {
+    interface GetResponse {
+      nodes: PlanNodeInterface[];
     }
-  ];
-  constructor() { }
 
-  getNodes(ParentId: string) {
-    return this.nodes.filter(x => x.parentId === ParentId);
+    const url = this.apiUrl + nodeLink;
+
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'text/plain'
+      })
+    };
+
+    return this.http
+      .get<GetResponse>(url, httpOptions)
+      .pipe(
+        map(data => {
+          this.nodes = data.nodes;
+          this.nodeSource.next(this.nodes);
+          return this.nodes.slice();
+        }),
+        catchError(this.handleError)
+      );
   }
 
+  getNodeSource(nodeLink: string) {
+    return this.nodeSource
+      .pipe(
+        map(data => {
+          if (Object.keys(data).length === 0) {
+            this.getNodesHttp(nodeLink)
+              .pipe(
+                take(1)
+              ).subscribe();
+          }
+          return data;
+        })
+      );
+  }
+
+  getNodeHttp(nodeLink: string, id: string) {
+
+    const url = this.apiUrl + nodeLink + '/' + id;
+
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'text/plain'
+      })
+    };
+
+    return this.http
+      .get<PlanNodeInterface>(url, httpOptions)
+      .pipe(
+        map(data => {
+          return data;
+        }),
+        catchError(this.handleError)
+      );
+  }
+
+
   getNodeById(id: string) {
-    return this.nodes.find(x => x.planNodeId === id);
+    return this.nodes.find(x => x.id === id);
   }
 
   // Returns true if the name is taken, false if otherwise
   checkNameNotTaken(nodeId: string): Observable<boolean | null> {
-    const result = (this.nodes.find(x => x.planNodeId === nodeId) === undefined) ? true : false;
+    const result = (this.nodes.find(x => x.id === nodeId) === undefined) ? true : false;
     return of(result);
   }
 
-  addNode(newNode: PlanNodeInterface) {
-    // Check if it already exists
-    if (this.nodes.findIndex(x => x.planNodeId === newNode.planNodeId) === -1) {
-      newNode.planNodeId = newNode.parentId + ':' + newNode.planNodeName;
-      this.nodes.push(newNode);
-    }
+  addNode(nodeLink: string, node: PlanNodeInterface) {
+
+    const url = environment.apiUrl + nodeLink;
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'text/plain'
+      })
+    };
+
+    const body = JSON.stringify(node);
+    return this.http
+      .post<PlanNodeInterface>(url, body, httpOptions)
+      .pipe(
+        map(data => {
+          console.log('from HTTP call');
+          console.log(JSON.stringify(data));
+          this.nodes.push(node);
+          this.nodeSource.next(this.nodes);
+          return data;
+        }),
+        catchError(this.handleError)
+      );
   }
 
-  delNode(nodeId: string) {
-    const idx = this.nodes.findIndex(x => x.planNodeId === nodeId);
-    if (idx !== -1) {
-      this.nodes.splice(idx, 1);
-    }
+  delNode(node: PlanNodeInterface) {
+
+    const url = environment.apiUrl + node.selfLink;
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'text/plain'
+      })
+    };
+    return this.http
+      .delete<PlanNodeInterface>(url, httpOptions)
+      .pipe(
+        map(data => {
+          console.log('from HTTP call');
+          console.log(JSON.stringify(data));
+          const idx = this.nodes.findIndex(x => x.id === node.id);
+          if (idx !== -1) {
+            this.nodes.splice(idx, 1);
+            this.nodeSource.next(this.nodes);
+          }
+          return data;
+        }),
+        catchError(this.handleError)
+      );
+
   }
 
-  editNode(newNode) {
-    const idx = this.nodes.findIndex(x => x.planNodeId === newNode.id);
-    this.nodes[idx] = newNode;
+  editNode(node: PlanNodeInterface) {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'text/plain'
+      })
+    };
+
+    const url = environment.apiUrl + node.selfLink;
+
+    const body = JSON.stringify(node);
+    return this.http
+      .put<PlanNodeInterface>(url, body, httpOptions)
+      .pipe(
+        map(data => {
+          console.log('from HTTP call');
+          console.log(JSON.stringify(data));
+          const idx = this.nodes.findIndex(x => x.id === node.id);
+          if (idx !== -1) {
+            this.nodes[idx] = node;
+            this.nodeSource.next(this.nodes);
+          }
+          return data;
+        }),
+        catchError(this.handleError)
+      );
+  }
+
+  private handleError(error: HttpErrorResponse) {
+    if (error.error instanceof ErrorEvent) {
+      // A client-side or network error occurred. Handle it accordingly.
+      if (!environment.production) {
+        console.error('An error occurred:', error.error.message);
+      }
+    } else {
+      // The backend returned an unsuccessful response code.
+      // The response body may contain clues as to what went wrong,
+      if (!environment.production) {
+        console.error(
+          `Backend returned code ${error.status}, ` +
+          `body was: ${error.error}`);
+      }
+    }
+    // return an observable with a user-facing error message
+    return throwError(
+      'Something bad happened; please try again later.');
   }
 }

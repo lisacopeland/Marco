@@ -5,7 +5,7 @@ import { ProductInterface } from '@shared/interfaces/product.interface';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ProductService } from '@shared/services/product.service';
 import { Observable } from 'rxjs';
-import { delay, map, catchError } from 'rxjs/operators';
+import { delay, map, catchError, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-productedit',
@@ -28,7 +28,7 @@ export class ProductEditDialogComponent implements OnInit {
   ngOnInit(): void {
     this.editMode = this.data !== null;
     if (this.editMode) {
-      this.productId = this.data.productId;
+      this.productId = this.data.id;
       this.product = this.data;
       this.editTitle = 'Editing ' + this.product.description;
     }
@@ -47,7 +47,8 @@ export class ProductEditDialogComponent implements OnInit {
       });
       this.productForm.get('name').disable();
     } else {
-      this.productForm.get('name').setValidators(Validators.required);
+      this.productForm.get('name').setValidators([Validators.required]);
+      // this.productForm.get('name').setValidators([Validators.required, Validators.pattern('[0 - 9A - Z] *')]);
       this.productForm.get('name').setAsyncValidators([
         this.validateNameAvailability.bind(this)]);
       this.onNameChanges();
@@ -70,8 +71,14 @@ export class ProductEditDialogComponent implements OnInit {
   }
 
   onNameChanges(): void {
-    this.productForm.get('name').valueChanges.subscribe(val => {
-      if (this.productForm.get('name').hasError('nameTaken')) {
+    this.productForm.get('name').valueChanges.pipe
+      (debounceTime(300),
+       distinctUntilChanged()).
+      subscribe(val => {
+        this.productForm.patchValue({
+        name: val.toUpperCase()
+      });
+        if (this.productForm.get('name').hasError('nameTaken')) {
         console.log('name is taken!');
       }
     });
@@ -102,17 +109,15 @@ export class ProductEditDialogComponent implements OnInit {
       });
     } else {
       const product = {
-        productId: this.productForm.value.name,
+        id: this.productForm.value.name,
         description: this.productForm.value.description,
         name: this.productForm.value.name,
+        parentId: '',
         selfLink: '',
-        planLink: ''
+        releasePlanLink: ''
       };
-/*       this.productService.addProduct(product);
-      this.snackBar.open('Product successfully added', '', {
-        duration: 2000,
-      }); */
-      this.productService.addProductHttp(product)
+
+      this.productService.addProduct(product)
         .subscribe(() => {
           this.snackBar.open('Product successfully added', '', {
             duration: 2000,

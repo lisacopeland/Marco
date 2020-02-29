@@ -44,7 +44,7 @@
       <ng-container matColumnDef="dashboard">
         <th mat-header-cell *matHeaderCellDef> </th>
         <td mat-cell *matCellDef="let row">
-          <button mat-icon-button [routerLink]="'/products/plandashboard'" [queryParams]="{id: row?.planId}">
+          <button mat-icon-button [routerLink]="'/products/plandashboard'" [queryParams]="{id: row?.id, planLink: product?.releasePlanLink }">
             <mat-icon>dashboard</mat-icon>
           </button>
         </td>

@@ -11,50 +11,22 @@ import { take, map, catchError } from 'rxjs/operators';
 export class ProductService {
 
   apiUrl = environment.apiUrl;
-  products: ProductInterface[] = [
-    {
-      productId: 'product1',
-      name: 'product1',
-      description: 'Description of Product 1',
-      selfLink: this.apiUrl + '/product/product1',
-      planLink: this.apiUrl + '/product/product1/plans'
-    },
-    {
-      productId: 'product2',
-      name: 'product2',
-      description: 'Description of Product 2',
-      selfLink: this.apiUrl + '/product/product2',
-      planLink: this.apiUrl + '/product/product2/plans'
-    },
-    {
-      productId: 'product3',
-      name: 'product3',
-      description: 'Description of product 3',
-      selfLink: this.apiUrl + '/product/product3',
-      planLink: this.apiUrl + '/product/product3/plans'
-    },
-    {
-      productId: 'product4',
-      name: 'product4',
-      description: 'Description of Product 4',
-      selfLink: this.apiUrl + '/product/product4',
-      planLink: this.apiUrl + '/product/product4/plans'
-    }
-  ];
-
-  private productsChanged: BehaviorSubject<ProductInterface[]> = new BehaviorSubject(this.products);
+  private productsSource = new BehaviorSubject<{}>({});
+  productLookup = this.productsSource.asObservable();
+  products: ProductInterface[];
 
   constructor(private http: HttpClient) { }
 
   getProductObservable(): Observable<ProductInterface[]> {
-    return this.productsChanged.asObservable();
+    return this.productLookup as Observable<ProductInterface[]>;
   }
 
   getProductsHttp() {
-
     interface GetResponse {
       products: ProductInterface[];
     }
+
+    const apiUrl = environment.apiUrl + '/api/v1/data/PRODUCT';
 
     const httpOptions = {
       headers: new HttpHeaders({
@@ -62,47 +34,44 @@ export class ProductService {
       })
     };
     return this.http
-      .get<GetResponse>(environment.apiUrl + '/product', httpOptions)
+      .get<GetResponse>(apiUrl, httpOptions)
       .pipe(
-        take(1),
         map(data => {
           console.log('from HTTP call');
           console.log(JSON.stringify(data));
           this.products = data.products;
-          this.productsChanged.next(this.products);
+          this.productsSource.next(this.products);
           return this.products.slice();
         }),
         catchError(this.handleError)
       );
   }
 
-  getProducts(): ProductInterface[] {
-    this.productsChanged.next(this.products);
-    return this.products.slice();
+  getProductSource() {
+    return this.productsSource
+      .pipe(
+        map(data => {
+          if (Object.keys(data).length === 0) {
+            this.getProductsHttp()
+              .pipe(
+                take(1)
+              ).subscribe();
+          }
+          return data;
+        })
+      );
   }
 
-  getProductById(id: string): ProductInterface {
-    return this.products.find(x => x.productId === id);
-  }
-
-  // Returns true if the name is not taken, false if otherwise
-  checkNameNotTaken(productId: string): Observable<boolean | null> {
-    const result = (this.products.find(x => x.productId === productId) === undefined) ? true : false;
-    return of(result);
-  }
-
-  addProductHttp(newProduct: ProductInterface) {
-
+  getProductHttp(id: string) {
+    const apiUrl = environment.apiUrl + '/api/v1/data/PRODUCT/' + id;
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'text/plain'
       })
     };
-    const body = JSON.stringify(newProduct);
     return this.http
-      .post<ProductInterface>(environment.apiUrl + '/product', body, httpOptions)
+      .get<ProductInterface>(apiUrl, httpOptions)
       .pipe(
-        take(1),
         map(data => {
           console.log('from HTTP call');
           console.log(JSON.stringify(data));
@@ -112,30 +81,86 @@ export class ProductService {
       );
   }
 
+  // Returns true if the name is not taken, false if otherwise
+  checkNameNotTaken(id: string): Observable<boolean | null> {
+    const result = (this.products.find(x => x.id === id) === undefined) ? true : false;
+    return of(result);
+  }
+
   addProduct(newProduct: ProductInterface) {
-    // Check if it already exists
-    if (this.products.findIndex(x => x.productId === newProduct.productId) === -1) {
-      newProduct.productId = newProduct.name;
-      this.products.push(newProduct);
-      this.productsChanged.next(this.products);
-    }
+
+    const apiUrl = environment.apiUrl + '/api/v1/data/PRODUCT';
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'text/plain'
+      })
+    };
+    const body = JSON.stringify(newProduct);
+    return this.http
+      .post<ProductInterface>(apiUrl, body, httpOptions)
+      .pipe(
+        map(data => {
+          console.log('from HTTP call');
+          console.log(JSON.stringify(data));
+          this.products.push(newProduct);
+          this.productsSource.next(this.products);
+          return data;
+        }),
+        catchError(this.handleError)
+      );
   }
 
-  delProduct(ProductId: string) {
-    const idx = this.products.findIndex(x => x.productId === ProductId);
+  delProduct(product: ProductInterface) {
 
-    if (idx !== -1) {
-      this.products.splice(idx, 1);
-      this.productsChanged.next(this.products);
-    }
+    const url = environment.apiUrl + product.selfLink;
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'text/plain'
+      })
+    };
+    return this.http
+      .delete<ProductInterface>(url, httpOptions)
+      .pipe(
+        map(data => {
+          console.log('from HTTP call');
+          console.log(JSON.stringify(data));
+          const idx = this.products.findIndex(x => x.id === product.id);
+          if (idx !== -1) {
+            this.products.splice(idx, 1);
+            this.productsSource.next(this.products);
+          }
+          return data;
+        }),
+        catchError(this.handleError)
+      );
+
   }
 
-  editProduct(newProduct) {
-    const idx = this.products.findIndex(x => x.productId === newProduct.productId);
-    if (idx !== -1) {
-      this.products[idx] = newProduct;
-      this.productsChanged.next(this.products);
-    }
+  editProduct(product: ProductInterface) {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'text/plain'
+      })
+    };
+
+    const url = environment.apiUrl + product.selfLink;
+
+    const body = JSON.stringify(product);
+    return this.http
+      .put<ProductInterface>(url, body, httpOptions)
+      .pipe(
+        map(data => {
+          console.log('from HTTP call');
+          console.log(JSON.stringify(data));
+          const idx = this.products.findIndex(x => x.id === product.id);
+          if (idx !== -1) {
+            this.products[idx] = product;
+            this.productsSource.next(this.products);
+          }
+          return data;
+        }),
+        catchError(this.handleError)
+      );
   }
 
   private handleError(error: HttpErrorResponse) {

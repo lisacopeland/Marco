@@ -1,100 +1,183 @@
 import { Injectable } from '@angular/core';
 import { ReleasePlanInterface } from '../interfaces/releaseplan.interface';
 import { environment } from '@environments/environment';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { HttpErrorResponse, HttpHeaders, HttpClient } from '@angular/common/http';
+import { take, map, catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReleasePlanService {
   apiUrl = environment.apiUrl;
+  private releasePlanSource = new BehaviorSubject<{}>({});
+  releasePlanLookup = this.releasePlanSource.asObservable();
+  releasePlans: ReleasePlanInterface[];
 
-  releasePlans: ReleasePlanInterface[] = [
-    {
-      planId: 'product1.plan1',
-      name: 'plan1',
-      parentId: 'product1',
-      description: 'Release Plan 1 for Product 1',
-      startNodeId: 'product1.plan1.node1',
-      deploymentId: '',
-      tags: [],
-      selfLink: this.apiUrl + '/product/product1/plans/plan1',
-      planNodeLink: this.apiUrl + '/product/product1/plans/plan1/nodes'
-    },
-    {
-      planId: 'product1.plan2',
-      name: 'plan2',
-      parentId: 'product1',
-      description: 'Release Plan 2 for Product 1',
-      startNodeId: 'product1.plan2.node1',
-      deploymentId: '',
-      tags: [],
-      selfLink: this.apiUrl + '/product/product1/plans/plan2',
-      planNodeLink: this.apiUrl + '/product/product1/plans/plan2/nodes'
-    },
-    {
-      planId: 'product2.plan1',
-      name: 'plan1',
-      parentId: 'product2',
-      description: 'Release Plan 1 for Product 2',
-      startNodeId: '', // Null for new plan
-      deploymentId: '',
-      tags: [],
-      selfLink: this.apiUrl + '/product/product2/plans/plan1',
-      planNodeLink: this.apiUrl + '/product/product2/plans/plan1/nodes'
-    },
-  ];
+  constructor(private http: HttpClient) { }
 
-  private releasePlansChanged: BehaviorSubject<ReleasePlanInterface[]> = new BehaviorSubject(this.releasePlans);
+  getReleasePlansHttp(releasePlanLink: string) {
+    interface GetResponse {
+      releasePlans: ReleasePlanInterface[];
+    }
 
-  constructor() { }
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'text/plain'
+      })
+    };
 
-  getPlanObservable(): Observable<ReleasePlanInterface[]> {
-    return this.releasePlansChanged.asObservable();
+    const url = environment.apiUrl + releasePlanLink;
+    return this.http
+      .get<GetResponse>(url, httpOptions)
+      .pipe(
+        map(data => {
+          this.releasePlans = data.releasePlans;
+          this.releasePlanSource.next(this.releasePlans);
+          return this.releasePlans.slice();
+        }),
+        catchError(this.handleError)
+      );
   }
 
-  getPlans(): ReleasePlanInterface[] {
-    this.releasePlansChanged.next(this.releasePlans);
-    return this.releasePlans.slice();
+  getReleasePlanSource(releasePlanLink: string) {
+    return this.releasePlanSource
+      .pipe(
+        map(data => {
+          if (Object.keys(data).length === 0) {
+            this.getReleasePlansHttp(releasePlanLink)
+              .pipe(
+                take(1)
+              ).subscribe();
+          }
+          return data;
+        })
+      );
   }
 
-  getPlansByProductId(id: string) {
-    return this.releasePlans.filter(x => x.parentId === id).slice();
+  getReleasePlanHttp(releasePlanLink: string, id: string) {
+    const url = environment.apiUrl + releasePlanLink + '/' + id;
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'text/plain'
+      })
+    };
+    return this.http
+      .get<ReleasePlanInterface>(url, httpOptions)
+      .pipe(
+        map(data => {
+          console.log('from HTTP call');
+          console.log(JSON.stringify(data));
+          return data;
+        }),
+        catchError(this.handleError)
+      );
   }
 
-  getPlanById(id: string): ReleasePlanInterface {
-    return this.releasePlans.find(x => x.planId === id);
+  getReleasePlanById(id: string): ReleasePlanInterface {
+    return this.releasePlans.find(x => x.id === id);
   }
 
   // Returns true if the name is taken, false if otherwise
-  checkNameNotTaken(planId: string): Observable<boolean | null> {
-    const result = (this.releasePlans.find(x => x.planId === planId) === undefined) ? true : false;
+  checkNameNotTaken(id: string): Observable<boolean | null> {
+    const result = (this.releasePlans.find(x => x.id === id) === undefined) ? true : false;
     return of(result);
   }
 
-  addPlan(newPlan: ReleasePlanInterface) {
-    // Check if it already exists
-    if (this.releasePlans.findIndex(x => x.planId === newPlan.planId) === -1) {
-      newPlan.planId = newPlan.parentId + '.' + newPlan.name;
-      this.releasePlans.push(newPlan);
-      this.releasePlansChanged.next(this.releasePlans);
-    }
+  addReleasePlan(releasePlanLink: string, newReleasePlan: ReleasePlanInterface) {
+
+    const url = environment.apiUrl + releasePlanLink;
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'text/plain'
+      })
+    };
+
+    const body = JSON.stringify(newReleasePlan);
+    return this.http
+      .post<ReleasePlanInterface>(url, body, httpOptions)
+      .pipe(
+        map(data => {
+          console.log('from HTTP call');
+          console.log(JSON.stringify(data));
+          this.releasePlans.push(newReleasePlan);
+          this.releasePlanSource.next(this.releasePlans);
+          return data;
+        }),
+        catchError(this.handleError)
+      );
   }
 
-  delPlan(PlanId: string) {
-    const idx = this.releasePlans.findIndex(x => x.planId === PlanId);
+  delReleasePlan(releasePlan: ReleasePlanInterface) {
 
-    if (idx !== -1) {
-      this.releasePlans.splice(idx, 1);
-      this.releasePlansChanged.next(this.releasePlans);
-    }
+    const url = environment.apiUrl + releasePlan.selfLink;
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'text/plain'
+      })
+    };
+    return this.http
+      .delete<ReleasePlanInterface>(url, httpOptions)
+      .pipe(
+        map(data => {
+          console.log('from HTTP call');
+          console.log(JSON.stringify(data));
+          const idx = this.releasePlans.findIndex(x => x.id === releasePlan.id);
+          if (idx !== -1) {
+            this.releasePlans.splice(idx, 1);
+            this.releasePlanSource.next(this.releasePlans);
+          }
+          return data;
+        }),
+        catchError(this.handleError)
+      );
+
   }
 
-  editPlan(newPlan) {
-    const idx = this.releasePlans.findIndex(x => x.planId === newPlan.planId);
-    if (idx !== -1) {
-      this.releasePlans[idx] = newPlan;
-      this.releasePlansChanged.next(this.releasePlans);
+  editReleasePlan(releasePlan: ReleasePlanInterface) {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'text/plain'
+      })
+    };
+
+    const url = environment.apiUrl + releasePlan.selfLink;
+
+    const body = JSON.stringify(releasePlan);
+    return this.http
+      .put<ReleasePlanInterface>(url, body, httpOptions)
+      .pipe(
+        map(data => {
+          console.log('from HTTP call');
+          console.log(JSON.stringify(data));
+          const idx = this.releasePlans.findIndex(x => x.id === releasePlan.id);
+          if (idx !== -1) {
+            this.releasePlans[idx] = releasePlan;
+            this.releasePlanSource.next(this.releasePlans);
+          }
+          return data;
+        }),
+        catchError(this.handleError)
+      );
+  }
+
+  private handleError(error: HttpErrorResponse) {
+    if (error.error instanceof ErrorEvent) {
+      // A client-side or network error occurred. Handle it accordingly.
+      if (!environment.production) {
+        console.error('An error occurred:', error.error.message);
+      }
+    } else {
+      // The backend returned an unsuccessful response code.
+      // The response body may contain clues as to what went wrong,
+      if (!environment.production) {
+        console.error(
+          `Backend returned code ${error.status}, ` +
+          `body was: ${error.error}`);
+      }
     }
+    // return an observable with a user-facing error message
+    return throwError(
+      'Something bad happened; please try again later.');
   }
 }

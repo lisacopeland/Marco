@@ -5,13 +5,15 @@ import { ReleasePlanService } from '@services/releaseplan.service';
 import { ReleasePlanInterface } from '@interfaces/releaseplan.interface';
 import { NodeService } from '@services/node.service';
 import { PlanNodeInterface } from '@interfaces/node.interface';
-import { PlanEditDialogComponent } from '../releaseplanedit/releaseplanedit.component';
+import { PlanEditDialogComponent, PlanEditDataInterface } from '../releaseplanedit/releaseplanedit.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { AlertDialogComponent } from 'src/app/alert-dialog/alert-dialog.component';
-import { NodeEditDialogComponent } from '../nodeedit/nodeedit.component';
+import { NodeEditDialogComponent, NodeEditDataInterface } from '../nodeedit/nodeedit.component';
+import { environment } from '@environments/environment';
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 @Component({
   selector: 'app-plan-dashboard',
@@ -21,6 +23,7 @@ import { NodeEditDialogComponent } from '../nodeedit/nodeedit.component';
 export class PlanDashboardComponent implements OnInit {
   releasePlan: ReleasePlanInterface;
   releasePlanId: string;
+  planLink: string;
   nodes: PlanNodeInterface[];
   displayedColumns: string[] = ['planNodeId', 'description', 'type', 'hasPredecessors', 'dashboard'];
   dataSource: MatTableDataSource<PlanNodeInterface>;
@@ -37,24 +40,39 @@ export class PlanDashboardComponent implements OnInit {
     this.route.queryParams
       .subscribe(params => {
         this.releasePlanId = params.id;
+        this.planLink = params.planLink;  // The planLink from the parent record
         console.log('plan id is ' + this.releasePlanId);
         if (this.releasePlanId) {
-          this.releasePlan = this.releasePlanService.getPlanById(this.releasePlanId);
-          this.nodes = this.nodeService.getNodes(this.releasePlan.planId);
-          this.dataSource = new MatTableDataSource<PlanNodeInterface>(this.nodes);
-          this.dataSource.paginator = this.paginator;
-          this.dataSource.sort = this.sort;
+          this.releasePlanService.getReleasePlanHttp(this.planLink, this.releasePlanId)
+            .pipe(
+              switchMap(releasePlan => {
+                this.releasePlan = releasePlan;
+                return this.nodeService.getNodesHttp(this.releasePlan.planNodeLink);
+              }))
+            .subscribe((data: any) => {
+              if (data && (Object.keys(data).length !== 0)) {
+                this.dataSource = new MatTableDataSource<PlanNodeInterface>(data);
+                this.dataSource.paginator = this.paginator;
+                this.dataSource.sort = this.sort;
+              }
+            }, error => {
+              if (!environment.production) {
+                console.log('got error getting data' + error);
+              }
+            });
         }
       });
   }
 
   onEdit() {
+    const editData: PlanEditDataInterface = {
+      parentId: this.releasePlan.parentId,
+      planLink: this.planLink,
+      releasePlan: this.releasePlan
+    };
     const dialogRef = this.dialog.open(PlanEditDialogComponent, {
       width: '500px',
-      data: {
-        parentId: this.releasePlan.parentId,
-        releasePlan: this.releasePlan
-      }
+      data: editData
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -68,12 +86,15 @@ export class PlanDashboardComponent implements OnInit {
   }
 
   onAddNode() {
+    const editData: NodeEditDataInterface = {
+      parentId: this.releasePlanId,
+      nodeLink: this.releasePlan.planNodeLink,
+      node: null
+    };
+
     const dialogRef = this.dialog.open(NodeEditDialogComponent, {
       width: '500px',
-      data: {
-        parentId: this.releasePlan.planId,
-        node: null
-      }
+      data: editData
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -93,8 +114,10 @@ export class PlanDashboardComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {
       if (result === 'Yes') {
         console.log('result was yes');
-        this.releasePlanService.delPlan(this.releasePlanId);
-        this.router.navigateByUrl('/products', { queryParams: { id: this.releasePlan.parentId }});
+        this.releasePlanService.delReleasePlan(this.releasePlan)
+          .subscribe(() => {
+            this.router.navigateByUrl('/products', { queryParams: { id: this.releasePlan.parentId }});
+          });
       }
     });
   }

@@ -7,8 +7,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable } from 'rxjs';
 import { delay, map, catchError } from 'rxjs/operators';
 
-export interface PlanEditData {
+export interface PlanEditDataInterface {
   parentId: string;
+  planLink: string;
   releasePlan: ReleasePlanInterface;
 }
 
@@ -22,6 +23,7 @@ export class PlanEditDialogComponent implements OnInit {
   editTitle = 'Add New Release Plan';
   releasePlanForm: FormGroup;
   releasePlan: ReleasePlanInterface;
+  planLink: string;
   parentId: string;
   editMode = false;
 
@@ -29,10 +31,11 @@ export class PlanEditDialogComponent implements OnInit {
     private releasePlanService: ReleasePlanService,
     private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<PlanEditDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: PlanEditData) {}
+    @Inject(MAT_DIALOG_DATA) public data: PlanEditDataInterface) {}
 
   ngOnInit(): void {
     this.parentId = this.data.parentId;
+    this.planLink = this.data.planLink;
     this.editMode = this.data.releasePlan !== null;
     if (this.editMode) {
       this.releasePlan = this.data.releasePlan;
@@ -87,14 +90,16 @@ export class PlanEditDialogComponent implements OnInit {
     if (this.editMode) {
       this.releasePlan.description = this.releasePlanForm.value.description;
       this.releasePlan.tags[0] = this.releasePlanForm.value.tags;
-      this.releasePlanService.editPlan(this.releasePlan);
-      this.snackBar.open('Release plan successfully updated', '', {
-        duration: 2000,
-      });
+      this.releasePlanService.editReleasePlan(this.releasePlan)
+        .subscribe(() => {
+          this.snackBar.open('Release plan successfully updated', '', {
+            duration: 2000,
+          });
+        });
     } else {
-      const releasePlan = {
+      const releasePlan: ReleasePlanInterface = {
         description: this.releasePlanForm.value.description,
-        planId: '', // Assigned by service
+        id: this.parentId + '.' + this.releasePlanForm.value.name,
         parentId: this.parentId,
         name: this.releasePlanForm.value.name,
         startNodeId: '',
@@ -103,10 +108,12 @@ export class PlanEditDialogComponent implements OnInit {
         selfLink: '', // Assigned by Service
         planNodeLink: '' // Assigned by Service
       };
-      this.releasePlanService.addPlan(releasePlan);
-      this.snackBar.open('Release plan successfully added', '', {
-        duration: 2000,
-      });
+      this.releasePlanService.addReleasePlan(this.planLink, releasePlan)
+        .subscribe(() => {
+          this.snackBar.open('Release plan successfully added', '', {
+            duration: 2000,
+          });
+        });
     }
     this.dialogRef.close(this.releasePlan);
   }
