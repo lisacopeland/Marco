@@ -31,15 +31,27 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   getProducts() {
-    this.productService.getProductSource()
-      .subscribe((data: any) => {
+    this.productService.getProductsHttp()
+      .subscribe(data => {
         if (data && (Object.keys(data).length !== 0)) {
           this.dataSource = new MatTableDataSource<ProductInterface>(data);
           this.dataSource.paginator = this.paginator;
           this.dataSource.sort = this.sort;
           this.hasData = true;
         }
+        this.subscribeToLookup();
       });
+  }
+
+  subscribeToLookup() {
+    this.productService.productLookup.subscribe(data => {
+      if (data && (Object.keys(data).length !== 0)) {
+        this.dataSource = new MatTableDataSource<ProductInterface>(data as ProductInterface[]);
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
+        this.hasData = true;
+      }
+    });
   }
 
   onAdd() {

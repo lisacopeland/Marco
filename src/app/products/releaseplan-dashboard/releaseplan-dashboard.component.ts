@@ -55,6 +55,7 @@ export class PlanDashboardComponent implements OnInit {
                 this.dataSource.paginator = this.paginator;
                 this.dataSource.sort = this.sort;
               }
+              this.subscribeToLookup();
             }, error => {
               if (!environment.production) {
                 console.log('got error getting data' + error);
@@ -62,6 +63,16 @@ export class PlanDashboardComponent implements OnInit {
             });
         }
       });
+  }
+
+  subscribeToLookup() {
+    this.nodeService.nodeLookup.subscribe(data => {
+      if (data && (Object.keys(data).length !== 0)) {
+        this.dataSource = new MatTableDataSource<PlanNodeInterface>(data as PlanNodeInterface[]);
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
+      }
+    });
   }
 
   onEdit() {

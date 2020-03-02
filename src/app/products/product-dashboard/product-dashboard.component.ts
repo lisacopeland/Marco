@@ -47,7 +47,7 @@ export class ProductDashboardComponent implements OnInit, OnDestroy {
             .pipe(
               switchMap(product => {
                 this.product = product;
-                return this.releasePlanService.getReleasePlanSource(this.product.releasePlanLink);
+                return this.releasePlanService.getReleasePlansHttp(this.product.releasePlanLink);
               }))
             .subscribe((data: any) => {
               if (data && (Object.keys(data).length !== 0)) {
@@ -55,6 +55,7 @@ export class ProductDashboardComponent implements OnInit, OnDestroy {
                 this.dataSource.paginator = this.paginator;
                 this.dataSource.sort = this.sort;
               }
+              this.subscribeToLookup();
             }, error => {
                 if (!environment.production) {
                   console.log('got error getting data' + error);
@@ -62,6 +63,16 @@ export class ProductDashboardComponent implements OnInit, OnDestroy {
           });
         }
       });
+  }
+
+  subscribeToLookup() {
+    this.releasePlanService.releasePlanLookup.subscribe(data => {
+      if (data && (Object.keys(data).length !== 0)) {
+        this.dataSource = new MatTableDataSource<ReleasePlanInterface>(data as ReleasePlanInterface[]);
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
+      }
+    });
   }
 
   onAdd() {

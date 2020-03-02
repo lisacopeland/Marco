@@ -55,9 +55,12 @@ export class ProductService {
             this.getProductsHttp()
               .pipe(
                 take(1)
-              ).subscribe();
+              ).subscribe(dataFromCall => {
+                return dataFromCall;
+              });
+          } else {
+            return data;
           }
-          return data;
         })
       );
   }
@@ -112,7 +115,7 @@ export class ProductService {
 
   delProduct(product: ProductInterface) {
 
-    const url = environment.apiUrl + product.selfLink;
+    const url = environment.apiUrl + '/' + product.selfLink;
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'text/plain'
@@ -143,7 +146,7 @@ export class ProductService {
       })
     };
 
-    const url = environment.apiUrl + product.selfLink;
+    const url = environment.apiUrl + '/' + product.selfLink;
 
     const body = JSON.stringify(product);
     return this.http

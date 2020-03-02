@@ -10,6 +10,7 @@ import { take, map, catchError } from 'rxjs/operators';
 })
 export class ReleasePlanService {
   apiUrl = environment.apiUrl;
+  httpCalled = false;
   private releasePlanSource = new BehaviorSubject<{}>({});
   releasePlanLookup = this.releasePlanSource.asObservable();
   releasePlans: ReleasePlanInterface[];
@@ -27,13 +28,15 @@ export class ReleasePlanService {
       })
     };
 
-    const url = environment.apiUrl + releasePlanLink;
+    const url = environment.apiUrl + '/' + releasePlanLink;
     return this.http
       .get<GetResponse>(url, httpOptions)
       .pipe(
         map(data => {
           this.releasePlans = data.releasePlans;
-          this.releasePlanSource.next(this.releasePlans);
+          if (this.releasePlans.length) {
+            this.releasePlanSource.next(this.releasePlans);
+          }
           return this.releasePlans.slice();
         }),
         catchError(this.handleError)
@@ -46,17 +49,18 @@ export class ReleasePlanService {
         map(data => {
           if (Object.keys(data).length === 0) {
             this.getReleasePlansHttp(releasePlanLink)
-              .pipe(
-                take(1)
-              ).subscribe();
+              .subscribe(dataFromCall => {
+                return dataFromCall;
+            });
+          } else {
+            return data;
           }
-          return data;
         })
       );
   }
 
   getReleasePlanHttp(releasePlanLink: string, id: string) {
-    const url = environment.apiUrl + releasePlanLink + '/' + id;
+    const url = environment.apiUrl + '/' + releasePlanLink + '/' + id;
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'text/plain'
@@ -86,7 +90,7 @@ export class ReleasePlanService {
 
   addReleasePlan(releasePlanLink: string, newReleasePlan: ReleasePlanInterface) {
 
-    const url = environment.apiUrl + releasePlanLink;
+    const url = environment.apiUrl + '/' + releasePlanLink;
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'text/plain'
@@ -110,7 +114,7 @@ export class ReleasePlanService {
 
   delReleasePlan(releasePlan: ReleasePlanInterface) {
 
-    const url = environment.apiUrl + releasePlan.selfLink;
+    const url = environment.apiUrl + '/' +  releasePlan.selfLink;
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'text/plain'
@@ -141,7 +145,7 @@ export class ReleasePlanService {
       })
     };
 
-    const url = environment.apiUrl + releasePlan.selfLink;
+    const url = environment.apiUrl + '/' + releasePlan.selfLink;
 
     const body = JSON.stringify(releasePlan);
     return this.http

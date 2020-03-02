@@ -102,7 +102,7 @@ export class PlanEditDialogComponent implements OnInit {
         id: this.parentId + '.' + this.releasePlanForm.value.name,
         parentId: this.parentId,
         name: this.releasePlanForm.value.name,
-        startNodeId: '',
+        startNode: 'product5.releaseplan1:node1',
         deploymentId: '',
         tags: [this.releasePlanForm.value.tags],
         selfLink: '', // Assigned by Service
