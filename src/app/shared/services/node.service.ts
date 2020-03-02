@@ -21,7 +21,7 @@ export class NodeService {
       nodes: PlanNodeInterface[];
     }
 
-    const url = this.apiUrl + nodeLink;
+    const url = this.apiUrl + '/' + nodeLink;
 
     const httpOptions = {
       headers: new HttpHeaders({
@@ -56,9 +56,9 @@ export class NodeService {
       );
   }
 
-  getNodeHttp(nodeLink: string, id: string) {
+  getNodeHttp(selfLink: string) {
 
-    const url = this.apiUrl + nodeLink + '/' + id;
+    const url = this.apiUrl + '/' + selfLink;
 
     const httpOptions = {
       headers: new HttpHeaders({
@@ -89,7 +89,7 @@ export class NodeService {
 
   addNode(nodeLink: string, node: PlanNodeInterface) {
 
-    const url = environment.apiUrl + nodeLink;
+    const url = environment.apiUrl + '/' + nodeLink;
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'text/plain'
@@ -113,7 +113,7 @@ export class NodeService {
 
   delNode(node: PlanNodeInterface) {
 
-    const url = environment.apiUrl + node.selfLink;
+    const url = environment.apiUrl + '/' + node.selfLink;
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'text/plain'
@@ -144,7 +144,7 @@ export class NodeService {
       })
     };
 
-    const url = environment.apiUrl + node.selfLink;
+    const url = environment.apiUrl + '/' + node.selfLink;
 
     const body = JSON.stringify(node);
     return this.http

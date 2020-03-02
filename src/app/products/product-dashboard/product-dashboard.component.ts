@@ -77,7 +77,7 @@ export class ProductDashboardComponent implements OnInit, OnDestroy {
 
   onAdd() {
     const editData: PlanEditDataInterface = {
-      parentId: this.productId,
+      selfLink: null,
       planLink: this.product.releasePlanLink,
       releasePlan: null
     };

@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 import { delay, map, catchError } from 'rxjs/operators';
 
 export interface PlanEditDataInterface {
-  parentId: string;
+  selfLink: string;
   planLink: string;
   releasePlan: ReleasePlanInterface;
 }
@@ -24,6 +24,7 @@ export class PlanEditDialogComponent implements OnInit {
   releasePlanForm: FormGroup;
   releasePlan: ReleasePlanInterface;
   planLink: string;
+  selfLink: string;
   parentId: string;
   editMode = false;
 
@@ -34,7 +35,7 @@ export class PlanEditDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: PlanEditDataInterface) {}
 
   ngOnInit(): void {
-    this.parentId = this.data.parentId;
+    this.selfLink = this.data.selfLink;
     this.planLink = this.data.planLink;
     this.editMode = this.data.releasePlan !== null;
     if (this.editMode) {
@@ -54,7 +55,7 @@ export class PlanEditDialogComponent implements OnInit {
       this.releasePlanForm.patchValue({
         name: this.releasePlan.name,
         description: this.releasePlan.description,
-        tags: this.releasePlan.tags[0]
+        tags: this.releasePlan.tags
       });
       this.releasePlanForm.get('name').disable();
     } else {
@@ -89,7 +90,7 @@ export class PlanEditDialogComponent implements OnInit {
     }
     if (this.editMode) {
       this.releasePlan.description = this.releasePlanForm.value.description;
-      this.releasePlan.tags[0] = this.releasePlanForm.value.tags;
+      this.releasePlan.tags = this.releasePlanForm.value.tags;
       this.releasePlanService.editReleasePlan(this.releasePlan)
         .subscribe(() => {
           this.snackBar.open('Release plan successfully updated', '', {
@@ -102,9 +103,9 @@ export class PlanEditDialogComponent implements OnInit {
         id: this.parentId + '.' + this.releasePlanForm.value.name,
         parentId: this.parentId,
         name: this.releasePlanForm.value.name,
-        startNode: 'product5.releaseplan1:node1',
+        startNode: 'PRODUCT5.RELEASEPLAN1:M.NODE1',
         deploymentId: '',
-        tags: [this.releasePlanForm.value.tags],
+        tags: 'tag1 | tag2',
         selfLink: '', // Assigned by Service
         planNodeLink: '' // Assigned by Service
       };

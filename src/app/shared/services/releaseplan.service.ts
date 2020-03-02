@@ -34,6 +34,7 @@ export class ReleasePlanService {
       .pipe(
         map(data => {
           this.releasePlans = data.releasePlans;
+          console.log('releaseplans : ' + JSON.stringify(this.releasePlans));
           if (this.releasePlans.length) {
             this.releasePlanSource.next(this.releasePlans);
           }
@@ -59,8 +60,8 @@ export class ReleasePlanService {
       );
   }
 
-  getReleasePlanHttp(releasePlanLink: string, id: string) {
-    const url = environment.apiUrl + '/' + releasePlanLink + '/' + id;
+  getReleasePlanHttp(selfLink: string) {
+    const url = environment.apiUrl + '/' + selfLink;
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'text/plain'

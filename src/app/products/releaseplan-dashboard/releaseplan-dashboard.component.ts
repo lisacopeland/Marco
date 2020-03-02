@@ -23,7 +23,7 @@ import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 export class PlanDashboardComponent implements OnInit {
   releasePlan: ReleasePlanInterface;
   releasePlanId: string;
-  planLink: string;
+  selfLink: string;
   nodes: PlanNodeInterface[];
   displayedColumns: string[] = ['planNodeId', 'description', 'type', 'hasPredecessors', 'dashboard'];
   dataSource: MatTableDataSource<PlanNodeInterface>;
@@ -40,10 +40,10 @@ export class PlanDashboardComponent implements OnInit {
     this.route.queryParams
       .subscribe(params => {
         this.releasePlanId = params.id;
-        this.planLink = params.planLink;  // The planLink from the parent record
+        this.selfLink = params.selfLink;  // The planLink from the parent record
         console.log('plan id is ' + this.releasePlanId);
         if (this.releasePlanId) {
-          this.releasePlanService.getReleasePlanHttp(this.planLink, this.releasePlanId)
+          this.releasePlanService.getReleasePlanHttp(this.selfLink)
             .pipe(
               switchMap(releasePlan => {
                 this.releasePlan = releasePlan;
@@ -77,8 +77,8 @@ export class PlanDashboardComponent implements OnInit {
 
   onEdit() {
     const editData: PlanEditDataInterface = {
-      parentId: this.releasePlan.parentId,
-      planLink: this.planLink,
+      planLink: this.releasePlan.planNodeLink,
+      selfLink: this.selfLink,
       releasePlan: this.releasePlan
     };
     const dialogRef = this.dialog.open(PlanEditDialogComponent, {
