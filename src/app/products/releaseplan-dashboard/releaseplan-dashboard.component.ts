@@ -74,6 +74,23 @@ export class ReleasePlanDashboardComponent implements OnInit {
     });
   }
 
+
+  onAddNode() {
+    const editData: NodeEditDataInterface = {
+      parentId: this.releasePlanId,
+      nodeLink: this.releasePlan.planNodeLink,
+      node: null
+    };
+
+    const dialogRef = this.dialog.open(NodeEditDialogComponent, {
+      width: '500px',
+      data: editData
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+    });
+  }
+
   onEdit() {
     const editData: PlanEditDataInterface = {
       planLink: this.releasePlan.planNodeLink,
@@ -92,22 +109,6 @@ export class ReleasePlanDashboardComponent implements OnInit {
       } else {
         console.log('the release plan was not updated');
       }
-    });
-  }
-
-  onAddNode() {
-    const editData: NodeEditDataInterface = {
-      parentId: this.releasePlanId,
-      nodeLink: this.releasePlan.planNodeLink,
-      node: null
-    };
-
-    const dialogRef = this.dialog.open(NodeEditDialogComponent, {
-      width: '500px',
-      data: editData
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
     });
   }
 
