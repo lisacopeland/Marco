@@ -13,14 +13,13 @@ import { MatSort } from '@angular/material/sort';
 import { AlertDialogComponent } from 'src/app/alert-dialog/alert-dialog.component';
 import { NodeEditDialogComponent, NodeEditDataInterface } from '../nodeedit/nodeedit.component';
 import { environment } from '@environments/environment';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 @Component({
   selector: 'app-plan-dashboard',
   templateUrl: './releaseplan-dashboard.component.html',
   styleUrls: ['./releaseplan-dashboard.component.scss']
 })
-export class PlanDashboardComponent implements OnInit {
+export class ReleasePlanDashboardComponent implements OnInit {
   releasePlan: ReleasePlanInterface;
   releasePlanId: string;
   selfLink: string;
