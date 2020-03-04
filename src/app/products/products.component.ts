@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy, AfterViewInit } from '@angular/core';
 import { ProductService } from '@shared/services/product.service';
 import { MatDialog } from '@angular/material/dialog';
 import { Subject } from 'rxjs';
@@ -17,7 +17,8 @@ import { ProductEditDialogComponent } from './productedit/productedit.component'
 export class ProductsComponent implements OnInit, OnDestroy {
 
   unsubscribe$: Subject<boolean> = new Subject();
-  hasData = false;
+  hasData = true;
+  waiting = true;
   displayedColumns: string[] = ['productId', 'name', 'description', 'dashboard'];
   dataSource: MatTableDataSource<ProductInterface>;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -33,11 +34,14 @@ export class ProductsComponent implements OnInit, OnDestroy {
   getProducts() {
     this.productService.getProductsHttp()
       .subscribe(data => {
+        this.waiting = false;
         if (data && (Object.keys(data).length !== 0)) {
           this.dataSource = new MatTableDataSource<ProductInterface>(data);
           this.dataSource.paginator = this.paginator;
           this.dataSource.sort = this.sort;
           this.hasData = true;
+        } else {
+          this.hasData = false;
         }
         this.subscribeToLookup();
       });
@@ -50,6 +54,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
         this.hasData = true;
+      } else {
+        this.hasData = false;
       }
     });
   }

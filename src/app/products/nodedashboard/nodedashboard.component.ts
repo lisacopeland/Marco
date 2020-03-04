@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { PlanNodeInterface } from '@interfaces/node.interface';
+import { PlanNodeInterface, PlanMilestoneInterface, PlanTaskInterface } from '@interfaces/node.interface';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NodeService } from '@services/node.service';
@@ -15,6 +15,7 @@ export class NodeDashboardComponent implements OnInit {
 
   node: PlanNodeInterface;
   nodeId: string;
+  selfLink: string;
 
   constructor(private route: ActivatedRoute,
               private nodeService: NodeService) { }
@@ -23,9 +24,18 @@ export class NodeDashboardComponent implements OnInit {
     this.route.queryParams
       .subscribe(params => {
         this.nodeId = params.id;
+        this.selfLink = params.selfLink;
         console.log('node id is ' + this.nodeId);
         if (this.nodeId) {
-          this.node = this.nodeService.getNodeById(this.nodeId);
+          this.nodeService.getNodeHttp(this.selfLink)
+            .subscribe(node => {
+              if (node.nodeType === 'Milestone') {
+                this.node = node as PlanMilestoneInterface;
+              } else {
+                this.node = node as PlanTaskInterface;
+              }
+
+            });
         }
       });
   }

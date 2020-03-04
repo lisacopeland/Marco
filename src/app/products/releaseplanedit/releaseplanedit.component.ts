@@ -5,7 +5,7 @@ import { ReleasePlanInterface } from '@interfaces/releaseplan.interface';
 import { ReleasePlanService } from '@services/releaseplan.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable } from 'rxjs';
-import { delay, map, catchError } from 'rxjs/operators';
+import { delay, map, catchError, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 export interface PlanEditDataInterface {
   selfLink: string;
@@ -62,6 +62,7 @@ export class PlanEditDialogComponent implements OnInit {
       this.releasePlanForm.get('name').setValidators(Validators.required);
       this.releasePlanForm.get('name').setAsyncValidators([
         this.validateNameAvailability.bind(this)]);
+      this.onNameChanges();
     }
   }
 
@@ -79,6 +80,20 @@ export class PlanEditDialogComponent implements OnInit {
         }),
         catchError(() => null)
       );
+  }
+
+  onNameChanges(): void {
+    this.releasePlanForm.get('name').valueChanges.pipe
+      (debounceTime(300),
+        distinctUntilChanged()).
+      subscribe(val => {
+        this.releasePlanForm.patchValue({
+          name: val.toUpperCase()
+        });
+        if (this.releasePlanForm.get('name').hasError('nameTaken')) {
+          console.log('name is taken!');
+        }
+      });
   }
 
   onSubmit() {
