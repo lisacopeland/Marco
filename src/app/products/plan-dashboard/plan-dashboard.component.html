@@ -1,19 +1,18 @@
-
-<div fxLayout="column">
+<section class="page-layout" fxLayout="column">
   <!-- Header with Title and menu button -->
-  <div>
+  <div fxLayout="row" class="page-header add-border" fxLayoutAlign="space-between center">
     <h1 class="mat-h1">Release Plan {{ releasePlan?.description }}</h1>
     <button mat-icon-button [matMenuTriggerFor]="planMenu">
       <mat-icon>more_vert</mat-icon>
     </button>
   </div>
   <mat-menu #planMenu="matMenu">
-    <button mat-menu-item (click)="onEdit()">Edit</button>
-    <button mat-menu-item (click)="onDelete()">Delete</button>
+    <button mat-menu-item (click)="onEdit()">Edit Pak Details</button>
+    <button mat-menu-item (click)="onDelete()">Delete Release Plan</button>
     <button mat-menu-item [routerLink]="'/products/productdashboard'" [queryParams]="{id: releasePlan?.parentId}">Return
       to Product Dashboard</button>
   </mat-menu>
 
   <app-plan-graph-view [planNodes]="nodes"></app-plan-graph-view>
   <app-plan-list-view [planNodes]="nodes"></app-plan-list-view>
-</div>
+</section>

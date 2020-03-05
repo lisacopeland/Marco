@@ -1,11 +1,11 @@
 .page-layout {
   max-height: 100vh;
-  height: 100%;
+  height: 92%;
   background-color: #F7F8FC;
 }
 
 .page-header {
-  height: 75px;
+  height: 65px;
   padding-left: 64px;
   padding-right: 64px;
 }
@@ -14,6 +14,12 @@
   background-color: white;
   min-height: 65%;
   margin: 64px;
+}
+
+.half-card-content {
+  background-color: white;
+  height: 350px;
+  margin: 10px;
 }
 
 .table-styling {

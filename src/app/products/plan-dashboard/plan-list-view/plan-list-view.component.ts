@@ -22,14 +22,15 @@ export class PlanListViewComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
+    console.log('hi from ngOnChanges');
     this.displayList();
   }
 
   displayList() {
-    if (this.planNodes && (Object.keys(this.planNodes).length !== 0)) {
+    // if (this.planNodes && (Object.keys(this.planNodes).length !== 0)) {
       this.dataSource = new MatTableDataSource<PlanNodeInterface>(this.planNodes);
       this.dataSource.paginator = this.paginator;
       this.dataSource.sort = this.sort;
-    }
+    // }
   }
 }

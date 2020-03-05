@@ -15,7 +15,7 @@ export class PlanGraphViewComponent implements OnInit, OnChanges {
   layout = 'dagre';
   draggingEnabled = true;
   panningEnabled = true;
-  zoomEnabled = true;
+  zoomEnabled = false;
 
   zoomSpeed = 0.1;
   minZoomLevel = 0.1;

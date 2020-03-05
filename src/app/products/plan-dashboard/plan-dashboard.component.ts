@@ -20,7 +20,7 @@ export class PlanDashboardComponent implements OnInit {
   releasePlan: ReleasePlanInterface;
   releasePlanId: string;
   selfLink: string;
-  nodes: PlanNodeInterface[];
+  nodes: PlanNodeInterface[] = [];
 
   constructor(private route: ActivatedRoute,
               private router: Router,
@@ -39,6 +39,7 @@ export class PlanDashboardComponent implements OnInit {
             .pipe(
               switchMap(releasePlan => {
                 this.releasePlan = releasePlan;
+                console.log('got releaseplan - its ' + this.releasePlan.name);
                 return this.nodeService.getNodesHttp(this.releasePlan.planNodeLink);
               }))
             .subscribe((data: any) => {
