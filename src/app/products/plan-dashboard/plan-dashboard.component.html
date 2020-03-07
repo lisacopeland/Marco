@@ -1,22 +1,39 @@
 <section class="page-layout" fxLayout="column">
   <!-- Header with Title and menu button -->
   <div fxLayout="row" class="page-header add-border" fxLayoutAlign="space-between center">
-    <div>
-    <h1 class="mat-h1">{{ releasePlan?.name }}</h1>
-    <h3 class="mat-h3">{{ versionString }}</h3>
-    <mat-select (click)="onChangeSelect()" >{{versionSelectString}}</mat-select>
+    <div fxLayout="column">
+      <!-- Top row of header -->
+      <div fxLayout="row" fxLayout="space-between center">
+
+        <div fxLayout="row" fxLayoutGap="32px" fxLayout="start center">
+          <h1 class="mat-h1">{{ releasePlan?.name }}</h1>
+          <h3 class="mat-h3">{{ version }}</h3>
+          <mat-slide-toggle (change)="onChangeVersion($event)" >{{versionSelectString}}</mat-slide-toggle>
+        </div>
+
+        <button mat-icon-button [matMenuTriggerFor]="planMenu">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+
+      </div>
+      <div *ngIf="releasePlan.verificationReports.length">
+        <a>This plan is not verified, click here to see reports</a>
+      </div>
     </div>
-    <button mat-icon-button [matMenuTriggerFor]="planMenu">
-      <mat-icon>more_vert</mat-icon>
-    </button>
   </div>
   <mat-menu #planMenu="matMenu">
-    <button mat-menu-item (click)="onEdit()">Edit Plan Details</button>
-    <button mat-menu-item (click)="onDelete()">Delete Release Plan</button>
+    <button mat-menu-item [disabled]="version==='master'" (click)="onEdit()">Edit Plan Details</button>
+<!--     <button mat-menu-item [disabled]="true" (click)="onDelete()">Delete Release Plan</button>
+ -->
+    <button mat-menu-item [disabled]="version==='master'" (click)="onVerify()">Verify</button>
+    <button mat-menu-item [disabled]="version==='master'" (click)="onCommit()">Commit</button>
+    <button mat-menu-item [disabled]="version==='master'" (click)="onReset()">Reset</button>
+    <button mat-menu-item [disabled]="version==='master'" (click)="onSave()">Save</button>
+    <button mat-menu-item [disabled]="version==='master'" (click)="onRefresh()">Refresh</button>
     <button mat-menu-item [routerLink]="'/products/productdashboard'" [queryParams]="{id: releasePlan?.parentId}">Return
       to Product Dashboard</button>
   </mat-menu>
 
-  <app-plan-graph-view [planNodes]="nodes"></app-plan-graph-view>
-  <app-plan-list-view [planNodes]="nodes"></app-plan-list-view>
+  <app-plan-graph-view></app-plan-graph-view>
+  <app-plan-list-view></app-plan-list-view>
 </section>

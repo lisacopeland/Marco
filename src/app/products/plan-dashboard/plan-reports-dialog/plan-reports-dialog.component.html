@@ -1,0 +1,15 @@
+<div mat-dialog-title fxLayout="row" fxLayoutAlign="space-between center">
+  <h1 class="mat-h1">Reports for {{ releasePlan.name }}</h1>
+  <button mat-icon-button matTooltip="toolTipText" matTooltipShowDelay="1000" (click)="onCancel()" color="primary">
+    <mat-icon color="primary">cancel</mat-icon>
+  </button>
+</div>
+<div fxLayout="column">
+  <div fxLayout="row" *ngFor="let report of releasePlan.verificationReports">
+    {{ report.report }} {{ report.source }} {{ report.createdOn | date:'medium' }} {{ report.isVerified }}
+  </div>
+</div>
+<div mat-dialog-actions fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="10px">
+  <button mat-raised-button color="primary"
+    (click)="onCancel()">Close</button>
+</div>

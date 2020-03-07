@@ -4,17 +4,44 @@ import { environment } from '@environments/environment';
 import { Observable, of, BehaviorSubject, throwError } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { map, catchError, take } from 'rxjs/operators';
+import { DatabaseInterface } from '@shared/interfaces/database.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NodeService {
+  nodes: PlanNodeInterface[] = [];
   apiUrl = environment.apiUrl;
-  private nodeSource = new BehaviorSubject<{}>({});
+  private nodeSource = new BehaviorSubject<PlanNodeInterface[]>(this.nodes);
   nodeLookup = this.nodeSource.asObservable();
-  nodes: PlanNodeInterface[];
 
   constructor(private http: HttpClient) { }
+
+  cacheNodes(nodes: PlanNodeInterface[]) {
+    this.nodes = nodes as PlanNodeInterface[];
+    this.nodeSource.next(this.nodes.slice());
+  }
+
+  addNodeCache(node: PlanNodeInterface) {
+    this.nodes.push(node);
+    this.nodeSource.next(this.nodes.slice());
+  }
+
+  editNodeCache(node: PlanNodeInterface) {
+    const idx = this.nodes.findIndex(x => x.id === node.id);
+    if (idx !== -1) {
+      this.nodes[idx] = node;
+      this.nodeSource.next(this.nodes.slice());
+    }
+  }
+
+  delNodeCache(node: PlanNodeInterface) {
+    const idx = this.nodes.findIndex(x => x.id === node.id);
+    if (idx !== -1) {
+      this.nodes.splice(idx, 1);
+      this.nodeSource.next(this.nodes);
+    }
+  }
 
   getNodesHttp(nodeLink: string) {
     interface GetResponse {
@@ -57,7 +84,6 @@ export class NodeService {
   }
 
   getNodeHttp(selfLink: string) {
-
     const url = this.apiUrl + '/' + selfLink;
 
     const httpOptions = {
@@ -76,7 +102,6 @@ export class NodeService {
       );
   }
 
-
   getNodeById(id: string) {
     return this.nodes.find(x => x.id === id);
   }
@@ -87,7 +112,7 @@ export class NodeService {
     return of(result);
   }
 
-  addNode(nodeLink: string, node: PlanNodeInterface) {
+  addNodeHTTP(nodeLink: string, node: PlanNodeInterface) {
 
     const url = environment.apiUrl + '/' + nodeLink;
     const httpOptions = {
@@ -111,7 +136,7 @@ export class NodeService {
       );
   }
 
-  delNode(node: PlanNodeInterface) {
+  delNodeHTTP(node: PlanNodeInterface) {
 
     const url = environment.apiUrl + '/' + node.selfLink;
     const httpOptions = {
@@ -137,7 +162,7 @@ export class NodeService {
 
   }
 
-  editNode(node: PlanNodeInterface) {
+  editNodeHTTP(node: PlanNodeInterface) {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'text/plain'

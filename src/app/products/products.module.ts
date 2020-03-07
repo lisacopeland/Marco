@@ -17,6 +17,7 @@ import { NodeEditDialogComponent } from './nodeedit/nodeedit.component';
 import { NgxGraphModule } from '@swimlane/ngx-graph';
 import { PlanListViewComponent } from './plan-dashboard/plan-list-view/plan-list-view.component';
 import { PlanGraphViewComponent } from './plan-dashboard/plan-graph-view/plan-graph-view.component';
+import { PlanReportsDialogComponent } from './plan-dashboard/plan-reports-dialog/plan-reports-dialog.component';
 
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import { PlanGraphViewComponent } from './plan-dashboard/plan-graph-view/plan-gr
     MilestoneLinkEditDialogComponent,
     PlanListViewComponent,
     PlanGraphViewComponent,
+    PlanReportsDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -43,7 +45,8 @@ import { PlanGraphViewComponent } from './plan-dashboard/plan-graph-view/plan-gr
   entryComponents: [
     PlanEditDialogComponent,
     ProductEditDialogComponent,
-    NodeEditDialogComponent
+    NodeEditDialogComponent,
+    PlanReportsDialogComponent
   ],
 })
 export class ProductsModule { }

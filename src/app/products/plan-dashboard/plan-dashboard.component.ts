@@ -10,6 +10,7 @@ import { switchMap } from 'rxjs/operators';
 import { environment } from '@environments/environment';
 import { PlanEditDialogComponent, PlanEditDataInterface } from '../releaseplanedit/releaseplanedit.component';
 import { AlertDialogComponent } from 'src/app/alert-dialog/alert-dialog.component';
+import { PlanReportsDialogComponent } from './plan-reports-dialog/plan-reports-dialog.component';
 
 @Component({
   selector: 'app-plan-dashboard',
@@ -20,7 +21,9 @@ export class PlanDashboardComponent implements OnInit {
   releasePlan: ReleasePlanInterface;
   releasePlanId: string;
   masterViewLink: string;
-  versionString = 'Master';
+  workingViewLink: string;
+  version = 'master';
+  planDirty = false;
   versionSelectString = 'Switch to Edit';
   selfLink: string;
   nodes: PlanNodeInterface[] = [];
@@ -36,33 +39,75 @@ export class PlanDashboardComponent implements OnInit {
       .subscribe(params => {
         this.releasePlanId = params.id;
         this.masterViewLink = params.masterViewLink;  // The planLink from the parent record
-        console.log('plan id is ' + this.releasePlanId);
+        console.log('link is ' + this.masterViewLink);
         if (this.releasePlanId) {
-          this.releasePlanService.getReleasePlan(this.masterViewLink)
-            .subscribe((data: any) => {
-              this.releasePlan = data as ReleasePlanInterface;
-              this.nodes = this.releasePlan.nodes;
-            }, error => {
-              if (!environment.production) {
-                console.log('got error getting data' + error);
-              }
-            });
+          this.getReleasePlan(this.masterViewLink);
         }
       });
   }
 
-/*   subscribeToLookup() {
+  getReleasePlan(link: string) {
+    this.releasePlanService.getReleasePlan(link)
+      .subscribe((data: any) => {
+        if (this.version === 'master') {
+          this.version = 'Master';
+          this.versionSelectString = 'Switch to Working Copy';
+          this.planDirty = false;
+        } else {
+          this.version = 'Working';
+          this.versionSelectString = 'Switch to Master';
+          this.planDirty = false;
+        }
+        this.releasePlan = data as ReleasePlanInterface;
+        this.workingViewLink = this.releasePlan.workingViewLink;
+        this.nodes = this.releasePlan.nodes;
+        this.nodeService.cacheNodes(this.nodes);
+        this.subscribeToLookup();
+      }, error => {
+        if (!environment.production) {
+          console.log('got error getting data' + error);
+        }
+      });
+  }
+
+  // This is how you are going to know that the data has changed
+  subscribeToLookup() {
     this.nodeService.nodeLookup.subscribe(data => {
       this.nodes = data as PlanNodeInterface[];
     });
   }
- */
 
-  onChangeSelect() {
+  onChangeVersion($event) {
+    if (this.version === 'master') {
+      this.getReleasePlan(this.workingViewLink);
+    } else {
+      // First see if the user has made changes
+      if (this.planDirty) {
+        const dialogRef = this.dialog.open(AlertDialogComponent, {
+          width: '400px',
+          data: {
+            header: 'You have made changes',
+            cancelTooltip: 'Return to dashboard',
+            message: 'Are you sure you want to switch to master?',
+            buttons: ['Yes', 'No']
+          }
+        });
+        dialogRef.afterClosed().subscribe((result) => {
+          if (result === 'Yes') {
+            console.log('result was yes');
+            this.getReleasePlan(this.masterViewLink);
+          }
+        });
+      } else {
+        this.getReleasePlan(this.masterViewLink);
+      }
+    }
 
   }
 
   onEdit() {
+    // Only available in working mode, allows the user to edit the "plan details",
+    // if the user changes them it puts the dashboard in "dirty" mode
     const editData: PlanEditDataInterface = {
       planLink: this.releasePlan.selfLink,
       releasePlan: this.releasePlan
@@ -76,13 +121,54 @@ export class PlanDashboardComponent implements OnInit {
       if (result) {
         console.log('the plan was updated');
         this.releasePlan = result;
+        this.planDirty = true;
       } else {
         console.log('the release plan was not updated');
       }
     });
   }
 
+  onShowReports() {
+    const dialogRef = this.dialog.open(PlanReportsDialogComponent, {
+      data: this.releasePlan,
+      width: '500px'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+    });
+
+  }
+
+  onVerify() {
+    // Only available in working mode, calls the verify link to see if the plan is
+    // verified. If it is not, then it will show the link so that the user can see
+    // the current reports. What am I going to get back?
+  }
+
+  onCommit() {
+    // Only available in working mode, this calls the commit link - internally this
+    // will verify and if it passes it will commit, the Master will now be the
+    // current working copy, and change the view to master. If the working copy does
+    // not verify, the view will stay in working mode and the reports link will show.
+  }
+
+  onReset() {
+    // Throws away all the changes in the working copy so it looks just like
+    // master, changes the view to Master
+  }
+
+  onSave() {
+    // Saves the working copy as it has been changed during this editing session,
+    // regardless of whether there are verification reports
+  }
+
+  onRefresh() {
+    // Only available while editing, throws away current changes in this editing
+    // session and restores the data on the screen to the current working copy
+  }
+
   onDelete() {
+    /*
     const dialogRef = this.dialog.open(AlertDialogComponent, {
       width: '400px',
       data: {
@@ -95,12 +181,13 @@ export class PlanDashboardComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {
       if (result === 'Yes') {
         console.log('result was yes');
-/*         this.releasePlanService.delReleasePlan(this.releasePlan)
+        this.releasePlanService.delReleasePlan(this.releasePlan)
           .subscribe(() => {
             this.router.navigateByUrl('/products', { queryParams: { id: this.releasePlan.parentId } });
-          }); */
+          });
       }
     });
+    */
   }
 
 }

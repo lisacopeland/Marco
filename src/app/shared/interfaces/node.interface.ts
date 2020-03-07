@@ -4,10 +4,10 @@ import { DatabaseInterface } from './database.interface';
 // timerTrigger in edit form should be a select which allows
 // user to select one of the other plan nodes
 export interface PlanNodeInterface extends DatabaseInterface {
-  nodeType: 'Milestone' | 'Task'; // Node type - cannot be changed
-  predecessors: string[];         // Ids of the predecessors of this node
-  timerDurationMinutes: number;   // Dunno
-  timerTrigger: string;           // this is typically a nodeid
+  nodeType: 'Milestone' | 'Task' | 'MilestoneLink'; // Node type - cannot be changed
+  predecessors: string[];         // Ids of the predecessors of this node, not used if this is a MilestoneLink
+  timerDurationMinutes: number;   // Dunno - not used if this is a MilestoneLink
+  timerTrigger: string;           // this is typically a nodeid, not used if this is a MilestoneLink
 }
 
 // The user uses these to show "state" like start
@@ -33,8 +33,7 @@ export interface TaskTemplateInputInterface {
 }
 
 // Used for links external to this release plan
-export interface MilestoneLinkInterface extends DatabaseInterface {
-  nodeType: 'MilestoneLink';
+export interface MilestoneLinkInterface extends PlanNodeInterface {
   linkedId: string;    // ReleasePlanNodeId
   linkedMilestoneType: 'Start' | 'API' | 'Feature' | 'Service' | 'Product';
   linkedLabel: string;  // Descriptive text to identify the milestone type

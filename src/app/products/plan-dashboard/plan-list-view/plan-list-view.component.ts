@@ -4,39 +4,40 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { FormControl, FormGroup } from '@angular/forms';
+import { NodeService } from '@shared/services/node.service';
 
 @Component({
   selector: 'app-plan-list-view',
   templateUrl: './plan-list-view.component.html',
   styleUrls: ['./plan-list-view.component.scss']
 })
-export class PlanListViewComponent implements OnInit, OnChanges {
-  @Input() planNodes: PlanNodeInterface[];
+export class PlanListViewComponent implements OnInit {
+  planNodes: PlanNodeInterface[];
   filterValues = ['All', 'Milestone', 'Task'];
-  displayedColumns: string[] = ['planNodeId', 'description', 'type', 'hasPredecessors', 'dashboard'];
+  displayedColumns: string[] = ['planNodeId', 'description', 'type', 'hasPredecessors'];
   dataSource: MatTableDataSource<PlanNodeInterface>;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
   filterValue = 'All';
   selectForm: FormGroup;
 
-
-  constructor() { }
+  constructor(private nodeService: NodeService) { }
 
   ngOnInit(): void {
-  }
-
-  ngOnChanges() {
-    console.log('hi from ngOnChanges');
-
     this.selectForm = new FormGroup({
       filterSelect: new FormControl('All')
     });
+    this.nodeService.nodeLookup
+      .subscribe(data => {
+        this.planNodes = data;
+        this.displayList();
+      });
+
     this.selectForm.get('filterSelect').valueChanges.subscribe(val => {
       this.filterValue = val;
       this.applyFilter(this.filterValue, this.dataSource);
     });
-    this.displayList();
+
   }
 
   applyFilter(filterValue: string, dataSource: MatTableDataSource<PlanNodeInterface>) {
@@ -56,11 +57,11 @@ export class PlanListViewComponent implements OnInit, OnChanges {
 
 
   displayList() {
-    // if (this.planNodes && (Object.keys(this.planNodes).length !== 0)) {
+    if (this.planNodes && (Object.keys(this.planNodes).length !== 0)) {
       this.dataSource = new MatTableDataSource<PlanNodeInterface>(this.planNodes);
       this.applyFilter(this.filterValue, this.dataSource);
       this.dataSource.paginator = this.paginator;
       this.dataSource.sort = this.sort;
-    // }
+    }
   }
 }

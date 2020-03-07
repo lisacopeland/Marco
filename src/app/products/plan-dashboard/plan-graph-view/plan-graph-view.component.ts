@@ -3,14 +3,15 @@ import { PlanNodeInterface } from '@shared/interfaces/node.interface';
 import { Edge, Node, Layout } from '@swimlane/ngx-graph';
 import * as shape from 'd3-shape';
 import { Subject } from 'rxjs';
+import { NodeService } from '@shared/services/node.service';
 
 @Component({
   selector: 'app-plan-graph-view',
   templateUrl: './plan-graph-view.component.html',
   styleUrls: ['./plan-graph-view.component.scss']
 })
-export class PlanGraphViewComponent implements OnInit, OnChanges {
-  @Input() planNodes: PlanNodeInterface;
+export class PlanGraphViewComponent implements OnInit {
+  planNodes: PlanNodeInterface[];
   curve: any = shape.curveLinear;
   layout = 'dagre';
   draggingEnabled = true;
@@ -121,13 +122,14 @@ export class PlanGraphViewComponent implements OnInit, OnChanges {
     }
   ];
 
-  constructor() { }
+  constructor(private nodeService: NodeService) { }
 
   ngOnInit(): void {
-  }
-
-  ngOnChanges(): void {
-    this.redrawGraph();
+    this.nodeService.nodeLookup
+      .subscribe(data => {
+        this.planNodes = data;
+        this.redrawGraph();
+      });
   }
 
   redrawGraph() {
