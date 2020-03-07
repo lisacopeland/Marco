@@ -17,6 +17,7 @@ export class ReleasePlanService {
 
   constructor(private http: HttpClient) { }
 
+  // A get to this URL from the product This URL re
   getReleasePlansHttp(releasePlanLink: string) {
     interface GetResponse {
       releasePlans: ReleasePlanInterface[];
@@ -43,6 +44,27 @@ export class ReleasePlanService {
         catchError(this.handleError)
       );
   }
+
+  getReleasePlan(link: string) {
+
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'text/plain'
+      })
+    };
+
+    const url = environment.apiUrl + '/' + link;
+    return this.http
+      .get<ReleasePlanInterface>(url, httpOptions)
+      .pipe(
+        map(data => {
+          console.log('releaseplan : ' + JSON.stringify(data));
+          return data;
+        }),
+        catchError(this.handleError)
+      );
+  }
+
 
   getReleasePlanSource(releasePlanLink: string) {
     return this.releasePlanSource

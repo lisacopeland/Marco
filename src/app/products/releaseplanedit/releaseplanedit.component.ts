@@ -8,7 +8,6 @@ import { Observable } from 'rxjs';
 import { delay, map, catchError, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 export interface PlanEditDataInterface {
-  selfLink: string;
   planLink: string;
   releasePlan: ReleasePlanInterface;
 }
@@ -35,8 +34,8 @@ export class PlanEditDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: PlanEditDataInterface) {}
 
   ngOnInit(): void {
-    this.selfLink = this.data.selfLink;
-    this.planLink = this.data.planLink;
+    // this.selfLink = this.data.selfLink;
+    // this.planLink = this.data.planLink;
     this.editMode = this.data.releasePlan !== null;
     if (this.editMode) {
       this.releasePlan = this.data.releasePlan;
@@ -118,11 +117,16 @@ export class PlanEditDialogComponent implements OnInit {
         id: this.parentId + '.' + this.releasePlanForm.value.name,
         parentId: this.parentId,
         name: this.releasePlanForm.value.name,
-        startNode: 'PRODUCT5.RELEASEPLAN1:M.NODE1',
-        deploymentId: '',
-        tags: 'tag1 | tag2',
+        tags: ['tag1', 'tag2'],
         selfLink: '', // Assigned by Service
-        planNodeLink: '' // Assigned by Service
+        view: 'Master',
+        nodes: [],
+        verificationReports: [],
+        verifyLink: null,
+        commitLink: null,
+        masterViewLink: null,
+        summaryViewLink: null,
+        workingViewLink: null
       };
       this.releasePlanService.addReleasePlan(this.planLink, releasePlan)
         .subscribe(() => {

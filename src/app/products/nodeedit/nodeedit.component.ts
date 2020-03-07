@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { PlanNodeInterface, PlanMilestoneInterface, PlanTaskInterface } from '@shared/interfaces/node.interface';
+import { PlanNodeInterface, PlanMilestoneInterface, PlanTaskInterface, MilestoneLinkInterface } from '@shared/interfaces/node.interface';
 import { FormGroup, FormControl, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { NodeService } from '@shared/services/node.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -7,9 +7,12 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
 import { delay, map, catchError, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
+// This dialog mutates the data or adds data but does not
+// Make database changes
+// This dialog is for editing Tasks and Milestones,
+// MilestoneLinks are edited in the MilestoneLinkEdit Component
+
 export interface NodeEditDataInterface {
-  parentId: string;
-  nodeLink: string;
   node: PlanNodeInterface;
 }
 
@@ -20,7 +23,7 @@ export interface NodeEditDataInterface {
 })
 export class NodeEditDialogComponent implements OnInit {
 
-  editTitle = 'Add New Node';
+  editTitle = 'Add New Milestone or Task';
   nodeForm: FormGroup;
   node: PlanNodeInterface;
   nodeLink: string;
@@ -37,8 +40,7 @@ export class NodeEditDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: NodeEditDataInterface) { }
 
   ngOnInit(): void {
-    this.parentId = this.data.parentId;
-    this.nodeLink = this.data.nodeLink;
+
     this.editMode = this.data.node !== null;
     if (this.editMode) {
       if (this.node.nodeType === 'Milestone') {
@@ -55,20 +57,39 @@ export class NodeEditDialogComponent implements OnInit {
 
     // If you are not in edit mode, start with nodetype Milestone and show the fields
     // for that nodeType
+    let currentNode;
+    if (this.node.nodeType === 'Milestone') {
+      currentNode = this.node as PlanMilestoneInterface;
+    } else {
+      currentNode = this.node as PlanTaskInterface;
+    }
+
+    // TODO: timerTrigger should be a select of all of the other nodes in the releaseplan
     this.nodeForm = new FormGroup({
       name: new FormControl(''),
       description: new FormControl('', [Validators.required, Validators.minLength(2)]),
       nodeType: new FormControl(this.nodeTypes[0]),
-      delayedStartTimerDurationMins: new FormControl(0),
-      delayedStartTimerTrigger: new FormControl('')
+      timerDurationMinutes: new FormControl(0),
+      timerTrigger: new FormControl('')
     });
     if (this.editMode) {
       this.nodeType = this.node.nodeType;
       this.nodeForm.patchValue({
         name: this.node.name,
         description: this.node.description,
-        nodeType: this.node.nodeType
+        nodeType: this.node.nodeType,
+        timerDurationMinutes: this.node.timerDurationMinutes,
+        timerTrigger: this.node.timerTrigger
       });
+      if (this.nodeType === 'Milestone') {
+        this.nodeForm.addControl('milestoneType', new FormControl(currentNode.milestoneType));
+        this.nodeForm.addControl('label', new FormControl(currentNode.label)),
+        this.nodeForm.addControl('stateAnnounced', new FormControl(currentNode.stateAnnounced));
+      } else {
+        this.nodeForm.addControl('taskType', new FormControl(currentNode.taskType));
+        this.nodeForm.addControl('taskData', new FormControl(currentNode.taskData));
+        this.nodeForm.addControl('expectedDurationMinutes', new FormControl(currentNode.expectedDurationMinutes));
+      }
       this.nodeForm.get('name').disable();
       this.nodeForm.get('nodeType').disable();
     } else {
@@ -84,48 +105,30 @@ export class NodeEditDialogComponent implements OnInit {
   }
 
   swapNodeTypeFields(newNodeTypeValue: string, removeOldControls: boolean) {
-    // I shouldn't even have this because I wont allow changing the nodetype
+    // This is only for when the user is adding a brand new node
     this.nodeType = newNodeTypeValue;
       // Swtiching to Milestone or initializing the form
     if (newNodeTypeValue === 'Milestone') {
         this.nodeForm.addControl('milestoneType', new FormControl(this.milestoneTypes[0], Validators.required));
         this.nodeForm.addControl('label', new FormControl('', Validators.required));
-        this.nodeForm.addControl('declaredStatus', new FormControl(''));
-        if (this.editMode) {
-          // Initialize the fields with the original values
-          const currentNode = this.node as PlanMilestoneInterface;
-          this.nodeForm.patchValue({
-            milestoneType: currentNode.milestoneType,
-            label: currentNode.label,
-            declaredStatus: currentNode.declaredStatus,
-          });
-        }
+        this.nodeForm.addControl('stateAnnounced', new FormControl(''));
         // If you are swapping from Milestone to Task
         if (removeOldControls) {
           this.nodeForm.removeControl('taskType');
           this.nodeForm.removeControl('taskData');
-          this.nodeForm.removeControl('inputs');
-          this.nodeForm.removeControl('expectedDurationMins');
+          // this.nodeForm.removeControl('inputs');
+          this.nodeForm.removeControl('expectedDurationMinutes');
         }
       } else {
         // Swtiching from Milestone to task
         this.nodeForm.addControl('taskType', new FormControl(''));
         this.nodeForm.addControl('taskData', new FormControl(''));
-        this.nodeForm.addControl('inputs', new FormControl(''));
-        this.nodeForm.addControl('expectedDurationMins', new FormControl(0));
-        if (this.editMode) {
-          const currentNode = this.node as PlanTaskInterface;
-          this.nodeForm.patchValue({
-            taskType: currentNode.taskType,
-            taskData: currentNode.taskData,
-            inputs: currentNode.inputs,
-            expectedDurationMins: currentNode.expectedDurationMins
-          });
-        }
+        // this.nodeForm.addControl('inputs', new FormControl(''));
+        this.nodeForm.addControl('expectedDurationMinutes', new FormControl(0));
         if (removeOldControls) {
           this.nodeForm.removeControl('milestoneType');
           this.nodeForm.removeControl('label');
-          this.nodeForm.removeControl('declaredStatus');
+          this.nodeForm.removeControl('stateAnnounced');
         }
       }
 
@@ -180,39 +183,41 @@ export class NodeEditDialogComponent implements OnInit {
     if (this.nodeType === 'Milestone') {
       const currentNode = this.node as PlanMilestoneInterface;
       node = {
-        id: (this.editMode) ? this.node.id : this.parentId + ':' + this.nodeForm.value.name,
+        id: (this.editMode) ? this.node.id : null,
         parentId: this.parentId,
         name: this.nodeForm.value.name,
         description: this.nodeForm.value.description,
         selfLink: (this.editMode) ? this.node.selfLink : '',
         nodeType: this.nodeType,
         predecessors: (this.editMode) ? this.node.predecessors : [],
-        delayedStartTimerDurationMins: this.nodeForm.value.delayedStartTimerDurationMins,
-        delayedStartTimerTrigger: this.nodeForm.value.delayedStartTimerTrigger,
+        timerDurationMinutes: this.nodeForm.value.timerDurationMinutes,
+        timerTrigger: this.nodeForm.value.timerTrigger,
         milestoneType: this.nodeForm.value.milestoneType,
         label: this.nodeForm.value.label,
-        declaredStatus: this.nodeForm.value.declaredStatus,
+        stateAnnounced: this.nodeForm.value.declaredStatus,
         spanningPredecessors: (this.editMode) ? currentNode.spanningPredecessors : [],
       } as PlanMilestoneInterface;
     } else {
       node = {
-        id: (this.editMode) ? this.node.id : this.parentId + ':' + this.nodeForm.value.name,
+        id: (this.editMode) ? this.node.id : null,
         parentId: this.parentId,
         name: this.nodeForm.value.name,
         description: this.nodeForm.value.description,
         selfLink: (this.editMode) ? this.node.selfLink : '',
         nodeType: this.nodeType,
         predecessors: (this.editMode) ? this.node.predecessors : [],
-        delayedStartTimerDurationMins: this.nodeForm.value.delayedStartTimerDurationMins,
-        delayedStartTimerTrigger: this.nodeForm.value.delayedStartTimerTrigger,
+        timerDurationMinutes: this.nodeForm.value.timerDurationMinutes,
+        timerTrigger: this.nodeForm.value.timerTrigger,
         taskType: this.nodeForm.value.taskType,
         taskData: this.nodeForm.value.taskData,
-        inputs: this.nodeForm.value.inputs,
-        expectedDurationMins: this.nodeForm.value.expectedDurationMins
+        inputs: null,
+        expectedDurationMinutes: this.nodeForm.value.expectedDurationMinutes
       } as PlanTaskInterface;
     }
 
-    if (this.editMode) {
+    this.dialogRef.close(node);
+
+/*     if (this.editMode) {
       this.nodeService.editNode(node)
         .subscribe(data => {
           this.snackBar.open('Node successfully updated', '', {
@@ -228,7 +233,7 @@ export class NodeEditDialogComponent implements OnInit {
         });
         this.dialogRef.close(node);
       });
-    }
+    } */
 
   }
 

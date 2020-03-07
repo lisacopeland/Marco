@@ -1,0 +1,38 @@
+<div class="form-header">
+  <h2>{{ editTitle }}</h2>
+</div>
+<form [formGroup]="nodeForm" (ngSubmit)="onSubmit()">
+  <mat-dialog-content fxLayout="column">
+    <mat-form-field class="input-75">
+      <mat-label>Name</mat-label>
+      <input matInput placeholder="Name" formControlName="name">
+    </mat-form-field>
+    <mat-form-field class="input-75">
+      <mat-label>Description</mat-label>
+      <input matInput placeholder="Description" formControlName="description" required>
+    </mat-form-field>
+
+    <!-- Fields for when nodeType is milestone -->
+    <mat-form-field class="input-75">
+      <mat-label>Linked Milestone Type</mat-label>
+      <mat-select formControlName="linkedMilestoneType">
+        <mat-option *ngFor="let milestoneType of milestoneTypes" [value]="milestoneType">
+          {{milestoneType}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="input-75">
+      <mat-label>Linked Label</mat-label>
+      <input matInput placeholder="" formControlName="linkedLabel">
+    </mat-form-field>
+    <mat-form-field class="input-75">
+      <mat-label>Linked State Announced</mat-label>
+      <input matInput placeholder="" formControlName="linkedStateAnnounced">
+    </mat-form-field>
+
+  </mat-dialog-content>
+<mat-dialog-actions class="form-footer">
+  <button mat-raised-button color="accent" type="submit">Save</button>
+  <button mat-raised-button color="primary" type="button" (click)="onClose()">Cancel</button>
+</mat-dialog-actions>
+</form>

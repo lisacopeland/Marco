@@ -19,6 +19,9 @@ import { AlertDialogComponent } from 'src/app/alert-dialog/alert-dialog.componen
 export class PlanDashboardComponent implements OnInit {
   releasePlan: ReleasePlanInterface;
   releasePlanId: string;
+  masterViewLink: string;
+  versionString = 'Master';
+  versionSelectString = 'Switch to Edit';
   selfLink: string;
   nodes: PlanNodeInterface[] = [];
 
@@ -32,19 +35,13 @@ export class PlanDashboardComponent implements OnInit {
     this.route.queryParams
       .subscribe(params => {
         this.releasePlanId = params.id;
-        this.selfLink = params.selfLink;  // The planLink from the parent record
+        this.masterViewLink = params.masterViewLink;  // The planLink from the parent record
         console.log('plan id is ' + this.releasePlanId);
         if (this.releasePlanId) {
-          this.releasePlanService.getReleasePlanHttp(this.selfLink)
-            .pipe(
-              switchMap(releasePlan => {
-                this.releasePlan = releasePlan;
-                console.log('got releaseplan - its ' + this.releasePlan.name);
-                return this.nodeService.getNodesHttp(this.releasePlan.planNodeLink);
-              }))
+          this.releasePlanService.getReleasePlan(this.masterViewLink)
             .subscribe((data: any) => {
-              this.nodes = data as PlanNodeInterface[];
-              this.subscribeToLookup();
+              this.releasePlan = data as ReleasePlanInterface;
+              this.nodes = this.releasePlan.nodes;
             }, error => {
               if (!environment.production) {
                 console.log('got error getting data' + error);
@@ -54,16 +51,20 @@ export class PlanDashboardComponent implements OnInit {
       });
   }
 
-  subscribeToLookup() {
+/*   subscribeToLookup() {
     this.nodeService.nodeLookup.subscribe(data => {
       this.nodes = data as PlanNodeInterface[];
     });
   }
+ */
+
+  onChangeSelect() {
+
+  }
 
   onEdit() {
     const editData: PlanEditDataInterface = {
-      planLink: this.releasePlan.planNodeLink,
-      selfLink: this.selfLink,
+      planLink: this.releasePlan.selfLink,
       releasePlan: this.releasePlan
     };
     const dialogRef = this.dialog.open(PlanEditDialogComponent, {
@@ -94,10 +95,10 @@ export class PlanDashboardComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {
       if (result === 'Yes') {
         console.log('result was yes');
-        this.releasePlanService.delReleasePlan(this.releasePlan)
+/*         this.releasePlanService.delReleasePlan(this.releasePlan)
           .subscribe(() => {
             this.router.navigateByUrl('/products', { queryParams: { id: this.releasePlan.parentId } });
-          });
+          }); */
       }
     });
   }

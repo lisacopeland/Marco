@@ -20,12 +20,12 @@
       </mat-select>
     </mat-form-field>
     <mat-form-field class="input-75">
-      <mat-label>Delayed Start Timer Duration</mat-label>
-      <input matInput type="number" placeholder="0" formControlName="delayedStartTimerDurationMins">
+      <mat-label>Timer Duration in Minutes</mat-label>
+      <input matInput type="number" placeholder="0" formControlName="timerDurationMinutes">
     </mat-form-field>
     <mat-form-field class="input-75">
-      <mat-label>Delayed Start Timer Trigger</mat-label>
-      <input matInput placeholder="" formControlName="delayedStartTimerTrigger">
+      <mat-label>Timer Trigger</mat-label>
+      <input matInput placeholder="" formControlName="timerTrigger">
     </mat-form-field>
 
     <!-- Fields for when nodeType is milestone -->
@@ -43,8 +43,8 @@
         <input matInput placeholder="" formControlName="label">
       </mat-form-field>
       <mat-form-field class="input-75">
-        <mat-label>Declared Status</mat-label>
-        <input matInput placeholder="" formControlName="declaredStatus">
+        <mat-label>State Announced</mat-label>
+        <input matInput placeholder="" formControlName="stateAnnounced">
       </mat-form-field>
     </div>
 
@@ -58,13 +58,13 @@
         <mat-label>Task Data</mat-label>
         <input matInput placeholder="" formControlName="taskData">
       </mat-form-field>
-      <mat-form-field class="input-75">
+<!--       <mat-form-field class="input-75">
         <mat-label>Inputs</mat-label>
         <input matInput placeholder="" formControlName="inputs">
-      </mat-form-field>
+      </mat-form-field> -->
       <mat-form-field class="input-75">
         <mat-label>Expected Duration in Minutes</mat-label>
-        <input matInput placeholder="" formControlName="expectedDurationMins">
+        <input matInput placeholder="" formControlName="expectedDurationMinutes">
       </mat-form-field>
     </div>
 

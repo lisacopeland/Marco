@@ -3,9 +3,16 @@
   <div class="content-frame">
   <div fxLayout="row" fxLayoutAlign="space-between center">
     <h1 class="mat-h1">Nodes</h1>
-    <button mat-icon-button color="primary" matTooltip="Add a node to the release plan">
-      <mat-icon>add</mat-icon>
-    </button>
+    <form [formGroup]="selectForm">
+    <mat-form-field>
+      <mat-label>Show</mat-label>
+      <mat-select formControlName="filterSelect">
+        <mat-option *ngFor="let choice of filterValues" [value]="choice">
+          {{choice}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    </form>
   </div>
 
   <mat-card-content>
