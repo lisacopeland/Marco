@@ -8,6 +8,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { takeUntil } from 'rxjs/operators';
 import { ProductEditDialogComponent } from './productedit/productedit.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-products',
@@ -25,6 +26,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   @ViewChild(MatSort, {static: true}) sort: MatSort;
 
   constructor(private productService: ProductService,
+              private router: Router,
               public dialog: MatDialog) { }
 
   ngOnInit(): void {
@@ -66,6 +68,10 @@ export class ProductsComponent implements OnInit, OnDestroy {
     });
     dialogRef.afterClosed().subscribe(result => {
     });
+  }
+
+  onDashboard(row) {
+    this.router.navigate([{ outlets: { primary: 'products/productdashboard', sidebar: 'productsidebar' }}], {queryParams: { id: row?.id }});
   }
 
   ngOnDestroy() {

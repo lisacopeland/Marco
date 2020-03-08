@@ -1,5 +1,5 @@
 <mat-card class="half-card-content" fxLayout="row">
-  <div class="graph-frame">
+  <div *ngIf="onReady" class="graph-frame">
     <ngx-graph [layout]="layout" [links]=links [nodes]=nodes [curve]="curve"
       [draggingEnabled]="draggingEnabled" [panningEnabled]="panningEnabled" [enableZoom]="zoomEnabled"
       [zoomSpeed]="zoomSpeed" [minZoomLevel]="minZoomLevel" [maxZoomLevel]="maxZoomLevel" [panOnZoom]="panOnZoom"
@@ -11,7 +11,7 @@
       </ng-template>
 
       <ng-template #nodeTemplate let-node>
-        <svg:g *ngIf="node.data.nodeType==='Milestone'" class="node" (click)="onNodeClick(node)">
+        <svg:g *ngIf="node.data.nodeType!=='Task'" class="node" (click)="onNodeClick(node)">
           <svg:rect [attr.width]="node.dimension.width" [attr.height]="node.dimension.height"
             [attr.fill]="node.data.backgroundColor" />
           <svg:text alignment-baseline="central" [attr.x]="10" [attr.fill]="node.data.color"
@@ -29,18 +29,18 @@
         <svg:g class="edge" (click)="onLineClick(link)">
           <svg:path class="line" stroke-width="2" marker-end="url(#arrow)">
           </svg:path>
-          <svg:text class="edge-label" text-anchor="middle">
+<!--           <svg:text class="edge-label" text-anchor="middle">
             <textPath class="text-path" [attr.href]="'#' + link.id" [style.dominant-baseline]="link.dominantBaseline"
               startOffset="50%">
               {{link.label}}
             </textPath>
-          </svg:text>
+          </svg:text> -->
         </svg:g>
       </ng-template>
     </ngx-graph>
   </div>
-  <div class="sidebar">
+<!--   <div class="sidebar">
     <div>This is the sidebar</div>
-  </div>
-
+  </div> -->
+<button mat-fab color="primary"><mat-icon>add</mat-icon></button>
 </mat-card>

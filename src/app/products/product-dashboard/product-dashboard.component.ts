@@ -47,6 +47,7 @@ export class ProductDashboardComponent implements OnInit, OnDestroy {
             .pipe(
               switchMap(product => {
                 this.product = product;
+                this.productService.setCurrentProduct(this.product);
                 return this.releasePlanService.getReleasePlansHttp(this.product.releasePlanLink);
               }))
             .subscribe((data: any) => {

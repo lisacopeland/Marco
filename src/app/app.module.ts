@@ -9,6 +9,8 @@ import { AppComponent } from './app.component';
 import { MaterialModule } from './material/material.module';
 import { AboutComponent } from './about/about.component';
 
+import { SidebarModule } from './sidebar/sidebar.module';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -20,7 +22,8 @@ import { AboutComponent } from './about/about.component';
     BrowserAnimationsModule,
     HttpClientModule,
     MaterialModule,
-    FlexLayoutModule
+    FlexLayoutModule,
+    SidebarModule
   ],
   providers: [],
   bootstrap: [AppComponent]

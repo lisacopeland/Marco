@@ -19,6 +19,7 @@ export class PlanListViewComponent implements OnInit {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
   filterValue = 'All';
+  dataLength = 0;
   selectForm: FormGroup;
 
   constructor(private nodeService: NodeService) { }
@@ -59,6 +60,7 @@ export class PlanListViewComponent implements OnInit {
   displayList() {
     if (this.planNodes && (Object.keys(this.planNodes).length !== 0)) {
       this.dataSource = new MatTableDataSource<PlanNodeInterface>(this.planNodes);
+      this.dataLength = this.dataSource.data.length;
       this.applyFilter(this.filterValue, this.dataSource);
       this.dataSource.paginator = this.paginator;
       this.dataSource.sort = this.sort;

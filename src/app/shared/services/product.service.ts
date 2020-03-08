@@ -14,11 +14,21 @@ export class ProductService {
   private productsSource = new BehaviorSubject<{}>({});
   productLookup = this.productsSource.asObservable();
   products: ProductInterface[];
+  private productSource = new BehaviorSubject<{}>({});
+  currentProductChanged = this.productSource.asObservable();
+  currentProduct: ProductInterface;
 
   constructor(private http: HttpClient) { }
 
   getProductObservable(): Observable<ProductInterface[]> {
     return this.productLookup as Observable<ProductInterface[]>;
+  }
+
+  // Use the currentProduct behaviour subject to communicate with the
+  // sidebar
+  setCurrentProduct(product: ProductInterface) {
+    this.currentProduct = product;
+    this.productSource.next(product);
   }
 
   getProductsHttp() {

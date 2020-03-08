@@ -1,19 +1,21 @@
 .page-layout {
-  max-height: 100vh;
-  height: 92%;
+  height: 92vh;
+  width: 83vw;
   background-color: #F7F8FC;
 }
 
 .page-header {
+  width: 83vw;
   height: 65px;
-  padding-left: 64px;
-  padding-right: 64px;
+  padding-left: 45px;
+  padding-right: 45px;
+
 }
 
 .card-content {
   background-color: white;
-  min-height: 65%;
-  margin: 64px;
+  min-height: 75%;
+  margin: 45px;
 }
 
 .half-card-content {

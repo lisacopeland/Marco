@@ -25,6 +25,7 @@ export class PlanDashboardComponent implements OnInit {
   version = 'master';
   planDirty = false;
   versionSelectString = 'Switch to Edit';
+  hasReports = false;
   selfLink: string;
   nodes: PlanNodeInterface[] = [];
 
@@ -47,18 +48,22 @@ export class PlanDashboardComponent implements OnInit {
   }
 
   getReleasePlan(link: string) {
+    console.log('getting releaseplans using ' + link);
     this.releasePlanService.getReleasePlan(link)
       .subscribe((data: any) => {
         if (this.version === 'master') {
-          this.version = 'Master';
+          this.version = 'master';
           this.versionSelectString = 'Switch to Working Copy';
           this.planDirty = false;
         } else {
-          this.version = 'Working';
+          this.version = 'working';
           this.versionSelectString = 'Switch to Master';
           this.planDirty = false;
         }
         this.releasePlan = data as ReleasePlanInterface;
+        if (this.releasePlan.verificationReports !== undefined) {
+          this.hasReports = (this.releasePlan.verificationReports.length !== 0);
+        }
         this.workingViewLink = this.releasePlan.workingViewLink;
         this.nodes = this.releasePlan.nodes;
         this.nodeService.cacheNodes(this.nodes);
@@ -79,6 +84,7 @@ export class PlanDashboardComponent implements OnInit {
 
   onChangeVersion($event) {
     if (this.version === 'master') {
+      this.version = 'working';
       this.getReleasePlan(this.workingViewLink);
     } else {
       // First see if the user has made changes
@@ -95,10 +101,12 @@ export class PlanDashboardComponent implements OnInit {
         dialogRef.afterClosed().subscribe((result) => {
           if (result === 'Yes') {
             console.log('result was yes');
+            this.version = 'master';
             this.getReleasePlan(this.masterViewLink);
           }
         });
       } else {
+        this.version = 'master';
         this.getReleasePlan(this.masterViewLink);
       }
     }

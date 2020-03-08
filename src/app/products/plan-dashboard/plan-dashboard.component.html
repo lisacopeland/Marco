@@ -1,11 +1,12 @@
 <section class="page-layout" fxLayout="column">
-  <!-- Header with Title and menu button -->
-  <div fxLayout="row" class="page-header add-border" fxLayoutAlign="space-between center">
-    <div fxLayout="column">
-      <!-- Top row of header -->
-      <div fxLayout="row" fxLayout="space-between center">
 
-        <div fxLayout="row" fxLayoutGap="32px" fxLayout="start center">
+
+  <!-- Header with Title and menu button -->
+  <div fxLayout="column">
+      <!-- Top row of header -->
+      <div fxLayout="row" fxLayoutAlign="space-between center">
+
+        <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
           <h1 class="mat-h1">{{ releasePlan?.name }}</h1>
           <h3 class="mat-h3">{{ version }}</h3>
           <mat-slide-toggle (change)="onChangeVersion($event)" >{{versionSelectString}}</mat-slide-toggle>
@@ -16,11 +17,12 @@
         </button>
 
       </div>
-      <div *ngIf="releasePlan.verificationReports.length">
+
+      <div *ngIf="hasReports">
         <a>This plan is not verified, click here to see reports</a>
       </div>
     </div>
-  </div>
+
   <mat-menu #planMenu="matMenu">
     <button mat-menu-item [disabled]="version==='master'" (click)="onEdit()">Edit Plan Details</button>
 <!--     <button mat-menu-item [disabled]="true" (click)="onDelete()">Delete Release Plan</button>
@@ -34,6 +36,6 @@
       to Product Dashboard</button>
   </mat-menu>
 
-  <app-plan-graph-view></app-plan-graph-view>
-  <app-plan-list-view></app-plan-list-view>
+   <app-plan-graph-view></app-plan-graph-view>
+   <app-plan-list-view></app-plan-list-view>
 </section>
