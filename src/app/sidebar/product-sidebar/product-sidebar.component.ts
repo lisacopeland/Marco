@@ -3,15 +3,25 @@ import { ProductService } from '@shared/services/product.service';
 import { ProductInterface } from '@shared/interfaces/product.interface';
 import { ReleasePlanService } from '@shared/services/releaseplan.service';
 import { MatDialog } from '@angular/material/dialog';
+import { MAT_TOOLTIP_DEFAULT_OPTIONS, MatTooltipDefaultOptions } from '@angular/material/tooltip';
 import { PlanEditDataInterface, PlanEditDialogComponent } from 'src/app/products/releaseplanedit/releaseplanedit.component';
 import { ProductEditDialogComponent } from 'src/app/products/productedit/productedit.component';
 import { AlertDialogComponent } from 'src/app/alert-dialog/alert-dialog.component';
 import { Router } from '@angular/router';
 
+export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
+  showDelay: 1000,
+  hideDelay: 500,
+  touchendHideDelay: 1000,
+};
+
 @Component({
   selector: 'app-product-sidebar',
   templateUrl: './product-sidebar.component.html',
-  styleUrls: ['./product-sidebar.component.scss']
+  styleUrls: ['./product-sidebar.component.scss'],
+  providers: [
+    { provide: MAT_TOOLTIP_DEFAULT_OPTIONS, useValue: myCustomTooltipDefaults }
+  ]
 })
 export class ProductSidebarComponent implements OnInit {
 

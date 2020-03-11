@@ -7,12 +7,15 @@
 }
 
 .sidebar-title {
-  font-size: large;
+  margin: 32px 0px 32px 0px;
+  font-size: 1.25em;
+  font-weight: 600;
 }
 
 .menu-choices {
-  font-size: medium;
+  margin-left: 16px;
   color: black;
   border: none;
+  cursor: pointer;
   text-decoration: none;
 }
