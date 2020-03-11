@@ -11,6 +11,12 @@ import { environment } from '@environments/environment';
 import { PlanEditDialogComponent, PlanEditDataInterface } from '../releaseplanedit/releaseplanedit.component';
 import { AlertDialogComponent } from 'src/app/alert-dialog/alert-dialog.component';
 import { PlanReportsDialogComponent } from './plan-reports-dialog/plan-reports-dialog.component';
+import { NodeEditDataInterface, NodeEditDialogComponent } from '../nodeedit/nodeedit.component';
+
+export interface NodeActionInterface {
+  action: string;
+  planNode: PlanNodeInterface|null;
+}
 
 @Component({
   selector: 'app-plan-dashboard',
@@ -23,6 +29,7 @@ export class PlanDashboardComponent implements OnInit {
   masterViewLink: string;
   workingViewLink: string;
   version = 'master';
+  nodeView = 'graph';
   planDirty = false;
   versionSelectString = 'Switch to Edit';
   hasReports = false;
@@ -36,6 +43,7 @@ export class PlanDashboardComponent implements OnInit {
               private releasePlanService: ReleasePlanService) { }
 
   ngOnInit(): void {
+    // TODO: You need to keep sidebar in sync with dashboard re: current view
     this.route.queryParams
       .subscribe(params => {
         this.releasePlanId = params.id;
@@ -82,6 +90,14 @@ export class PlanDashboardComponent implements OnInit {
     });
   }
 
+  onChangeView() {
+    if (this.nodeView === 'list') {
+      this.nodeView = 'graph';
+    } else {
+      this.nodeView = 'list';
+    }
+  }
+
   onChangeVersion($event) {
     if (this.version === 'master') {
       this.version = 'working';
@@ -111,6 +127,34 @@ export class PlanDashboardComponent implements OnInit {
       }
     }
 
+  }
+
+  onNodeAction($event: NodeActionInterface) {
+    if (($event.action === 'add') || ($event.action === 'edit')) {
+      const editData: NodeEditDataInterface = {
+        parentId: this.releasePlan.id,
+        node: ($event.action === 'edit') ? $event.planNode : null
+      };
+      const dialogRef = this.dialog.open(NodeEditDialogComponent, {
+        width: '500px',
+        data: editData
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          console.log('a planNode was edited or added');
+          if ($event.action === 'add') {
+            this.nodeService.addNodeCache(result);
+          } else if ($event.action === 'edit') {
+            this.nodeService.editNodeCache(result);
+          }
+        } else {
+          console.log('dialog was cancelled');
+        }
+      });
+    } else if ($event.action === 'delete') {
+      this.nodeService.delNodeCache($event.planNode);
+    }
   }
 
   onEdit() {

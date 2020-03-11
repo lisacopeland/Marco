@@ -1,4 +1,11 @@
-<mat-card fxLayout="column" class="half-card-content">
+  <div class="view-header" fxLayout="row" fxLayoutAlign="space-between center">
+    <h1 class="mat-h1">Plan List View</h1>
+    <button mat-icon-button color="primary" matTooltip="Add a node" (click)="onAddPlanNode()">
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
+
+<mat-card fxLayout="column" class="card-content">
 
   <div class="content-frame">
   <div fxLayout="row" fxLayoutAlign="space-between center">
@@ -41,15 +48,15 @@
 
         </td>
       </ng-container>
-<!--       <ng-container matColumnDef="dashboard">
+      <ng-container matColumnDef="dashboard">
         <th mat-header-cell *matHeaderCellDef> </th>
         <td mat-cell *matCellDef="let row">
           <button mat-icon-button [routerLink]="'/products/nodedashboard'"
             [queryParams]="{id: row?.id, selfLink: row?.selfLink }">
-            <mat-icon>dashboard</mat-icon>
+            <mat-icon>edit</mat-icon>
           </button>
         </td>
-      </ng-container> -->
+      </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
@@ -57,7 +64,7 @@
     </table>
     <mat-paginator
       [length]=dataLength
-      [pageSize]="4"
+      [pageSize]="10"
       showFirstLastButtons></mat-paginator>
   </mat-card-content>
   </div>

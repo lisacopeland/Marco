@@ -1,14 +1,17 @@
 .sidebar {
   width: 15vw;
   height: 92vh;
-
+  padding: 16px;
   background: white;
   border: 1px solid grey;
 }
 
-.menu-choices {
+.sidebar-title {
   font-size: large;
-  margin-left: 45px;
+}
+
+.menu-choices {
+  font-size: medium;
   color: black;
   border: none;
   text-decoration: none;

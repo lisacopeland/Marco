@@ -14,8 +14,20 @@ export class ReleasePlanService {
   private releasePlanSource = new BehaviorSubject<{}>({});
   releasePlanLookup = this.releasePlanSource.asObservable();
   releasePlans: ReleasePlanInterface[];
+  private currentPlanSource = new BehaviorSubject<{}>({});
+  currentPlanChanged = this.currentPlanSource.asObservable();
+  currentPlan: ReleasePlanInterface;
 
   constructor(private http: HttpClient) { }
+
+  setCurrentPlan(releasePlan: ReleasePlanInterface) {
+    this.currentPlan = releasePlan;
+    this.currentPlanSource.next(this.currentPlan);
+  }
+
+  getCurrentPlan() {
+    return this.currentPlan;
+  }
 
   // A get to this URL from the product This URL re
   getReleasePlansHttp(releasePlanLink: string) {

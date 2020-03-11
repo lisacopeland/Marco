@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, Output, EventEmitter } from '@angular/core';
 import { ReleasePlanService } from '@services/releaseplan.service';
 import { ReleasePlanInterface } from '@interfaces/releaseplan.interface';
 import { MatDialog } from '@angular/material/dialog';
@@ -74,6 +74,15 @@ export class ProductDashboardComponent implements OnInit, OnDestroy {
         this.dataSource.sort = this.sort;
       }
     });
+  }
+
+  onGotoPlan(row) {
+    this.releasePlanService.setCurrentPlan(row);
+    this.router.navigate(
+      [{ outlets:
+       { primary: 'products/newdashboard',
+         sidebar: 'plandashboardsidebar' } }],
+       { queryParams: { id: row?.id, masterViewLink: row?.masterViewLink } });
   }
 
   onAdd() {

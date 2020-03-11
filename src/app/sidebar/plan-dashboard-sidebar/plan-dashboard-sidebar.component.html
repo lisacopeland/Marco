@@ -1,10 +1,9 @@
 <div fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="24px" class="sidebar">
-  <div fxLayout="row" class="page-header" fxLayoutAlign="space-between center">
-    <h1 class="mat-h1">Sections</h1>
-  </div>
-  <p>This is the plan dashboard sidebar</p>
-  <a class="menu-choices"
-    [routerLink]="[{ outlets: { primary: ['products'], sidebar: ['productssidebar'] } }]">Products</a>
-  <a class="menu-choices" routerLink="/deployments">Deployments</a>
-  <a class="menu-choices" routerLink="/about">About</a>
+  <div class="sidebar-title">Release Plan</div>
+  <a class="menu-choices">Edit Plan Details</a>
+  <a class="menu-choices">Verify Plan</a>
+  <a class="menu-choices">Commit Plan</a>
+    <a class="menu-choices" (click)="onReturnToProduct()">Return to
+      Product Dashboard</a>
+
 </div>

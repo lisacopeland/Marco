@@ -4,38 +4,33 @@
   <!-- Header with Title and menu button -->
   <div fxLayout="column">
       <!-- Top row of header -->
-      <div fxLayout="row" fxLayoutAlign="space-between center">
-
-        <div fxLayout="row" fxLayoutGap="32px" fxLayoutAlign="start center">
-          <h1 class="mat-h1">{{ releasePlan?.name }}</h1>
-          <h3 class="mat-h3">{{ version }}</h3>
-          <mat-slide-toggle (change)="onChangeVersion($event)" >{{versionSelectString}}</mat-slide-toggle>
-        </div>
-
-        <button mat-icon-button [matMenuTriggerFor]="planMenu">
-          <mat-icon>more_vert</mat-icon>
-        </button>
-
-      </div>
-
-      <div *ngIf="hasReports">
-        <a>This plan is not verified, click here to see reports</a>
-      </div>
+    <div class="page-header" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
+      <h1 class="mat-h1">{{ releasePlan?.name }}</h1>
+      <h3 class="mat-h3">{{ version }}</h3>
+      <mat-slide-toggle (change)="onChangeVersion($event)" >{{versionSelectString}}</mat-slide-toggle>
     </div>
 
-  <mat-menu #planMenu="matMenu">
-    <button mat-menu-item [disabled]="version==='master'" (click)="onEdit()">Edit Plan Details</button>
-<!--     <button mat-menu-item [disabled]="true" (click)="onDelete()">Delete Release Plan</button>
- -->
-    <button mat-menu-item [disabled]="version==='master'" (click)="onVerify()">Verify</button>
-    <button mat-menu-item [disabled]="version==='master'" (click)="onCommit()">Commit</button>
-    <button mat-menu-item [disabled]="version==='master'" (click)="onReset()">Reset</button>
-    <button mat-menu-item [disabled]="version==='master'" (click)="onSave()">Save</button>
-    <button mat-menu-item [disabled]="version==='master'" (click)="onRefresh()">Refresh</button>
-    <button mat-menu-item [routerLink]="'/products/productdashboard'" [queryParams]="{id: releasePlan?.parentId}">Return
-      to Product Dashboard</button>
-  </mat-menu>
+    <mat-toolbar class="plan-toolbar" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+      <div fxLayout="row">
+        <a fxLayoutAlign="start center"><mat-icon>save</mat-icon>save</a>
+      </div>
+      <div fxLayout="row">
+        <a fxLayoutAlign="start center"><mat-icon>refresh</mat-icon>refresh</a>
+      </div>
+      <div fxLayout="row">
+        <a fxLayoutAlign="start center"><mat-icon>cancel</mat-icon>reset</a>
+      </div>
+      <div (click)="onChangeView()" fxLayout="row">
+        <a fxLayoutAlign="start center" *ngIf="nodeView==='graph'"><mat-icon>view_list</mat-icon>view</a>
+        <a fxLayoutAlign="start center" *ngIf="nodeView==='list'"><mat-icon>satellite</mat-icon>view</a>
+      </div>
+    </mat-toolbar>
+    </div>
 
-   <app-plan-graph-view></app-plan-graph-view>
-   <app-plan-list-view></app-plan-list-view>
+  <div *ngIf="nodeView==='graph'">
+   <app-plan-graph-view (nodeAction)="onNodeAction($event)"></app-plan-graph-view>
+  </div>
+  <div *ngIf="nodeView==='list'">
+   <app-plan-list-view  (nodeAction)="onNodeAction($event)"></app-plan-list-view>
+  </div>
 </section>

@@ -1,9 +1,10 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, Output, EventEmitter } from '@angular/core';
 import { PlanNodeInterface } from '@shared/interfaces/node.interface';
 import { Edge, Node, Layout } from '@swimlane/ngx-graph';
 import * as shape from 'd3-shape';
 import { Subject } from 'rxjs';
 import { NodeService } from '@shared/services/node.service';
+import { NodeActionInterface } from '../plan-dashboard.component';
 
 @Component({
   selector: 'app-plan-graph-view',
@@ -12,6 +13,7 @@ import { NodeService } from '@shared/services/node.service';
   styleUrls: ['./plan-graph-view.component.scss']
 })
 export class PlanGraphViewComponent implements OnInit {
+  @Output() nodeAction = new EventEmitter<NodeActionInterface>();
   onReady = true;
   taskBackgroundColor = '#ffccff';
   milestoneBackgroundColor = '#99ccff';
@@ -221,6 +223,28 @@ export class PlanGraphViewComponent implements OnInit {
           this.redrawGraph();
         }
       });
+  }
+
+  onAddPlanNode() {
+    // Send a message to the dashboard to add a node
+    this.nodeAction.emit({
+      action: 'add',
+      planNode: null
+    });
+  }
+
+  onEditNode(node) {
+    this.nodeAction.emit({
+      action: 'edit',
+      planNode: node
+    });
+  }
+
+  onDeleteNode(node) {
+    this.nodeAction.emit({
+      action: 'delete',
+      planNode: node
+    });
   }
 
   redrawGraph() {

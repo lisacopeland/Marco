@@ -1,46 +1,51 @@
-<mat-card class="half-card-content" fxLayout="row">
-  <div *ngIf="onReady" class="graph-frame">
-    <ngx-graph [layout]="layout" [links]=links [nodes]=nodes [curve]="curve"
-      [draggingEnabled]="draggingEnabled" [panningEnabled]="panningEnabled" [enableZoom]="zoomEnabled"
-      [zoomSpeed]="zoomSpeed" [minZoomLevel]="minZoomLevel" [maxZoomLevel]="maxZoomLevel" [panOnZoom]="panOnZoom"
-      [autoZoom]="autoZoom" [autoCenter]="autoCenter" [update$]="update$" [center$]="center$" [zoomToFit$]="zoomToFit$">
-      <ng-template #defsTemplate>
-        <svg:marker id="arrow" viewBox="0 -5 10 10" refX="8" refY="0" markerWidth="4" markerHeight="4" orient="auto">
-          <svg:path d="M0,-5L10,0L0,5" class="arrow-head" />
-        </svg:marker>
-      </ng-template>
+<div class="view-header" fxLayout="row" fxLayoutAlign="space-between center">
+  <div>Plan Graph View</div>
+  <button mat-icon-button color="primary" matTooltip="Add a node" (click)="onAddPlanNode()">
+    <mat-icon>add</mat-icon>
+  </button>
+</div>
 
-      <ng-template #nodeTemplate let-node>
-        <svg:g *ngIf="node.data.nodeType!=='Task'" class="node" (click)="onNodeClick(node)">
-          <svg:rect [attr.width]="node.dimension.width" [attr.height]="node.dimension.height"
-            [attr.fill]="node.data.backgroundColor" />
-          <svg:text alignment-baseline="central" [attr.x]="10" [attr.fill]="node.data.color"
-            [attr.y]="node.dimension.height / 2">{{node.label}}</svg:text>
-        </svg:g>
-        <svg:g *ngIf="node.data.nodeType==='Task'" class="node" (click)="onNodeClick(node)">
-          <svg:ellipse [attr.width]=65 [attr.height]=65 [attr.cx]="node.dimension.width / 2"
-            [attr.cy]="node.dimension.height / 2" [attr.rx]="25" [attr.cy]="25" [attr.fill]="node.data.backgroundColor" />
-          <svg:text alignment-baseline="central" [attr.fill]="node.data.color" [attr.x]="10"
-            [attr.y]="node.dimension.height / 2">{{node.label}}</svg:text>
-        </svg:g>
-      </ng-template>
+  <mat-card class="card-content" fxLayout="row">
+    <div *ngIf="onReady" class="graph-frame">
+      <ngx-graph [layout]="layout" [links]=links [nodes]=nodes [curve]="curve"
+        [draggingEnabled]="draggingEnabled" [panningEnabled]="panningEnabled" [enableZoom]="zoomEnabled"
+        [zoomSpeed]="zoomSpeed" [minZoomLevel]="minZoomLevel" [maxZoomLevel]="maxZoomLevel" [panOnZoom]="panOnZoom"
+        [autoZoom]="autoZoom" [autoCenter]="autoCenter" [update$]="update$" [center$]="center$" [zoomToFit$]="zoomToFit$">
+        <ng-template #defsTemplate>
+          <svg:marker id="arrow" viewBox="0 -5 10 10" refX="8" refY="0" markerWidth="4" markerHeight="4" orient="auto">
+            <svg:path d="M0,-5L10,0L0,5" class="arrow-head" />
+          </svg:marker>
+        </ng-template>
 
-      <ng-template #linkTemplate let-link>
-        <svg:g class="edge" (click)="onLineClick(link)">
-          <svg:path class="line" stroke-width="2" marker-end="url(#arrow)">
-          </svg:path>
-<!--           <svg:text class="edge-label" text-anchor="middle">
-            <textPath class="text-path" [attr.href]="'#' + link.id" [style.dominant-baseline]="link.dominantBaseline"
-              startOffset="50%">
-              {{link.label}}
-            </textPath>
-          </svg:text> -->
-        </svg:g>
-      </ng-template>
-    </ngx-graph>
-  </div>
-<!--   <div class="sidebar">
-    <div>This is the sidebar</div>
-  </div> -->
-<button mat-fab color="primary"><mat-icon>add</mat-icon></button>
-</mat-card>
+        <ng-template #nodeTemplate let-node>
+          <svg:g *ngIf="node.data.nodeType!=='Task'" class="node" (click)="onNodeClick(node)">
+            <svg:rect [attr.width]="node.dimension.width" [attr.height]="node.dimension.height"
+              [attr.fill]="node.data.backgroundColor" />
+            <svg:text alignment-baseline="central" [attr.x]="10" [attr.fill]="node.data.color"
+              [attr.y]="node.dimension.height / 2">{{node.label}}</svg:text>
+          </svg:g>
+          <svg:g *ngIf="node.data.nodeType==='Task'" class="node" (click)="onNodeClick(node)">
+            <svg:ellipse [attr.width]=65 [attr.height]=65 [attr.cx]="node.dimension.width / 2"
+              [attr.cy]="node.dimension.height / 2" [attr.rx]="25" [attr.cy]="25" [attr.fill]="node.data.backgroundColor" />
+            <svg:text alignment-baseline="central" [attr.fill]="node.data.color" [attr.x]="10"
+              [attr.y]="node.dimension.height / 2">{{node.label}}</svg:text>
+          </svg:g>
+        </ng-template>
+
+        <ng-template #linkTemplate let-link>
+          <svg:g class="edge" (click)="onLineClick(link)">
+            <svg:path class="line" stroke-width="2" marker-end="url(#arrow)">
+            </svg:path>
+  <!--           <svg:text class="edge-label" text-anchor="middle">
+              <textPath class="text-path" [attr.href]="'#' + link.id" [style.dominant-baseline]="link.dominantBaseline"
+                startOffset="50%">
+                {{link.label}}
+              </textPath>
+            </svg:text> -->
+          </svg:g>
+        </ng-template>
+      </ngx-graph>
+    </div>
+  <!-- <button mat-fab color="primary"><mat-icon>add</mat-icon></button> -->
+  </mat-card>
+

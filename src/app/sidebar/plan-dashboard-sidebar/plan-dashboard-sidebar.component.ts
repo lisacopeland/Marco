@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { ReleasePlanService } from '@shared/services/releaseplan.service';
+import { ReleasePlanInterface } from '@shared/interfaces/releaseplan.interface';
 
 @Component({
   selector: 'app-plan-dashboard-sidebar',
@@ -7,9 +10,24 @@ import { Component, OnInit } from '@angular/core';
 })
 export class PlanDashboardSidebarComponent implements OnInit {
 
-  constructor() { }
+  releasePlan: ReleasePlanInterface;
+  constructor(private router: Router,
+              private releasePlanService: ReleasePlanService) { }
 
   ngOnInit(): void {
+    this.releasePlanService.currentPlanChanged
+      .subscribe(plan => {
+        this.releasePlan = plan as ReleasePlanInterface;
+      });
+  }
+
+  onReturnToProduct() {
+    this.router.navigate(
+      [{
+        outlets:
+          { primary: 'products/productdashboard',
+            sidebar: 'productsidebar' } }],
+          { queryParams: { id: this.releasePlan.parentId } });
   }
 
 }

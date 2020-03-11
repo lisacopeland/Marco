@@ -14,6 +14,7 @@ import { delay, map, catchError, debounceTime, distinctUntilChanged } from 'rxjs
 
 export interface NodeEditDataInterface {
   node: PlanNodeInterface;
+  parentId: string;
 }
 
 @Component({
@@ -42,6 +43,7 @@ export class NodeEditDialogComponent implements OnInit {
   ngOnInit(): void {
 
     this.editMode = this.data.node !== null;
+    this.parentId = this.data.parentId;
     if (this.editMode) {
       if (this.node.nodeType === 'Milestone') {
         this.node = this.data.node as PlanMilestoneInterface;

@@ -1,10 +1,8 @@
 <div fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="24px" class="sidebar">
-  <div fxLayout="row" class="page-header" fxLayoutAlign="space-between center">
-    <h1 class="mat-h1">Sections</h1>
-  </div>
-  <p>This is the product sidebar</p>
-    <a mat-menu-item (click)="onAdd()">Add Release Plan</a>
-    <a class="menu-choices" (click)="onEdit()">Edit</a>
-    <a class="menu-choices" (click)="onDelete()">Delete</a>
-    <a class="menu-choices" [routerLink]="[{ outlets: { primary: ['products'], sidebar: ['productssidebar'] } }]">Return to Overview</a>
+    <div class="sidebar-title">Product Dashboard</div>
+
+    <a class="menu-choices" (click)="onAdd()">Add Release Plan</a>
+    <a class="menu-choices" (click)="onEdit()">Edit Product Details</a>
+    <a class="menu-choices" (click)="onDelete()">Delete Product</a>
+    <a class="menu-choices" [routerLink]="[{ outlets: { primary: ['products'], sidebar: ['productssidebar'] } }]">Return to Product List</a>
 </div>
