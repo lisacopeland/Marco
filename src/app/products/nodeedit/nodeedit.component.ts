@@ -27,6 +27,9 @@ export class NodeEditDialogComponent implements OnInit {
   editTitle = 'Add New Milestone or Task';
   nodeForm: FormGroup;
   node: PlanNodeInterface;
+  nodeSelectList: PlanNodeInterface[];
+  successors: PlanNodeInterface[] = [];
+  predecessors: PlanNodeInterface[] = [];
   nodeLink: string;
   parentId: string;
   editMode = false;
@@ -52,6 +55,16 @@ export class NodeEditDialogComponent implements OnInit {
       }
       this.editTitle = 'Editing ' + this.node.name;
     }
+    this.nodeService.nodeLookup
+      .subscribe(data => {
+        if (data.length) {
+          this.nodeSelectList = data;
+          if (this.editMode) {
+            const idx = this.nodeSelectList.findIndex(x => x.name === this.node.name);
+            this.nodeSelectList.splice(idx, 1);
+          }
+        }
+      });
     this.initForm();
   }
 
@@ -72,9 +85,29 @@ export class NodeEditDialogComponent implements OnInit {
       description: new FormControl('', [Validators.required, Validators.minLength(2)]),
       nodeType: new FormControl(this.nodeTypes[0]),
       timerDurationMinutes: new FormControl(0),
-      timerTrigger: new FormControl('')
+      timerTrigger: new FormControl(''),
+      predecessor: new FormControl(''),
+      successor: new FormControl('')
     });
     if (this.editMode) {
+      // Get this nodes predecessors
+      this.node.predecessors.forEach(predecessorId => {
+        const idx = this.nodeSelectList.findIndex(x => x.id === predecessorId);
+        if (idx !== -1) {
+          this.successors.push(this.nodeSelectList[idx]);
+        }
+      });
+      // Get this nodes successor
+      this.successors = [];
+      this.nodeSelectList.forEach(node => {
+        // See if the node being edited is in the list of predecessors of
+        // this nodes predecessors
+        const idx = node.predecessors.findIndex(x => x === node.id);
+        if (idx !== -1) {
+          // node is a predecessor of node being edited
+          this.successors.push(node);
+        }
+      });
       this.nodeType = this.node.nodeType;
       this.nodeForm.patchValue({
         name: this.node.name,
@@ -83,6 +116,17 @@ export class NodeEditDialogComponent implements OnInit {
         timerDurationMinutes: this.node.timerDurationMinutes,
         timerTrigger: this.node.timerTrigger
       });
+      if (this.predecessors.length) {
+        this.nodeForm.patchValue({
+          predecessor: this.predecessors[0]
+        });
+      }
+      if (this.successors.length) {
+        this.nodeForm.patchValue({
+          successor: this.successors[0]
+        });
+      }
+
       if (this.nodeType === 'Milestone') {
         this.nodeForm.addControl('milestoneType', new FormControl(currentNode.milestoneType));
         this.nodeForm.addControl('label', new FormControl(currentNode.label)),
@@ -207,7 +251,7 @@ export class NodeEditDialogComponent implements OnInit {
         description: this.nodeForm.value.description,
         selfLink: (this.editMode) ? this.node.selfLink : '',
         nodeType: this.nodeType,
-        predecessors: (this.editMode) ? this.node.predecessors : [],
+        predecessors: this.nodeForm.value.predecessor,
         timerDurationMinutes: this.nodeForm.value.timerDurationMinutes,
         timerTrigger: this.nodeForm.value.timerTrigger,
         taskType: this.nodeForm.value.taskType,
