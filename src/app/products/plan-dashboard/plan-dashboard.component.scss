@@ -8,11 +8,14 @@
 
 .plan-toolbar {
   height: 30px;
+  padding-left: 45px;
   font-size: small;
-  border-top: 1px solid grey;
+  background-color: #cccccc;
+/*   border-top: 1px solid grey;
   border-bottom: 1px solid grey;
-}
+ */}
 
-a {
-  cursor: pointer;
+button {
+  background-color: #cccccc;
+  height: 30px;
 }

@@ -1,31 +1,10 @@
 <section fxLayout="column" class="page-layout">
-  <div fxLayout="row" class="page-header" fxLayoutAlign="space-between center">
+  <div fxLayout="row" class="page-header" fxLayoutAlign="start center">
     <h1 class="mat-h1">{{ product?.name }}</h1>
-<!--     <button mat-icon-button [matMenuTriggerFor]="productMenu">
-      <mat-icon>more_vert</mat-icon>
-    </button> -->
+    <p>{{ product?.description }}</p>
   </div>
 
-<!--   <mat-menu #productMenu="matMenu">
-    <button mat-menu-item (click)="onAdd()">Add Release Plan</button>
-    <button mat-menu-item (click)="onEdit()">Edit</button>
-    <button mat-menu-item (click)="onDelete()">Delete</button>
-    <button mat-menu-item routerLink="/products">Return to Overview</button>
-  </mat-menu> -->
-
   <mat-card class="card-content">
-
-<!--     <div fxLayout="row" fxLayoutAlign="space-between center">
-      <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
-        <h1 class="mat-h1">{{ product?.name }}</h1>
-        <p>{{product?.description}}</p>
-      </div>
-      <button
-        mat-icon-button
-        color="primary"
-        matTooltip="Add a release plan"
-        (click)="onAdd()"><mat-icon>add</mat-icon></button>
-    </div> -->
 
     <h1 class="mat-h1">Release Plans</h1>
     <table class="table-styling" mat-table matSort [dataSource]="dataSource">
@@ -58,6 +37,6 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
     </table>
-    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+    <mat-paginator [pageSize]="10" showFirstLastButtons></mat-paginator>
   </mat-card>
   </section>
