@@ -18,13 +18,20 @@
         </ng-template>
 
         <ng-template #nodeTemplate let-node>
-          <svg:g *ngIf="node.data.nodeType!=='Task'" class="node" (click)="onNodeClick(node)">
+          <svg:g matTooltip="This is a milestone" *ngIf="node.data.node.nodeType==='Milestone'" class="node" (click)="onNodeClick(node)">
             <svg:rect [attr.width]="node.dimension.width" [attr.height]="node.dimension.height"
               [attr.fill]="node.data.backgroundColor" />
             <svg:text alignment-baseline="central" [attr.x]="10" [attr.fill]="node.data.color"
               [attr.y]="node.dimension.height / 2">{{node.label}}</svg:text>
           </svg:g>
-          <svg:g *ngIf="node.data.nodeType==='Task'" class="node" (click)="onNodeClick(node)">
+          <svg:g matTooltip="This is a milestone link" *ngIf="node.data.node.nodeType==='MilestoneLink'" class="node" (click)="onNodeClick(node)">
+            <svg:rect [attr.width]="node.dimension.width" [attr.height]="node.dimension.height"
+              [attr.fill]="node.data.backgroundColor" />
+            <svg:text alignment-baseline="central" [attr.x]="10" [attr.fill]="node.data.color"
+              [attr.y]="node.dimension.height / 2">{{node.label}}</svg:text>
+          </svg:g>
+
+          <svg:g matTooltip="This is a task" *ngIf="node.data.node.nodeType==='Task'" class="node" (click)="onNodeClick(node)">
             <svg:ellipse [attr.width]=65 [attr.height]=65 [attr.cx]="node.dimension.width / 2"
               [attr.cy]="node.dimension.height / 2" [attr.rx]="25" [attr.cy]="25" [attr.fill]="node.data.backgroundColor" />
             <svg:text alignment-baseline="central" [attr.fill]="node.data.color" [attr.x]="10"

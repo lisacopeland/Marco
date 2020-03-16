@@ -132,6 +132,12 @@ export class PlanDashboardComponent implements OnInit {
   }
 
   onNodeAction($event: NodeActionInterface) {
+    if (this.version === 'master') {
+      this.snackBar.open('Switch to working copy to edit nodes', '', {
+        duration: 2000,
+      });
+      return;
+    }
     if (($event.action === 'add') || ($event.action === 'edit')) {
       const editData: NodeEditDataInterface = {
         parentId: this.releasePlan.id,

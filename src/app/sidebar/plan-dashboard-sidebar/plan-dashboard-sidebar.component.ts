@@ -83,7 +83,6 @@ export class PlanDashboardSidebarComponent implements OnInit {
 
   }
 
-
   onReturnToProduct() {
     this.router.navigate(
       [{

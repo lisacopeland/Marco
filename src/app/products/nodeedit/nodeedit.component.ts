@@ -70,15 +70,6 @@ export class NodeEditDialogComponent implements OnInit {
 
   initForm() {
 
-    // If you are not in edit mode, start with nodetype Milestone and show the fields
-    // for that nodeType
-    let currentNode;
-    if (this.node.nodeType === 'Milestone') {
-      currentNode = this.node as PlanMilestoneInterface;
-    } else {
-      currentNode = this.node as PlanTaskInterface;
-    }
-
     // TODO: timerTrigger should be a select of all of the other nodes in the releaseplan
     this.nodeForm = new FormGroup({
       name: new FormControl(''),
@@ -90,6 +81,12 @@ export class NodeEditDialogComponent implements OnInit {
       successor: new FormControl('')
     });
     if (this.editMode) {
+      let currentNode;
+      if (this.node.nodeType === 'Milestone') {
+        currentNode = this.node as PlanMilestoneInterface;
+      } else {
+        currentNode = this.node as PlanTaskInterface;
+      }
       // Get this nodes predecessors
       this.node.predecessors.forEach(predecessorId => {
         const idx = this.nodeSelectList.findIndex(x => x.id === predecessorId);
@@ -226,16 +223,29 @@ export class NodeEditDialogComponent implements OnInit {
     }
 
     let node;
+    let nodeId = '';
+    if (!this.editMode) {
+      nodeId = this.parentId + '!';
+      if (this.nodeType === 'task') {
+        nodeId = nodeId + 'T.' + this.nodeForm.value.name;
+      } else {
+        nodeId = nodeId + 'M.' + this.nodeForm.value.name;
+      }
+    } else {
+      nodeId = this.node.id;
+    }
+
     if (this.nodeType === 'Milestone') {
       const currentNode = this.node as PlanMilestoneInterface;
+
       node = {
-        id: (this.editMode) ? this.node.id : null,
+        id: nodeId,
         parentId: this.parentId,
         name: this.nodeForm.value.name,
         description: this.nodeForm.value.description,
         selfLink: (this.editMode) ? this.node.selfLink : '',
         nodeType: this.nodeType,
-        predecessors: (this.editMode) ? this.node.predecessors : [],
+        predecessors: [this.nodeForm.value.predecessors.id],
         timerDurationMinutes: this.nodeForm.value.timerDurationMinutes,
         timerTrigger: this.nodeForm.value.timerTrigger,
         milestoneType: this.nodeForm.value.milestoneType,
@@ -245,13 +255,13 @@ export class NodeEditDialogComponent implements OnInit {
       } as PlanMilestoneInterface;
     } else {
       node = {
-        id: (this.editMode) ? this.node.id : null,
+        id: nodeId,
         parentId: this.parentId,
         name: this.nodeForm.value.name,
         description: this.nodeForm.value.description,
         selfLink: (this.editMode) ? this.node.selfLink : '',
         nodeType: this.nodeType,
-        predecessors: this.nodeForm.value.predecessor,
+        predecessors: [this.nodeForm.value.predecessor.id],
         timerDurationMinutes: this.nodeForm.value.timerDurationMinutes,
         timerTrigger: this.nodeForm.value.timerTrigger,
         taskType: this.nodeForm.value.taskType,

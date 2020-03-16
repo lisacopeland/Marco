@@ -44,7 +44,11 @@
     </mat-form-field>
     <mat-form-field class="input-75">
       <mat-label>Timer Trigger</mat-label>
-      <input matInput placeholder="" formControlName="timerTrigger">
+      <mat-select formControlName="timerTrigger">
+        <mat-option *ngFor="let node of nodeSelectList" [value]="node">
+          {{node.name}}
+        </mat-option>
+      </mat-select>
     </mat-form-field>
 
     <!-- Fields for when nodeType is milestone -->

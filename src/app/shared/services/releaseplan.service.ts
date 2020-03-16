@@ -77,7 +77,6 @@ export class ReleasePlanService {
       );
   }
 
-
   getReleasePlanSource(releasePlanLink: string) {
     return this.releasePlanSource
       .pipe(
