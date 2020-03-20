@@ -41,8 +41,16 @@ export class PlanLineDialogComponent implements OnInit {
       .subscribe(data => {
         if (data.length) {
           this.nodeSelectList = data;
+          this.nodeSelectList.forEach(x => {
+            console.log('node name ' + x.name);
+          });
           const idx = this.nodeSelectList.findIndex(x => x.name === this.node.name);
-          this.nodeSelectList.splice(idx, 1);
+          if (idx !== -1) {
+            this.nodeSelectList.splice(idx, 1);
+          }
+          this.nodeSelectList.forEach(x => {
+            console.log('node name ' + x.name);
+          });
         }
         this.initForm();
       });
