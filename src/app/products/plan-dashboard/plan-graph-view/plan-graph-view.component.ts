@@ -1,10 +1,11 @@
-import { Component, OnInit, ChangeDetectionStrategy, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, Output, EventEmitter, ViewChild } from '@angular/core';
 import { PlanNodeInterface } from '@shared/interfaces/node.interface';
 import { Edge, Node, Layout } from '@swimlane/ngx-graph';
 import * as shape from 'd3-shape';
 import { Subject } from 'rxjs';
 import { NodeService } from '@shared/services/node.service';
 import { NodeActionInterface } from '../plan-dashboard.component';
+import { MatMenuTrigger } from '@angular/material/menu';
 
 @Component({
   selector: 'app-plan-graph-view',
@@ -14,6 +15,7 @@ import { NodeActionInterface } from '../plan-dashboard.component';
 })
 export class PlanGraphViewComponent implements OnInit {
   @Output() nodeAction = new EventEmitter<NodeActionInterface>();
+  // @ViewChild(MatMenuTrigger) trigger: MatMenuTrigger;
   onReady = true;
   taskBackgroundColor = '#ffccff';
   milestoneBackgroundColor = '#99ccff';
@@ -56,21 +58,40 @@ export class PlanGraphViewComponent implements OnInit {
     // Send a message to the dashboard to add a node
     this.nodeAction.emit({
       action: 'add',
-      planNode: null
+      planNode: null,
+      targetNode: null
     });
   }
 
-  onEditNode(node) {
+  onEditNode(node: PlanNodeInterface) {
     this.nodeAction.emit({
       action: 'edit',
-      planNode: node
+      planNode: node,
+      targetNode: null
     });
   }
 
-  onDeleteNode(node) {
+  onDeleteNode(node: PlanNodeInterface) {
     this.nodeAction.emit({
       action: 'delete',
-      planNode: node
+      planNode: node,
+      targetNode: null
+    });
+  }
+
+  onAddLine(node: PlanNodeInterface, fromHere: string) {
+    this.nodeAction.emit({
+      action: fromHere,
+      planNode: node,
+      targetNode: null
+    });
+  }
+
+  onDelLine(sourceNode: PlanNodeInterface, targetNode: PlanNodeInterface) {
+    this.nodeAction.emit({
+      action: 'deleteLine',
+      planNode: sourceNode,
+      targetNode
     });
   }
 
@@ -110,8 +131,6 @@ export class PlanGraphViewComponent implements OnInit {
         });
       }
     });
-    console.log('newNodes is ' + JSON.stringify(newNodes));
-    console.log('newLinks is ' + JSON.stringify(newLinks));
     this.nodes = newNodes;
     this.links = newLinks;
   }

@@ -41,7 +41,6 @@ export class ProductDashboardComponent implements OnInit, OnDestroy {
     this.route.queryParams
       .subscribe(params => {
         this.productId = params.id;
-        console.log('product id is ' + this.productId);
         if (this.productId) {
           this.productService.getProductHttp(this.productId)
             .pipe(
@@ -96,7 +95,6 @@ export class ProductDashboardComponent implements OnInit, OnDestroy {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
     });
   }
 
@@ -106,7 +104,6 @@ export class ProductDashboardComponent implements OnInit, OnDestroy {
       data: this.product
     });
     dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
       if (result) {
         this.product = result;
       }
@@ -125,7 +122,6 @@ export class ProductDashboardComponent implements OnInit, OnDestroy {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result === 'Yes') {
-        console.log('result was yes');
         this.productService.delProduct(this.product)
           .subscribe(() => {
             this.router.navigateByUrl('/products');

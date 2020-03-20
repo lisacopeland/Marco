@@ -25,7 +25,6 @@ export class NodeDashboardComponent implements OnInit {
       .subscribe(params => {
         this.nodeId = params.id;
         this.selfLink = params.selfLink;
-        console.log('node id is ' + this.nodeId);
         if (this.nodeId) {
           this.nodeService.getNodeHttp(this.selfLink)
             .subscribe(node => {

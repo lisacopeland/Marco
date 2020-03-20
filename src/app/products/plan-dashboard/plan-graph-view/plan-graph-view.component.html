@@ -18,25 +18,50 @@
         </ng-template>
 
         <ng-template #nodeTemplate let-node>
-          <svg:g matTooltip="This is a milestone" *ngIf="node.data.node.nodeType==='Milestone'" class="node" (click)="onNodeClick(node)">
-            <svg:rect [attr.width]="node.dimension.width" [attr.height]="node.dimension.height"
-              [attr.fill]="node.data.backgroundColor" />
-            <svg:text alignment-baseline="central" [attr.x]="10" [attr.fill]="node.data.color"
-              [attr.y]="node.dimension.height / 2">{{node.label}}</svg:text>
-          </svg:g>
-          <svg:g matTooltip="This is a milestone link" *ngIf="node.data.node.nodeType==='MilestoneLink'" class="node" (click)="onNodeClick(node)">
+          <svg:g
+            *ngIf="node.data.node.nodeType==='Milestone'"
+            matTooltip="This is a milestone"
+            mat-button
+            [matMenuTriggerFor]="clickMenu"
+            class="node">
             <svg:rect [attr.width]="node.dimension.width" [attr.height]="node.dimension.height"
               [attr.fill]="node.data.backgroundColor" />
             <svg:text alignment-baseline="central" [attr.x]="10" [attr.fill]="node.data.color"
               [attr.y]="node.dimension.height / 2">{{node.label}}</svg:text>
           </svg:g>
 
-          <svg:g matTooltip="This is a task" *ngIf="node.data.node.nodeType==='Task'" class="node" (click)="onNodeClick(node)">
+
+          <svg:g
+            *ngIf="node.data.node.nodeType==='MilestoneLink'"
+            matTooltip="This is a milestone link"
+            class="node"
+            mat-button
+            [matMenuTriggerFor]="clickMenu">
+            <svg:rect [attr.width]="node.dimension.width" [attr.height]="node.dimension.height"
+              [attr.fill]="node.data.backgroundColor" />
+            <svg:text alignment-baseline="central" [attr.x]="10" [attr.fill]="node.data.color"
+              [attr.y]="node.dimension.height / 2">{{node.label}}</svg:text>
+          </svg:g>
+
+          <svg:g
+            *ngIf="node.data.node.nodeType==='Task'"
+            matTooltip="This is a task"
+            class="node"
+            mat-button
+            [matMenuTriggerFor]="clickMenu">
             <svg:ellipse [attr.width]=65 [attr.height]=65 [attr.cx]="node.dimension.width / 2"
               [attr.cy]="node.dimension.height / 2" [attr.rx]="25" [attr.cy]="25" [attr.fill]="node.data.backgroundColor" />
             <svg:text alignment-baseline="central" [attr.fill]="node.data.color" [attr.x]="10"
               [attr.y]="node.dimension.height / 2">{{node.label}}</svg:text>
           </svg:g>
+
+          <mat-menu #clickMenu="matMenu">
+            <button mat-menu-item (click)="onEditNode(node.data.node)">Edit</button>
+            <button mat-menu-item (click)="onAddLine(node.data.node, 'from')">Add Line From Here</button>
+            <button mat-menu-item (click)="onAddLine(node.data.node, 'to')">Add Line to Here</button>
+            <button mat-menu-item (click)="onDeleteNode(node.data.node)">Delete</button>
+          </mat-menu>
+
         </ng-template>
 
         <ng-template #linkTemplate let-link>

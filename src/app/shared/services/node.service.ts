@@ -36,11 +36,30 @@ export class NodeService {
   }
 
   delNodeCache(node: PlanNodeInterface) {
+    // First loop thru all nodes and remove this one from
+    // the predecessor list of all nodes
+    const successorNodes = this.nodes.filter(targetNode => {
+      return (targetNode.predecessors.find(x => x === node.id) !== undefined);
+    });
+    successorNodes.forEach(targetNode => {
+      const idx1 = targetNode.predecessors.findIndex(x => x === node.id);
+      targetNode.predecessors.splice(idx1, 1);
+    });
+    // Now remove this node from the list
     const idx = this.nodes.findIndex(x => x.id === node.id);
     if (idx !== -1) {
       this.nodes.splice(idx, 1);
       this.nodeSource.next(this.nodes);
     }
+  }
+
+  delLineCache(sourceNode: PlanNodeInterface, targetNode: PlanNodeInterface) {
+    // TargetNode should have sourceNode as a predecessor
+    const idx = this.nodes.findIndex(x => x.id === targetNode.id);
+    const editNode = this.nodes[idx];
+    const idx1 = editNode.predecessors.findIndex(x => x === sourceNode.id);
+    targetNode.predecessors.splice(idx1, 1);
+    this.nodeSource.next(this.nodes);
   }
 
   getNodesHttp(nodeLink: string) {
@@ -107,8 +126,8 @@ export class NodeService {
   }
 
   // Returns true if the name is taken, false if otherwise
-  checkNameNotTaken(nodeId: string): Observable<boolean | null> {
-    const result = (this.nodes.find(x => x.id === nodeId) === undefined) ? true : false;
+  isNameTaken(name: string): Observable<boolean | null> {
+    const result = (this.nodes.find(x => x.name === name.toUpperCase()) !== undefined);
     return of(result);
   }
 
@@ -126,8 +145,6 @@ export class NodeService {
       .post<PlanNodeInterface>(url, body, httpOptions)
       .pipe(
         map(data => {
-          console.log('from HTTP call');
-          console.log(JSON.stringify(data));
           this.nodes.push(node);
           this.nodeSource.next(this.nodes);
           return data;
@@ -138,6 +155,8 @@ export class NodeService {
 
   delNodeHTTP(node: PlanNodeInterface) {
 
+    // TODO: If we ever use this we need to be sure to take
+    // care of predecessors
     const url = environment.apiUrl + '/' + node.selfLink;
     const httpOptions = {
       headers: new HttpHeaders({
@@ -148,8 +167,6 @@ export class NodeService {
       .delete<PlanNodeInterface>(url, httpOptions)
       .pipe(
         map(data => {
-          console.log('from HTTP call');
-          console.log(JSON.stringify(data));
           const idx = this.nodes.findIndex(x => x.id === node.id);
           if (idx !== -1) {
             this.nodes.splice(idx, 1);
@@ -176,8 +193,6 @@ export class NodeService {
       .put<PlanNodeInterface>(url, body, httpOptions)
       .pipe(
         map(data => {
-          console.log('from HTTP call');
-          console.log(JSON.stringify(data));
           const idx = this.nodes.findIndex(x => x.id === node.id);
           if (idx !== -1) {
             this.nodes[idx] = node;

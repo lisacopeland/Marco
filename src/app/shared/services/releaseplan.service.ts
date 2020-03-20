@@ -47,7 +47,6 @@ export class ReleasePlanService {
       .pipe(
         map(data => {
           this.releasePlans = data.releasePlans;
-          console.log('releaseplans : ' + JSON.stringify(this.releasePlans));
           if (this.releasePlans.length) {
             this.releasePlanSource.next(this.releasePlans);
           }
@@ -70,7 +69,6 @@ export class ReleasePlanService {
       .get<ReleasePlanInterface>(url, httpOptions)
       .pipe(
         map(data => {
-          console.log('releaseplan : ' + JSON.stringify(data));
           return data;
         }),
         catchError(this.handleError)
@@ -104,8 +102,6 @@ export class ReleasePlanService {
       .get<ReleasePlanInterface>(url, httpOptions)
       .pipe(
         map(data => {
-          console.log('from HTTP call');
-          console.log(JSON.stringify(data));
           return data;
         }),
         catchError(this.handleError)
@@ -136,8 +132,6 @@ export class ReleasePlanService {
       .post<ReleasePlanInterface>(url, body, httpOptions)
       .pipe(
         map(data => {
-          console.log('from HTTP call');
-          console.log(JSON.stringify(data));
           this.releasePlans.push(newReleasePlan);
           this.releasePlanSource.next(this.releasePlans);
           return data;
@@ -158,8 +152,6 @@ export class ReleasePlanService {
       .delete<ReleasePlanInterface>(url, httpOptions)
       .pipe(
         map(data => {
-          console.log('from HTTP call');
-          console.log(JSON.stringify(data));
           const idx = this.releasePlans.findIndex(x => x.id === releasePlan.id);
           if (idx !== -1) {
             this.releasePlans.splice(idx, 1);
@@ -186,8 +178,6 @@ export class ReleasePlanService {
       .put<ReleasePlanInterface>(url, body, httpOptions)
       .pipe(
         map(data => {
-          console.log('from HTTP call');
-          console.log(JSON.stringify(data));
           const idx = this.releasePlans.findIndex(x => x.id === releasePlan.id);
           if (idx !== -1) {
             this.releasePlans[idx] = releasePlan;

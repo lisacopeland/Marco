@@ -4,7 +4,7 @@ import { FormGroup, FormControl, Validators, AbstractControl, ValidationErrors }
 import { NodeService } from '@shared/services/node.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { delay, map, catchError, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 // This dialog mutates the data or adds data but does not
@@ -48,7 +48,7 @@ export class NodeEditDialogComponent implements OnInit {
     this.editMode = this.data.node !== null;
     this.parentId = this.data.parentId;
     if (this.editMode) {
-      if (this.node.nodeType === 'Milestone') {
+      if (this.data.node.nodeType === 'Milestone') {
         this.node = this.data.node as PlanMilestoneInterface;
       } else {
         this.node = this.data.node as PlanTaskInterface;
@@ -64,15 +64,20 @@ export class NodeEditDialogComponent implements OnInit {
             this.nodeSelectList.splice(idx, 1);
           }
         }
+        this.initForm();
       });
-    this.initForm();
+
   }
 
   initForm() {
 
     // TODO: timerTrigger should be a select of all of the other nodes in the releaseplan
     this.nodeForm = new FormGroup({
-      name: new FormControl(''),
+      name: new FormControl(
+        '',
+        { validators: [Validators.required],
+          asyncValidators: [this.validateNameAvailability.bind(this)],
+          updateOn: 'blur' }),
       description: new FormControl('', [Validators.required, Validators.minLength(2)]),
       nodeType: new FormControl(this.nodeTypes[0]),
       timerDurationMinutes: new FormControl(0),
@@ -137,10 +142,10 @@ export class NodeEditDialogComponent implements OnInit {
       this.nodeForm.get('nodeType').disable();
     } else {
       this.nodeType = 'Milestone';
-      this.nodeForm.get('name').setValidators(Validators.required);
-      this.nodeForm.get('name').setAsyncValidators([
-        this.validateNameAvailability.bind(this)]);
-      this.onNameChanges();
+      // this.nodeForm.get('name').setValidators(Validators.required);
+      // this.nodeForm.get('name').setAsyncValidators([
+      //   this.validateNameAvailability.bind(this)]);
+      // this.onNameChanges();
       this.nodeForm.get('nodeType').setValidators(Validators.required);
       this.swapNodeTypeFields('Milestone', false);
       this.onNodeTypeChanges();
@@ -177,20 +182,11 @@ export class NodeEditDialogComponent implements OnInit {
 
   }
 
-  validateNameAvailability(control: AbstractControl): Observable<ValidationErrors | null> {
-    const node = this.parentId + ':' + control.value;
-    return this.nodeService.checkNameNotTaken(node)
-      .pipe(
-        delay(1000),
-        map(res => {
-          if (!res) {
-            this.nodeForm.get('name').setErrors({ nameTaken: true });
-            return;
-          }
-          return null;
-        }),
-        catchError(() => null)
-      );
+  validateNameAvailability(ctrl: AbstractControl): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> {
+    return this.nodeService.isNameTaken(ctrl.value).pipe(
+      map(isTaken => (isTaken ? { nameTaken: true } : null)),
+      catchError(() => of(null))
+    );
   }
 
   onNameChanges(): void {
@@ -202,7 +198,6 @@ export class NodeEditDialogComponent implements OnInit {
           name: val.toUpperCase()
         });
         if (this.nodeForm.get('name').hasError('nameTaken')) {
-          console.log('name is taken!');
         }
       });
   }
@@ -241,11 +236,11 @@ export class NodeEditDialogComponent implements OnInit {
       node = {
         id: nodeId,
         parentId: this.parentId,
-        name: this.nodeForm.value.name,
+        name: this.nodeForm.value.name.toUpperCase(),
         description: this.nodeForm.value.description,
         selfLink: (this.editMode) ? this.node.selfLink : '',
         nodeType: this.nodeType,
-        predecessors: [this.nodeForm.value.predecessors.id],
+        predecessors: [this.nodeForm.value.predecessor.id],
         timerDurationMinutes: this.nodeForm.value.timerDurationMinutes,
         timerTrigger: this.nodeForm.value.timerTrigger,
         milestoneType: this.nodeForm.value.milestoneType,
@@ -257,7 +252,7 @@ export class NodeEditDialogComponent implements OnInit {
       node = {
         id: nodeId,
         parentId: this.parentId,
-        name: this.nodeForm.value.name,
+        name: this.nodeForm.value.name.toUpperCase(),
         description: this.nodeForm.value.description,
         selfLink: (this.editMode) ? this.node.selfLink : '',
         nodeType: this.nodeType,
@@ -272,25 +267,6 @@ export class NodeEditDialogComponent implements OnInit {
     }
 
     this.dialogRef.close(node);
-
-/*     if (this.editMode) {
-      this.nodeService.editNode(node)
-        .subscribe(data => {
-          this.snackBar.open('Node successfully updated', '', {
-            duration: 2000,
-          });
-          this.dialogRef.close(node);
-        });
-    } else {
-      this.nodeService.addNode(this.nodeLink, node)
-      .subscribe(() => {
-        this.snackBar.open('Node successfully added', '', {
-          duration: 2000,
-        });
-        this.dialogRef.close(node);
-      });
-    } */
-
   }
 
   onClose(): void {

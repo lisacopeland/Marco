@@ -6,10 +6,11 @@
     <mat-form-field class="input-75">
       <mat-label>Name</mat-label>
       <input matInput placeholder="Name" formControlName="name">
+      <mat-error *ngIf="nodeForm.get('name').hasError('nameTaken')">Name must be unique</mat-error>
     </mat-form-field>
     <mat-form-field class="input-75">
       <mat-label>Description</mat-label>
-      <input matInput placeholder="Ex. My Plan" formControlName="description" required>
+      <input matInput placeholder="Description of this node" formControlName="description" required>
     </mat-form-field>
     <mat-form-field class="input-75">
       <mat-label>Node Type</mat-label>

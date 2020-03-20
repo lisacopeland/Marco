@@ -1,0 +1,25 @@
+<!-- Dialog title -->
+<div mat-dialog-title fxLayout="row" fxLayoutAlign="space-between center">
+  <h1 class="mat-h1">Add a line {{ direction }} {{ node.name }}</h1>
+  <button mat-icon-button matTooltip="toolTipText" matTooltipShowDelay="1000" (click)="onCancel()" color="primary">
+    <mat-icon color="primary">cancel</mat-icon>
+  </button>
+</div>
+
+<form [formGroup]="nodeForm" (ngSubmit)="onSubmit()">
+  <mat-form-field class="input-75">
+    <mat-label *ngIf="direction === 'to'">Node is preceded by</mat-label>
+    <mat-label *ngIf="direction === 'from'">Node is succeeded by</mat-label>
+    <mat-select formControlName="newNode">
+      <mat-option *ngFor="let node of nodeSelectList" [value]="node">
+        {{node.name}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <!-- Dialog Actions -->
+  <mat-dialog-actions class="form-footer">
+    <button mat-raised-button color="accent" type="submit">Save</button>
+    <button mat-raised-button color="primary" type="button" (click)="onCancel()">Cancel</button>
+  </mat-dialog-actions>
+</form>

@@ -12,12 +12,12 @@ import { NodeDashboardComponent } from './nodedashboard/nodedashboard.component'
 import { ProductDashboardComponent } from './product-dashboard/product-dashboard.component';
 import { ProductEditDialogComponent } from './productedit/productedit.component';
 import { AlertDialogModule } from '../alert-dialog/alert-dialog.module';
-import { MilestoneLinkEditDialogComponent } from './milestonelink-edit/milestonelink-edit.component';
 import { NodeEditDialogComponent } from './nodeedit/nodeedit.component';
 import { NgxGraphModule } from '@swimlane/ngx-graph';
 import { PlanListViewComponent } from './plan-dashboard/plan-list-view/plan-list-view.component';
 import { PlanGraphViewComponent } from './plan-dashboard/plan-graph-view/plan-graph-view.component';
 import { PlanReportsDialogComponent } from './plan-dashboard/plan-reports-dialog/plan-reports-dialog.component';
+import { PlanLineDialogComponent } from './plan-dashboard/plan-line-dialog/plan-line-dialog.component';
 
 @NgModule({
   declarations: [
@@ -28,10 +28,10 @@ import { PlanReportsDialogComponent } from './plan-dashboard/plan-reports-dialog
     ProductDashboardComponent,
     ProductEditDialogComponent,
     NodeEditDialogComponent,
-    MilestoneLinkEditDialogComponent,
     PlanListViewComponent,
     PlanGraphViewComponent,
     PlanReportsDialogComponent,
+    PlanLineDialogComponent
   ],
   imports: [
     CommonModule,
@@ -46,7 +46,8 @@ import { PlanReportsDialogComponent } from './plan-dashboard/plan-reports-dialog
     PlanEditDialogComponent,
     ProductEditDialogComponent,
     NodeEditDialogComponent,
-    PlanReportsDialogComponent
+    PlanReportsDialogComponent,
+    PlanLineDialogComponent
   ],
 })
 export class ProductsModule { }

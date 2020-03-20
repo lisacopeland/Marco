@@ -64,21 +64,24 @@ export class PlanListViewComponent implements OnInit {
     // Send a message to the dashboard to add a node
     this.nodeAction.emit({
       action: 'add',
-      planNode: null
+      planNode: null,
+      targetNode: null,
     });
   }
 
   onEditNode(row) {
     this.nodeAction.emit({
       action: 'edit',
-      planNode: row
+      planNode: row,
+      targetNode: null
     });
   }
 
   onDeleteNode(row) {
     this.nodeAction.emit({
       action: 'delete',
-      planNode: row
+      planNode: row,
+      targetNode: null
     });
   }
 

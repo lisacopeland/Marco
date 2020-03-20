@@ -13,10 +13,12 @@ import { AlertDialogComponent } from 'src/app/alert-dialog/alert-dialog.componen
 import { PlanReportsDialogComponent } from './plan-reports-dialog/plan-reports-dialog.component';
 import { NodeEditDataInterface, NodeEditDialogComponent } from '../nodeedit/nodeedit.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { PlanLineEditDialogData, PlanLineDialogComponent } from './plan-line-dialog/plan-line-dialog.component';
 
 export interface NodeActionInterface {
   action: string;
   planNode: PlanNodeInterface|null;
+  targetNode: PlanNodeInterface|null;
 }
 
 @Component({
@@ -131,6 +133,8 @@ export class PlanDashboardComponent implements OnInit {
 
   }
 
+  // If either the plan-list-view or graph-view wants to modify a node
+  // It emits an event and is handled here
   onNodeAction($event: NodeActionInterface) {
     if (this.version === 'master') {
       this.snackBar.open('Switch to working copy to edit nodes', '', {
@@ -138,6 +142,7 @@ export class PlanDashboardComponent implements OnInit {
       });
       return;
     }
+    // User wants to add or edit an existing node
     if (($event.action === 'add') || ($event.action === 'edit')) {
       const editData: NodeEditDataInterface = {
         parentId: this.releasePlan.id,
@@ -161,7 +166,31 @@ export class PlanDashboardComponent implements OnInit {
           console.log('dialog was cancelled');
         }
       });
+    } else if (($event.action === 'from') || ($event.action === 'to')) {
+      const editData: PlanLineEditDialogData = {
+        node: $event.planNode,
+        direction: $event.action
+      };
+      const dialogRef = this.dialog.open(PlanLineDialogComponent, {
+        width: '500px',
+        data: editData
+      });
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          console.log('a plan line was added');
+          this.planDirty = true;
+          this.nodeService.editNodeCache(result);
+        } else {
+          console.log('dialog was cancelled');
+        }
+      });
+
+    } else if ($event.action === 'deleteLine') {
+      this.nodeService.delLineCache($event.planNode, $event.targetNode);
+      this.planDirty = true;
     } else if ($event.action === 'delete') {
+      // TODO: delNodeCache will make sure to remove this node from the predecessor
+      // list of all nodes
       this.nodeService.delNodeCache($event.planNode);
       this.planDirty = true;
     }
@@ -187,11 +216,8 @@ export class PlanDashboardComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('the plan was updated');
         this.releasePlan = result;
         this.planDirty = true;
-      } else {
-        console.log('the release plan was not updated');
       }
     });
   }

@@ -47,8 +47,6 @@ export class ProductService {
       .get<GetResponse>(apiUrl, httpOptions)
       .pipe(
         map(data => {
-          console.log('from HTTP call');
-          console.log(JSON.stringify(data));
           this.products = data.products;
           this.productsSource.next(this.products);
           return this.products.slice();
@@ -86,8 +84,6 @@ export class ProductService {
       .get<ProductInterface>(apiUrl, httpOptions)
       .pipe(
         map(data => {
-          console.log('from HTTP call');
-          console.log(JSON.stringify(data));
           return data;
         }),
         catchError(this.handleError)
@@ -113,8 +109,6 @@ export class ProductService {
       .post<ProductInterface>(apiUrl, body, httpOptions)
       .pipe(
         map(data => {
-          console.log('from HTTP call');
-          console.log(JSON.stringify(data));
           this.products.push(newProduct);
           this.productsSource.next(this.products);
           return data;
@@ -135,8 +129,6 @@ export class ProductService {
       .delete<ProductInterface>(url, httpOptions)
       .pipe(
         map(data => {
-          console.log('from HTTP call');
-          console.log(JSON.stringify(data));
           const idx = this.products.findIndex(x => x.id === product.id);
           if (idx !== -1) {
             this.products.splice(idx, 1);
@@ -163,8 +155,6 @@ export class ProductService {
       .put<ProductInterface>(url, body, httpOptions)
       .pipe(
         map(data => {
-          console.log('from HTTP call');
-          console.log(JSON.stringify(data));
           const idx = this.products.findIndex(x => x.id === product.id);
           if (idx !== -1) {
             this.products[idx] = product;

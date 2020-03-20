@@ -48,7 +48,6 @@ export class ProductSidebarComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
     });
   }
 
@@ -58,7 +57,6 @@ export class ProductSidebarComponent implements OnInit {
       data: this.product
     });
     dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
       if (result) {
         this.product = result;
       }
@@ -77,7 +75,6 @@ export class ProductSidebarComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result) => {
       if (result === 'Yes') {
-        console.log('result was yes');
         this.productService.delProduct(this.product)
           .subscribe(() => {
             this.router.navigate([{ outlets: { primary: 'products', sidebar: 'productssidebar' } }]);
