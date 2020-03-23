@@ -17,6 +17,7 @@ export class ProductService {
   private productSource = new BehaviorSubject<{}>({});
   currentProductChanged = this.productSource.asObservable();
   currentProduct: ProductInterface;
+  headers = new HttpHeaders().set('Content-Type', 'text/plain');
 
   constructor(private http: HttpClient) { }
 
@@ -37,10 +38,9 @@ export class ProductService {
     }
 
     const apiUrl = environment.apiUrl + '/api/v1/namespaces';
-    const headers =  new HttpHeaders().set('Content-Type', 'text/plain');
 
     return this.http
-      .get<GetResponse>(apiUrl, { observe: 'response', headers })
+      .get<GetResponse>(apiUrl, { observe: 'response', headers: this.headers })
       .pipe(
         map(response => {
           console.log(response);
@@ -72,16 +72,12 @@ export class ProductService {
 
   getProductHttp(id: string) {
     const apiUrl = environment.apiUrl + '/api/v1/namespaces/' + id;
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'text/plain'
-      })
-    };
+
     return this.http
-      .get<ProductInterface>(apiUrl, httpOptions)
+      .get<ProductInterface>(apiUrl, { observe: 'response', headers: this.headers })
       .pipe(
-        map(data => {
-          return data;
+        map(response => {
+          return response.body;
         }),
         catchError(this.handleError)
       );
@@ -96,19 +92,15 @@ export class ProductService {
   addProduct(newProduct: ProductInterface) {
 
     const apiUrl = environment.apiUrl + '/api/v1/namespaces';
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'text/plain'
-      })
-    };
+
     const body = JSON.stringify(newProduct);
     return this.http
-      .post<ProductInterface>(apiUrl, body, httpOptions)
+      .post<ProductInterface>(apiUrl, body, { observe: 'response', headers: this.headers })
       .pipe(
         map(data => {
           this.products.push(newProduct);
           this.productsSource.next(this.products);
-          return data;
+          return newProduct;
         }),
         catchError(this.handleError)
       );
@@ -118,21 +110,16 @@ export class ProductService {
 
     const apiUrl = environment.apiUrl + '/api/v1/namespaces/product.name';
 
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'text/plain'
-      })
-    };
     return this.http
-      .delete<ProductInterface>(apiUrl, httpOptions)
+      .delete<ProductInterface>(apiUrl, { observe: 'response', headers: this.headers })
       .pipe(
-        map(data => {
+        map(response => {
           const idx = this.products.findIndex(x => x.namespace === product.namespace);
           if (idx !== -1) {
             this.products.splice(idx, 1);
             this.productsSource.next(this.products);
           }
-          return data;
+          return response.body;
         }),
         catchError(this.handleError)
       );
@@ -140,25 +127,20 @@ export class ProductService {
   }
 
   editProduct(product: ProductInterface) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'text/plain'
-      })
-    };
 
     const apiUrl = environment.apiUrl + '/api/v1/namespaces/product.name';
 
     const body = JSON.stringify(product);
     return this.http
-      .put<ProductInterface>(apiUrl, body, httpOptions)
+      .put<ProductInterface>(apiUrl, body, { observe: 'response', headers: this.headers })
       .pipe(
-        map(data => {
+        map(response => {
           const idx = this.products.findIndex(x => x.namespace === product.namespace);
           if (idx !== -1) {
             this.products[idx] = product;
             this.productsSource.next(this.products);
           }
-          return data;
+          return response.body;
         }),
         catchError(this.handleError)
       );

@@ -62,7 +62,7 @@ export class PlanDashboardComponent implements OnInit {
 
   getReleasePlan(link: string) {
     console.log('getting releaseplans using ' + link);
-    this.actionSequenceTemplateService.getActionSequenceTemplateHttp(link)
+    this.actionSequenceTemplateService.getActionSequenceTemplate(link)
       .subscribe((data: any) => {
         if (this.version === 'master') {
           this.version = 'master';

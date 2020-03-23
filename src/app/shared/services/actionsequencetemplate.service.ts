@@ -18,6 +18,7 @@ export class ActionSequenceTemplateService {
   private currentTemplateSource = new BehaviorSubject<{}>({});
   currentTemplateChanged = this.currentTemplateSource.asObservable();
   currentTemplate: ActionSequenceTemplateInterface;
+  headers = new HttpHeaders().set('Content-Type', 'text/plain');
 
   constructor(private http: HttpClient) { }
 
@@ -36,18 +37,12 @@ export class ActionSequenceTemplateService {
       actionSequenceTemplates: ActionSequenceTemplateInterface[];
     }
 
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'text/plain'
-      })
-    };
-
     const url = environment.apiUrl + '/' + actionSequenceTemplatesLink;
     return this.http
-      .get<GetResponse>(url, httpOptions)
+      .get<GetResponse>(url, { observe: 'response', headers: this.headers })
       .pipe(
-        map(data => {
-          this.actionSequenceTemplates = data.actionSequenceTemplates;
+        map(response => {
+          this.actionSequenceTemplates = response.body.actionSequenceTemplates;
           if (this.actionSequenceTemplates.length) {
             this.actionSequenceTemplateSource.next(this.actionSequenceTemplates);
           }
@@ -59,19 +54,12 @@ export class ActionSequenceTemplateService {
 
   // Used to get the working or committed plan
   getActionSequenceTemplate(link: string) {
-
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'text/plain'
-      })
-    };
-
     const url = environment.apiUrl + '/' + link;
     return this.http
-      .get<ActionSequenceTemplateInterface>(url, httpOptions)
+      .get<ActionSequenceTemplateInterface>(url, { observe: 'response', headers: this.headers })
       .pipe(
-        map(data => {
-          return data;
+        map(response => {
+          return response.body;
         }),
         catchError(this.handleError)
       );
@@ -79,35 +67,26 @@ export class ActionSequenceTemplateService {
 
   verifyOrCommitTemplate(link: string) {
     const url = environment.apiUrl + '/' + link;
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'text/plain'
-      })
-    };
-
+    const body = JSON.stringify(link);
     return this.http
-      .post<VerificationRequestInterface>(url, httpOptions)
+      .post<VerificationRequestInterface>(url, body, { observe: 'response', headers: this.headers })
       .pipe(
-        map(data => {
-          return data;
+        map(response => {
+          return response.body;
         }),
         catchError(this.handleError)
       );
   }
 
+  // Call the deleteAllLink or deleteWorkingLink
   deleteOrDeleteAll(link) {
     const url = environment.apiUrl + '/' + link;
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'text/plain'
-      })
-    };
-
+    const body = JSON.stringify(link);
     return this.http
-      .post(url, httpOptions)
+      .post<string>(url, body, { observe: 'response', headers: this.headers })
       .pipe(
-        map(data => {
-          return data;
+        map(response => {
+          return response.statusText;
         }),
         catchError(this.handleError)
       );
@@ -129,23 +108,6 @@ export class ActionSequenceTemplateService {
       );
   }
 
-  getActionSequenceTemplateHttp(selfLink: string) {
-    const url = environment.apiUrl + '/' + selfLink;
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'text/plain'
-      })
-    };
-    return this.http
-      .get<ActionSequenceTemplateInterface>(url, httpOptions)
-      .pipe(
-        map(data => {
-          return data;
-        }),
-        catchError(this.handleError)
-      );
-  }
-
   getActionSequenceTemplateById(id: string): ActionSequenceTemplateInterface {
     return this.actionSequenceTemplates.find(x => x.id === id);
   }
@@ -159,69 +121,36 @@ export class ActionSequenceTemplateService {
   addActionSequenceTemplate(actionSequenceTemplatesLink: string, newActionSequenceTemplate: ActionSequenceTemplateInterface) {
 
     const url = environment.apiUrl + '/' + actionSequenceTemplatesLink;
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'text/plain'
-      })
-    };
 
     const body = JSON.stringify(newActionSequenceTemplate);
     return this.http
-      .post<ActionSequenceTemplateInterface>(url, body, httpOptions)
+      .post<ActionSequenceTemplateInterface>(url, body, { observe: 'response', headers: this.headers })
       .pipe(
-        map(data => {
+        map(response => {
           this.actionSequenceTemplates.push(newActionSequenceTemplate);
           this.actionSequenceTemplateSource.next(this.actionSequenceTemplates);
-          return data;
+          return response.body;
         }),
         catchError(this.handleError)
       );
   }
 
-  delActionSequenceTemplate(actionSequenceTemplate: ActionSequenceTemplateInterface) {
-
-    const url = environment.apiUrl + '/' +  actionSequenceTemplate.selfLink;
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'text/plain'
-      })
-    };
-    return this.http
-      .delete<ActionSequenceTemplateInterface>(url, httpOptions)
-      .pipe(
-        map(data => {
-          const idx = this.actionSequenceTemplates.findIndex(x => x.id === actionSequenceTemplate.id);
-          if (idx !== -1) {
-            this.actionSequenceTemplates.splice(idx, 1);
-            this.actionSequenceTemplateSource.next(this.actionSequenceTemplates);
-          }
-          return data;
-        }),
-        catchError(this.handleError)
-      );
-
-  }
-
+  // Pass in the working copy and call the saveLink
   editActionSequenceTemplate(actionSequenceTemplate: ActionSequenceTemplateInterface) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'text/plain'
-      })
-    };
 
-    const url = environment.apiUrl + '/' + actionSequenceTemplate.selfLink;
+    const url = environment.apiUrl + '/' + actionSequenceTemplate.saveLink;
 
     const body = JSON.stringify(actionSequenceTemplate);
     return this.http
-      .put<ActionSequenceTemplateInterface>(url, body, httpOptions)
+      .post<ActionSequenceTemplateInterface>(url, body, { observe: 'response', headers: this.headers })
       .pipe(
-        map(data => {
+        map(response => {
           const idx = this.actionSequenceTemplates.findIndex(x => x.id === actionSequenceTemplate.id);
           if (idx !== -1) {
             this.actionSequenceTemplates[idx] = actionSequenceTemplate;
             this.actionSequenceTemplateSource.next(this.actionSequenceTemplates);
           }
-          return data;
+          return response.body;
         }),
         catchError(this.handleError)
       );
