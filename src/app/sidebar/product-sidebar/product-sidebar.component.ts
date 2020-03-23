@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ProductService } from '@shared/services/product.service';
 import { ProductInterface } from '@shared/interfaces/product.interface';
-import { ReleasePlanService } from '@shared/services/releaseplan.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MAT_TOOLTIP_DEFAULT_OPTIONS, MatTooltipDefaultOptions } from '@angular/material/tooltip';
 import { PlanEditDataInterface, PlanEditDialogComponent } from 'src/app/products/releaseplanedit/releaseplanedit.component';
@@ -39,8 +38,8 @@ export class ProductSidebarComponent implements OnInit {
 
   onAdd() {
     const editData: PlanEditDataInterface = {
-      planLink: this.product.releasePlanLink,
-      releasePlan: null
+      planLink: this.product.actionSequenceTemplatesLink,
+      actionSequenceTemplate: null
     };
     const dialogRef = this.dialog.open(PlanEditDialogComponent, {
       width: '500px',
@@ -51,7 +50,7 @@ export class ProductSidebarComponent implements OnInit {
     });
   }
 
-  onEdit() {
+/*   onEdit() {
     const dialogRef = this.dialog.open(ProductEditDialogComponent, {
       width: '500px',
       data: this.product
@@ -61,7 +60,7 @@ export class ProductSidebarComponent implements OnInit {
         this.product = result;
       }
     });
-  }
+  } */
 
   onDelete() {
     const dialogRef = this.dialog.open(AlertDialogComponent, {

@@ -1,24 +1,24 @@
 import { Component, OnInit } from '@angular/core';
-import { ReleasePlanInterface } from '@shared/interfaces/releaseplan.interface';
-import { PlanNodeInterface } from '@shared/interfaces/node.interface';
+import { ActionSequenceTemplateInterface } from '@shared/interfaces/actionsequencetemplate.interface';
+import { NodeInterface } from '@shared/interfaces/node.interface';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NodeService } from '@shared/services/node.service';
 import { MatDialog } from '@angular/material/dialog';
-import { ReleasePlanService } from '@shared/services/releaseplan.service';
+import { ActionSequenceTemplateService } from '@shared/services/actionsequencetemplate.service';
 import { switchMap } from 'rxjs/operators';
 
 import { environment } from '@environments/environment';
 import { PlanEditDialogComponent, PlanEditDataInterface } from '../releaseplanedit/releaseplanedit.component';
 import { AlertDialogComponent } from 'src/app/alert-dialog/alert-dialog.component';
 import { PlanReportsDialogComponent } from './plan-reports-dialog/plan-reports-dialog.component';
-import { NodeEditDataInterface, NodeEditDialogComponent } from '../nodeedit/nodeedit.component';
+import { NodeEditDataInterface, NodeEditDialogComponent } from './nodeedit/nodeedit.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PlanLineEditDialogData, PlanLineDialogComponent } from './plan-line-dialog/plan-line-dialog.component';
 
 export interface NodeActionInterface {
   action: string;
-  planNode: PlanNodeInterface|null;
-  targetNode: PlanNodeInterface|null;
+  planNode: NodeInterface|null;
+  targetNode: NodeInterface|null;
 }
 
 @Component({
@@ -27,8 +27,8 @@ export interface NodeActionInterface {
   styleUrls: ['./plan-dashboard.component.scss']
 })
 export class PlanDashboardComponent implements OnInit {
-  releasePlan: ReleasePlanInterface;
-  releasePlanId: string;
+  actionSequenceTemplate: ActionSequenceTemplateInterface;
+  actionSequenceTemplateId: string;
   masterViewLink: string;
   workingViewLink: string;
   version = 'master';
@@ -37,23 +37,24 @@ export class PlanDashboardComponent implements OnInit {
   versionSelectString = 'Switch to Edit';
   hasReports = false;
   selfLink: string;
-  nodes: PlanNodeInterface[] = [];
+  currentNode: NodeInterface;
+  nodes: NodeInterface[] = [];
 
   constructor(private route: ActivatedRoute,
               private router: Router,
               private nodeService: NodeService,
               public dialog: MatDialog,
               private snackBar: MatSnackBar,
-              private releasePlanService: ReleasePlanService) { }
+              private actionSequenceTemplateService: ActionSequenceTemplateService) { }
 
   ngOnInit(): void {
     // TODO: You need to keep sidebar in sync with dashboard re: current view
     this.route.queryParams
       .subscribe(params => {
-        this.releasePlanId = params.id;
+        this.actionSequenceTemplateId = params.id;
         this.masterViewLink = params.masterViewLink;  // The planLink from the parent record
         console.log('link is ' + this.masterViewLink);
-        if (this.releasePlanId) {
+        if (this.actionSequenceTemplateId) {
           this.getReleasePlan(this.masterViewLink);
         }
       });
@@ -61,7 +62,7 @@ export class PlanDashboardComponent implements OnInit {
 
   getReleasePlan(link: string) {
     console.log('getting releaseplans using ' + link);
-    this.releasePlanService.getReleasePlan(link)
+    this.actionSequenceTemplateService.getActionSequenceTemplateHttp(link)
       .subscribe((data: any) => {
         if (this.version === 'master') {
           this.version = 'master';
@@ -72,12 +73,9 @@ export class PlanDashboardComponent implements OnInit {
           this.versionSelectString = 'Switch to Master';
           this.planDirty = false;
         }
-        this.releasePlan = data as ReleasePlanInterface;
-        if (this.releasePlan.verificationReports !== undefined) {
-          this.hasReports = (this.releasePlan.verificationReports.length !== 0);
-        }
-        this.workingViewLink = this.releasePlan.workingViewLink;
-        this.nodes = this.releasePlan.nodes;
+        this.actionSequenceTemplate = data as ActionSequenceTemplateInterface;
+        this.workingViewLink = this.actionSequenceTemplate.workingLink;
+        this.nodes = this.actionSequenceTemplate.nodes;
         this.nodeService.cacheNodes(this.nodes);
         this.subscribeToLookup();
       }, error => {
@@ -90,12 +88,17 @@ export class PlanDashboardComponent implements OnInit {
   // This is how you are going to know that the data has changed
   subscribeToLookup() {
     this.nodeService.nodeLookup.subscribe(data => {
-      this.nodes = data as PlanNodeInterface[];
+      this.nodes = data as NodeInterface[];
     });
   }
 
+  // If you click the change button and the view is graph, change to list
+  // If you are on list view then change to graph view
+  // If you are on dashboard then switch to list view
   onChangeView() {
-    if (this.nodeView === 'list') {
+    if (this.nodeView === 'graph') {
+      this.nodeView = 'list';
+    } else if (this.nodeView === 'list') {
       this.nodeView = 'graph';
     } else {
       this.nodeView = 'list';
@@ -145,7 +148,7 @@ export class PlanDashboardComponent implements OnInit {
     // User wants to add or edit an existing node
     if (($event.action === 'add') || ($event.action === 'edit')) {
       const editData: NodeEditDataInterface = {
-        parentId: this.releasePlan.id,
+        parentId: this.actionSequenceTemplate.id,
         node: ($event.action === 'edit') ? $event.planNode : null
       };
       const dialogRef = this.dialog.open(NodeEditDialogComponent, {
@@ -184,15 +187,19 @@ export class PlanDashboardComponent implements OnInit {
           console.log('dialog was cancelled');
         }
       });
-
     } else if ($event.action === 'deleteLine') {
       this.nodeService.delLineCache($event.planNode, $event.targetNode);
       this.planDirty = true;
     } else if ($event.action === 'delete') {
-      // TODO: delNodeCache will make sure to remove this node from the predecessor
-      // list of all nodes
       this.nodeService.delNodeCache($event.planNode);
       this.planDirty = true;
+    } else if ($event.action === 'dashboard') {
+      this.currentNode = $event.planNode;
+      this.nodeView = 'dashboard';
+    } else if ($event.action === 'list') {
+      this.nodeView = 'list';
+    } else if ($event.action === 'graph') {
+      this.nodeView = 'graph';
     }
   }
 
@@ -206,8 +213,8 @@ export class PlanDashboardComponent implements OnInit {
       return;
     }
     const editData: PlanEditDataInterface = {
-      planLink: this.releasePlan.selfLink,
-      releasePlan: this.releasePlan
+      planLink: this.actionSequenceTemplate.selfLink,
+      actionSequenceTemplate: this.actionSequenceTemplate
     };
     const dialogRef = this.dialog.open(PlanEditDialogComponent, {
       width: '500px',
@@ -216,7 +223,7 @@ export class PlanDashboardComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.releasePlan = result;
+        this.actionSequenceTemplate = result;
         this.planDirty = true;
       }
     });

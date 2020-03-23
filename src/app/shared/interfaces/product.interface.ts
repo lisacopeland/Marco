@@ -1,5 +1,9 @@
 import { DatabaseInterface } from './database.interface';
 
-export interface ProductInterface extends DatabaseInterface {
-  releasePlanLink: string;    // URL to get an array of releasePlan summaries
+export interface ProductInterface {
+  namespace: string;
+  automationTriggersLink: string;
+  automationTemplatesLink: string;
+  actionSequenceTemplatesLink: string;
+  actionTypesLink: string;
 }

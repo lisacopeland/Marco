@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, Output, EventEmitter, ViewChild } from '@angular/core';
-import { PlanNodeInterface } from '@shared/interfaces/node.interface';
+import { NodeInterface } from '@shared/interfaces/node.interface';
 import { Edge, Node, Layout } from '@swimlane/ngx-graph';
 import * as shape from 'd3-shape';
 import { Subject } from 'rxjs';
@@ -15,12 +15,18 @@ import { MatMenuTrigger } from '@angular/material/menu';
 })
 export class PlanGraphViewComponent implements OnInit {
   @Output() nodeAction = new EventEmitter<NodeActionInterface>();
-  // @ViewChild(MatMenuTrigger) trigger: MatMenuTrigger;
+
   onReady = true;
-  taskBackgroundColor = '#ffccff';
-  milestoneBackgroundColor = '#99ccff';
-  milestoneLinkBackgroundColor = '#99ffcc';
-  planNodes: PlanNodeInterface[];
+  milestoneBackground = '#99ccff';
+  // milestoneText = '#ff0000';
+  milestoneText = '#404040';
+  milestoneLinkBackground = '#80ffaa';
+  milestoneLinkText = '#404040';
+  nodeBackground = '#ff80ff';
+  // nodeText = '#0000cc';
+  nodeText = '#404040';
+  lineColor = '#333333';
+  planNodes: NodeInterface[];
   curve: any = shape.curveLinear;
   layout = 'dagre';
   draggingEnabled = true;
@@ -63,7 +69,7 @@ export class PlanGraphViewComponent implements OnInit {
     });
   }
 
-  onEditNode(node: PlanNodeInterface) {
+  onEditNode(node: NodeInterface) {
     this.nodeAction.emit({
       action: 'edit',
       planNode: node,
@@ -71,7 +77,7 @@ export class PlanGraphViewComponent implements OnInit {
     });
   }
 
-  onDeleteNode(node: PlanNodeInterface) {
+  onDeleteNode(node: NodeInterface) {
     this.nodeAction.emit({
       action: 'delete',
       planNode: node,
@@ -79,7 +85,7 @@ export class PlanGraphViewComponent implements OnInit {
     });
   }
 
-  onAddLine(node: PlanNodeInterface, fromHere: string) {
+  onAddLine(node: NodeInterface, fromHere: string) {
     this.nodeAction.emit({
       action: fromHere,
       planNode: node,
@@ -87,7 +93,9 @@ export class PlanGraphViewComponent implements OnInit {
     });
   }
 
-  onDelLine(sourceNode: PlanNodeInterface, targetNode: PlanNodeInterface) {
+  onDelLine(sourceNodeId: string, targetNodeId: string) {
+    const sourceNode = this.planNodes.find(x => x.id === sourceNodeId);
+    const targetNode = this.planNodes.find(x => x.id === targetNodeId);
     this.nodeAction.emit({
       action: 'deleteLine',
       planNode: sourceNode,
@@ -101,29 +109,17 @@ export class PlanGraphViewComponent implements OnInit {
     const newLinks: Edge[] = [];
     let edgeCounter = 0;
     this.planNodes.forEach(node => {
-      console.log('current node : ' + JSON.stringify(node));
-      let backgroundColor = '';
-      if (node.nodeType === 'Milestone') {
-        backgroundColor = this.milestoneBackgroundColor;
-      } else if (node.nodeType === 'Task') {
-        backgroundColor = this.taskBackgroundColor;
-      } else if (node.nodeType === 'MilestoneLink') {
-        backgroundColor = this.milestoneLinkBackgroundColor;
-      } else {
-        backgroundColor = '#ffffff';
-      }
       newNodes.push({
         id: node.id,
         label: node.name,
         data: {
-          node,
-          backgroundColor
+          node
         }
       });
-      if ((node.predecessors !== undefined) && (node.predecessors.length)) {
+      if (node.predecessors) {
         node.predecessors.forEach(predecessor => {
           newLinks.push({
-            id: 'no' + edgeCounter.toString(),
+            id: 'edge' + edgeCounter.toString(),
             source: predecessor,
             target: node.id
           });
@@ -134,15 +130,4 @@ export class PlanGraphViewComponent implements OnInit {
     this.nodes = newNodes;
     this.links = newLinks;
   }
-
-  onNodeClick($event) {
-    console.log('Im node ' + $event.label + 'and I was clicked!');
-
-  }
-
-  onLineClick($event) {
-    console.log('I am a line between ' + $event.source + ' and ' + $event.target + ' and I was clicked!');
-  }
-
-
 }

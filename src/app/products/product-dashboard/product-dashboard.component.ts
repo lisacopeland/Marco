@@ -1,10 +1,10 @@
-import { Component, OnInit, OnDestroy, ViewChild, Output, EventEmitter } from '@angular/core';
-import { ReleasePlanService } from '@services/releaseplan.service';
-import { ReleasePlanInterface } from '@interfaces/releaseplan.interface';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { ActionSequenceTemplateService } from '@shared/services/actionsequencetemplate.service';
+import { ActionSequenceTemplateInterface } from '@shared/interfaces/actionsequencetemplate.interface';
 import { MatDialog } from '@angular/material/dialog';
 import { PlanEditDialogComponent, PlanEditDataInterface } from '../releaseplanedit/releaseplanedit.component';
 import { Subject } from 'rxjs';
-import { takeUntil, switchMap } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -24,34 +24,34 @@ export class ProductDashboardComponent implements OnInit, OnDestroy {
 
   unsubscribe$: Subject<boolean> = new Subject();
   product: ProductInterface;
-  productId = '';
+  productName = '';
   displayedColumns: string[] = ['planId', 'name', 'description', 'tags', 'dashboard'];
-  dataSource: MatTableDataSource<ReleasePlanInterface>;
+  dataSource: MatTableDataSource<ActionSequenceTemplateInterface>;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
 
   constructor(private route: ActivatedRoute,
               private router: Router,
               private productService: ProductService,
-              private releasePlanService: ReleasePlanService,
+              private actionSequenceTemplateService: ActionSequenceTemplateService,
               public dialog: MatDialog) { }
 
   ngOnInit(): void {
 
     this.route.queryParams
       .subscribe(params => {
-        this.productId = params.id;
-        if (this.productId) {
-          this.productService.getProductHttp(this.productId)
+        this.productName = params.name;
+        if (this.productName) {
+          this.productService.getProductHttp(this.productName)
             .pipe(
               switchMap(product => {
                 this.product = product;
                 this.productService.setCurrentProduct(this.product);
-                return this.releasePlanService.getReleasePlansHttp(this.product.releasePlanLink);
+                return this.actionSequenceTemplateService.getActionSequenceTemplatesHttp(this.product.actionSequenceTemplatesLink);
               }))
             .subscribe((data: any) => {
               if (data && (Object.keys(data).length !== 0)) {
-                this.dataSource = new MatTableDataSource<ReleasePlanInterface>(data);
+                this.dataSource = new MatTableDataSource<ActionSequenceTemplateInterface>(data);
                 this.dataSource.paginator = this.paginator;
                 this.dataSource.sort = this.sort;
               }
@@ -66,9 +66,9 @@ export class ProductDashboardComponent implements OnInit, OnDestroy {
   }
 
   subscribeToLookup() {
-    this.releasePlanService.releasePlanLookup.subscribe(data => {
+    this.actionSequenceTemplateService.actionSequenceTemplateLookup.subscribe(data => {
       if (data && (Object.keys(data).length !== 0)) {
-        this.dataSource = new MatTableDataSource<ReleasePlanInterface>(data as ReleasePlanInterface[]);
+        this.dataSource = new MatTableDataSource<ActionSequenceTemplateInterface>(data as ActionSequenceTemplateInterface[]);
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
       }
@@ -76,7 +76,7 @@ export class ProductDashboardComponent implements OnInit, OnDestroy {
   }
 
   onGotoPlan(row) {
-    this.releasePlanService.setCurrentPlan(row);
+    this.actionSequenceTemplateService.setCurrentTemplate(row);
     this.router.navigate(
       [{ outlets:
        { primary: 'products/newdashboard',
@@ -86,8 +86,8 @@ export class ProductDashboardComponent implements OnInit, OnDestroy {
 
   onAdd() {
     const editData: PlanEditDataInterface = {
-      planLink: this.product.releasePlanLink,
-      releasePlan: null
+      planLink: this.product.actionSequenceTemplatesLink,
+      actionSequenceTemplate: null
     };
     const dialogRef = this.dialog.open(PlanEditDialogComponent, {
       width: '500px',

@@ -17,7 +17,7 @@ export class ProductEditDialogComponent implements OnInit {
   editTitle = 'Add New Product';
   productForm: FormGroup;
   product: ProductInterface;
-  productId: string;
+  productName: string;
   editMode = false;
 
   constructor(private productService: ProductService,
@@ -26,24 +26,22 @@ export class ProductEditDialogComponent implements OnInit {
               @Inject(MAT_DIALOG_DATA) public data: ProductInterface) { }
 
   ngOnInit(): void {
-    this.editMode = this.data !== null;
+/*     this.editMode = this.data !== null;
     if (this.editMode) {
-      this.productId = this.data.id;
+      this.productName = this.data.namespace;
       this.product = this.data;
-      this.editTitle = 'Editing ' + this.product.description;
-    }
+      this.editTitle = 'Editing ' + this.product.namespace;
+    } */
     this.initForm();
   }
 
   initForm() {
     this.productForm = new FormGroup({
       name: new FormControl(''),
-      description: new FormControl('', [Validators.required, Validators.minLength(2)]),
     });
     if (this.editMode) {
       this.productForm.patchValue({
-        name: this.product.name,
-        description: this.product.description
+        name: this.product.namespace
       });
       this.productForm.get('name').disable();
     } else {
@@ -102,19 +100,17 @@ export class ProductEditDialogComponent implements OnInit {
       return;
     }
     if (this.editMode) {
-      this.product.description = this.productForm.value.description;
       this.productService.editProduct(this.product);
       this.snackBar.open('Product successfully updated', '', {
         duration: 2000,
       });
     } else {
       const product = {
-        id: this.productForm.value.name,
-        description: this.productForm.value.description,
-        name: this.productForm.value.name,
-        parentId: '',
-        selfLink: '',
-        releasePlanLink: ''
+        namespace: this.productForm.value.name,
+        automationTriggersLink: '',
+        automationTemplatesLink: '',
+        actionSequenceTemplatesLink: '',
+        actionTypesLink: ''
       };
 
       this.productService.addProduct(product)

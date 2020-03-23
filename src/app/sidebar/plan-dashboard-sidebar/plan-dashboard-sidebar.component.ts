@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { MAT_TOOLTIP_DEFAULT_OPTIONS, MatTooltipDefaultOptions } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
-import { ReleasePlanService } from '@shared/services/releaseplan.service';
-import { ReleasePlanInterface } from '@shared/interfaces/releaseplan.interface';
+import { ActionSequenceTemplateService } from '@shared/services/actionsequencetemplate.service';
+import { ActionSequenceTemplateInterface } from '@shared/interfaces/actionsequencetemplate.interface';
 import { PlanEditDataInterface, PlanEditDialogComponent } from 'src/app/products/releaseplanedit/releaseplanedit.component';
 import { PlanReportsDialogComponent } from 'src/app/products/plan-dashboard/plan-reports-dialog/plan-reports-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -24,15 +24,15 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
 })
 export class PlanDashboardSidebarComponent implements OnInit {
 
-  releasePlan: ReleasePlanInterface;
+  releasePlan: ActionSequenceTemplateInterface;
   constructor(private router: Router,
               public dialog: MatDialog,
-              private releasePlanService: ReleasePlanService) { }
+              private actionSequenceTemplateService: ActionSequenceTemplateService) { }
 
   ngOnInit(): void {
-    this.releasePlanService.currentPlanChanged
+    this.actionSequenceTemplateService.currentTemplateChanged
       .subscribe(plan => {
-        this.releasePlan = plan as ReleasePlanInterface;
+        this.releasePlan = plan as ActionSequenceTemplateInterface;
       });
   }
 
@@ -74,7 +74,7 @@ export class PlanDashboardSidebarComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {
 /*       if (result === 'Yes') {
         console.log('result was yes');
-        this.releasePlanService.delReleasePlan(this.releasePlan)
+        this.actionSequenceTemplateService.delReleasePlan(this.releasePlan)
           .subscribe(() => {
             this.router.navigateByUrl('/products', { queryParams: { id: this.releasePlan.parentId } });
           });

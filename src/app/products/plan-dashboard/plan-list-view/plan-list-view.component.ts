@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, OnChanges, ViewChild, Output, EventEmitter } from '@angular/core';
-import { PlanNodeInterface } from '@shared/interfaces/node.interface';
+import { NodeInterface } from '@shared/interfaces/node.interface';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -15,10 +15,10 @@ import { NodeActionInterface } from '../plan-dashboard.component';
 })
 export class PlanListViewComponent implements OnInit {
   @Output() nodeAction = new EventEmitter<NodeActionInterface>();
-  planNodes: PlanNodeInterface[];
+  planNodes: NodeInterface[];
   filterValues = ['All', 'Milestone', 'Task'];
-  displayedColumns: string[] = ['planNodeId', 'description', 'type', 'hasPredecessors'];
-  dataSource: MatTableDataSource<PlanNodeInterface>;
+  displayedColumns: string[] = ['planNodeId', 'description', 'type', 'hasPredecessors', 'dashboard'];
+  dataSource: MatTableDataSource<NodeInterface>;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
   filterValue = 'All';
@@ -45,7 +45,7 @@ export class PlanListViewComponent implements OnInit {
       });
   }
 
-  applyFilter(filterValue: string, dataSource: MatTableDataSource<PlanNodeInterface>) {
+  applyFilter(filterValue: string, dataSource: MatTableDataSource<NodeInterface>) {
     if (dataSource.data === null || dataSource.data.length === 0) {
       return;
     } else if (filterValue === 'All') {
@@ -58,6 +58,14 @@ export class PlanListViewComponent implements OnInit {
       };
     }
     dataSource.filter = filterValue;
+  }
+
+  onDashboard(row) {
+    this.nodeAction.emit({
+      action: 'dashboard',
+      planNode: row,
+      targetNode: null,
+    });
   }
 
   onAddPlanNode() {
@@ -85,9 +93,17 @@ export class PlanListViewComponent implements OnInit {
     });
   }
 
+  onAddLine(node: NodeInterface, fromHere: string) {
+    this.nodeAction.emit({
+      action: fromHere,
+      planNode: node,
+      targetNode: null
+    });
+  }
+
   displayList() {
     if (this.planNodes && (Object.keys(this.planNodes).length !== 0)) {
-      this.dataSource = new MatTableDataSource<PlanNodeInterface>(this.planNodes);
+      this.dataSource = new MatTableDataSource<NodeInterface>(this.planNodes);
       this.dataLength = this.dataSource.data.length;
       this.applyFilter(this.filterValue, this.dataSource);
       this.dataSource.paginator = this.paginator;

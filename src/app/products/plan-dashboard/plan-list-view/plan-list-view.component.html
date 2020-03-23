@@ -51,9 +51,8 @@
       <ng-container matColumnDef="dashboard">
         <th mat-header-cell *matHeaderCellDef> </th>
         <td mat-cell *matCellDef="let row">
-          <button mat-icon-button [routerLink]="'/products/nodedashboard'"
-            [queryParams]="{id: row?.id, selfLink: row?.selfLink }">
-            <mat-icon>edit</mat-icon>
+          <button mat-icon-button (click)="onDashboard(row)">
+            <mat-icon>dashboard</mat-icon>
           </button>
         </td>
       </ng-container>

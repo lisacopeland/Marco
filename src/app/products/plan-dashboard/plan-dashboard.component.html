@@ -5,10 +5,10 @@
       <!-- Top row of header -->
     <div class="page-header" fxLayout="row" fxLayoutAlign="space-between center">
       <div fxLayout="row" fxLayoutAlign="start center">
-        <h1 class="mat-h1">{{ releasePlan?.name }}</h1>
+        <h1 class="mat-h1">{{ actionSequenceTemplate?.name }}</h1>
         <p>{{ version }}</p>
       </div>
-      <mat-slide-toggle (change)="onChangeVersion($event)" >{{versionSelectString}}</mat-slide-toggle>
+      <mat-slide-toggle (change)="onChangeVersion($event)" >{{ versionSelectString }}</mat-slide-toggle>
     </div>
 
     <mat-toolbar class="plan-toolbar" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
@@ -39,8 +39,9 @@
         <button mat-flat-button mat-tooltip="Discard the changes to the working copy" fxLayoutAlign="start center"><mat-icon>cancel</mat-icon>reset</button>
       </div>
       <div (click)="onChangeView()" fxLayout="row" fxLayoutAlign="start center">
-        <button mat-flat-button mat-tooltip="Toggle view to the node list" fxLayoutAlign="start center" *ngIf="nodeView==='graph'"><mat-icon>view_list</mat-icon>view</button>
-        <button mat-flat-button mat-tooltip="Toggle view to the node graph" fxLayoutAlign="start center" *ngIf="nodeView==='list'"><mat-icon>satellite</mat-icon>view</button>
+        <button *ngIf="nodeView==='graph'" mat-flat-button mat-tooltip="Toggle view to the node list" fxLayoutAlign="start center" ><mat-icon>view_list</mat-icon>view</button>
+        <button *ngIf="nodeView==='list'"  mat-flat-button mat-tooltip="Toggle view to the node graph" fxLayoutAlign="start center" ><mat-icon>satellite</mat-icon>view</button>
+        <button *ngIf="nodeView==='dashboard'" mat-flat-button mat-tooltip="Toggle view to the node list" fxLayoutAlign="start center" ><mat-icon>view_list</mat-icon>view</button>
       </div>
     </mat-toolbar>
     </div>
@@ -49,6 +50,9 @@
    <app-plan-graph-view (nodeAction)="onNodeAction($event)"></app-plan-graph-view>
   </div>
   <div *ngIf="nodeView==='list'">
-   <app-plan-list-view  (nodeAction)="onNodeAction($event)"></app-plan-list-view>
+   <app-plan-list-view (nodeAction)="onNodeAction($event)"></app-plan-list-view>
+  </div>
+  <div *ngIf="nodeView==='dashboard'">
+    <app-nodedashboard [node]="currentNode" (nodeAction)="onNodeAction($event)"></app-nodedashboard>
   </div>
 </section>

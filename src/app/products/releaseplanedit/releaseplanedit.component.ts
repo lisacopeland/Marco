@@ -1,15 +1,15 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { FormGroup, FormControl, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { ReleasePlanInterface } from '@interfaces/releaseplan.interface';
-import { ReleasePlanService } from '@services/releaseplan.service';
+import { ActionSequenceTemplateInterface } from '@shared/interfaces/actionsequencetemplate.interface';
+import { ActionSequenceTemplateService } from '@shared/services/actionsequencetemplate.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable } from 'rxjs';
 import { delay, map, catchError, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 export interface PlanEditDataInterface {
   planLink: string;
-  releasePlan: ReleasePlanInterface;
+  actionSequenceTemplate: ActionSequenceTemplateInterface;
 }
 
 @Component({
@@ -20,15 +20,15 @@ export interface PlanEditDataInterface {
 export class PlanEditDialogComponent implements OnInit {
 
   editTitle = 'Add New Release Plan';
-  releasePlanForm: FormGroup;
-  releasePlan: ReleasePlanInterface;
+  actionSequenceTemplateForm: FormGroup;
+  actionSequenceTemplate: ActionSequenceTemplateInterface;
   planLink: string;
   selfLink: string;
   parentId: string;
   editMode = false;
 
   constructor(
-    private releasePlanService: ReleasePlanService,
+    private actionSequenceTemplateService: ActionSequenceTemplateService,
     private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<PlanEditDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: PlanEditDataInterface) {}
@@ -36,30 +36,30 @@ export class PlanEditDialogComponent implements OnInit {
   ngOnInit(): void {
     // this.selfLink = this.data.selfLink;
     // this.planLink = this.data.planLink;
-    this.editMode = this.data.releasePlan !== null;
+    this.editMode = this.data.actionSequenceTemplate !== null;
     if (this.editMode) {
-      this.releasePlan = this.data.releasePlan;
-      this.editTitle = 'Editing ' + this.releasePlan.description;
+      this.actionSequenceTemplate = this.data.actionSequenceTemplate;
+      this.editTitle = 'Editing ' + this.actionSequenceTemplate.description;
     }
     this.initForm();
   }
 
   initForm() {
-    this.releasePlanForm = new FormGroup({
+    this.actionSequenceTemplateForm = new FormGroup({
       name: new FormControl(''),
       description: new FormControl('', [Validators.required, Validators.minLength(2)]),
       tags: new FormControl(''),
     });
     if (this.editMode) {
-      this.releasePlanForm.patchValue({
-        name: this.releasePlan.name,
-        description: this.releasePlan.description,
-        tags: this.releasePlan.tags
+      this.actionSequenceTemplateForm.patchValue({
+        name: this.actionSequenceTemplate.name,
+        description: this.actionSequenceTemplate.description,
+        tags: this.actionSequenceTemplate.tags
       });
-      this.releasePlanForm.get('name').disable();
+      this.actionSequenceTemplateForm.get('name').disable();
     } else {
-      this.releasePlanForm.get('name').setValidators(Validators.required);
-      this.releasePlanForm.get('name').setAsyncValidators([
+      this.actionSequenceTemplateForm.get('name').setValidators(Validators.required);
+      this.actionSequenceTemplateForm.get('name').setAsyncValidators([
         this.validateNameAvailability.bind(this)]);
       this.onNameChanges();
     }
@@ -67,12 +67,12 @@ export class PlanEditDialogComponent implements OnInit {
 
   validateNameAvailability(control: AbstractControl): Observable<ValidationErrors | null> {
     const planId = this.parentId + '.' + control.value;
-    return this.releasePlanService.checkNameNotTaken(planId)
+    return this.actionSequenceTemplateService.checkNameNotTaken(planId)
       .pipe(
         delay(1000),
         map(res => {
           if (!res) {
-            this.releasePlanForm.get('name').setErrors({ nameTaken: true });
+            this.actionSequenceTemplateForm.get('name').setErrors({ nameTaken: true });
             return;
           }
           return null;
@@ -82,60 +82,61 @@ export class PlanEditDialogComponent implements OnInit {
   }
 
   onNameChanges(): void {
-    this.releasePlanForm.get('name').valueChanges.pipe
+    this.actionSequenceTemplateForm.get('name').valueChanges.pipe
       (debounceTime(300),
         distinctUntilChanged()).
       subscribe(val => {
-        this.releasePlanForm.patchValue({
+        this.actionSequenceTemplateForm.patchValue({
           name: val.toUpperCase()
         });
-        if (this.releasePlanForm.get('name').hasError('nameTaken')) {
+        if (this.actionSequenceTemplateForm.get('name').hasError('nameTaken')) {
           console.log('name is taken!');
         }
       });
   }
 
   onSubmit() {
-    if (this.releasePlanForm.invalid) {
+    if (this.actionSequenceTemplateForm.invalid) {
       this.snackBar.open('Please fill in required fields', '', {
         duration: 2000,
       });
       return;
     }
     if (this.editMode) {
-      this.releasePlan.description = this.releasePlanForm.value.description;
-      this.releasePlan.tags = this.releasePlanForm.value.tags;
-      this.releasePlanService.editReleasePlan(this.releasePlan)
+      this.actionSequenceTemplate.description = this.actionSequenceTemplateForm.value.description;
+      this.actionSequenceTemplate.tags = this.actionSequenceTemplateForm.value.tags;
+      this.actionSequenceTemplateService.editActionSequenceTemplate(this.actionSequenceTemplate)
         .subscribe(() => {
           this.snackBar.open('Release plan successfully updated', '', {
             duration: 2000,
           });
         });
     } else {
-      const releasePlan: ReleasePlanInterface = {
-        description: this.releasePlanForm.value.description,
-        id: this.parentId + '.' + this.releasePlanForm.value.name,
+      const actionSequenceTemplate: ActionSequenceTemplateInterface = {
+        description: this.actionSequenceTemplateForm.value.description,
+        id: this.parentId + '.' + this.actionSequenceTemplateForm.value.name,
         parentId: this.parentId,
-        name: this.releasePlanForm.value.name,
+        name: this.actionSequenceTemplateForm.value.name,
         tags: ['tag1', 'tag2'],
         selfLink: '', // Assigned by Service
         view: 'Master',
         nodes: [],
-        verificationReports: [],
         verifyLink: null,
         commitLink: null,
-        masterViewLink: null,
-        summaryViewLink: null,
-        workingViewLink: null
+        saveLink: null,
+        deleteAllLink: null,
+        deleteWorkingLink: null,
+        committedLink: null,
+        workingLink: null
       };
-      this.releasePlanService.addReleasePlan(this.planLink, releasePlan)
+      this.actionSequenceTemplateService.addActionSequenceTemplate(this.planLink, actionSequenceTemplate)
         .subscribe(() => {
           this.snackBar.open('Release plan successfully added', '', {
             duration: 2000,
           });
         });
     }
-    this.dialogRef.close(this.releasePlan);
+    this.dialogRef.close(this.actionSequenceTemplate);
   }
 
   onClose(): void {

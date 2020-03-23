@@ -33,21 +33,18 @@ export class ProductService {
 
   getProductsHttp() {
     interface GetResponse {
-      products: ProductInterface[];
+      namespaces: ProductInterface[];
     }
 
-    const apiUrl = environment.apiUrl + '/api/v1/data/PRODUCT';
+    const apiUrl = environment.apiUrl + '/api/v1/namespaces';
+    const headers =  new HttpHeaders().set('Content-Type', 'text/plain');
 
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'text/plain'
-      })
-    };
     return this.http
-      .get<GetResponse>(apiUrl, httpOptions)
+      .get<GetResponse>(apiUrl, { observe: 'response', headers })
       .pipe(
-        map(data => {
-          this.products = data.products;
+        map(response => {
+          console.log(response);
+          this.products = response.body.namespaces;
           this.productsSource.next(this.products);
           return this.products.slice();
         }),
@@ -74,7 +71,7 @@ export class ProductService {
   }
 
   getProductHttp(id: string) {
-    const apiUrl = environment.apiUrl + '/api/v1/data/PRODUCT/' + id;
+    const apiUrl = environment.apiUrl + '/api/v1/namespaces/' + id;
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'text/plain'
@@ -91,14 +88,14 @@ export class ProductService {
   }
 
   // Returns true if the name is not taken, false if otherwise
-  checkNameNotTaken(id: string): Observable<boolean | null> {
-    const result = (this.products.find(x => x.id === id) === undefined) ? true : false;
+  checkNameNotTaken(name: string): Observable<boolean | null> {
+    const result = (this.products.find(x => x.namespace === name) === undefined) ? true : false;
     return of(result);
   }
 
   addProduct(newProduct: ProductInterface) {
 
-    const apiUrl = environment.apiUrl + '/api/v1/data/PRODUCT';
+    const apiUrl = environment.apiUrl + '/api/v1/namespaces';
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'text/plain'
@@ -119,17 +116,18 @@ export class ProductService {
 
   delProduct(product: ProductInterface) {
 
-    const url = environment.apiUrl + '/' + product.selfLink;
+    const apiUrl = environment.apiUrl + '/api/v1/namespaces/product.name';
+
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'text/plain'
       })
     };
     return this.http
-      .delete<ProductInterface>(url, httpOptions)
+      .delete<ProductInterface>(apiUrl, httpOptions)
       .pipe(
         map(data => {
-          const idx = this.products.findIndex(x => x.id === product.id);
+          const idx = this.products.findIndex(x => x.namespace === product.namespace);
           if (idx !== -1) {
             this.products.splice(idx, 1);
             this.productsSource.next(this.products);
@@ -148,14 +146,14 @@ export class ProductService {
       })
     };
 
-    const url = environment.apiUrl + '/' + product.selfLink;
+    const apiUrl = environment.apiUrl + '/api/v1/namespaces/product.name';
 
     const body = JSON.stringify(product);
     return this.http
-      .put<ProductInterface>(url, body, httpOptions)
+      .put<ProductInterface>(apiUrl, body, httpOptions)
       .pipe(
         map(data => {
-          const idx = this.products.findIndex(x => x.id === product.id);
+          const idx = this.products.findIndex(x => x.namespace === product.namespace);
           if (idx !== -1) {
             this.products[idx] = product;
             this.productsSource.next(this.products);

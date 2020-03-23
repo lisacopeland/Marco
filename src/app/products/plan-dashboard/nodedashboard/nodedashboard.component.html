@@ -1,0 +1,26 @@
+<section fxLayout="column" class="page-layout">
+  <div fxLayout="row" class="page-header" fxLayoutAlign="space-between center">
+    <h1 class="mat-h1">Node Dashboard</h1>
+    <button
+      mat-icon-button
+      color="primary"
+      [matMenuTriggerFor]="clickMenu"><mat-icon>more_vert</mat-icon></button>
+  </div>
+
+  <mat-menu #clickMenu="matMenu">
+    <button mat-menu-item (click)="onEditNode(node)">Edit</button>
+    <button mat-menu-item (click)="onAddLine(node, 'from')">Add Line From Here</button>
+    <button mat-menu-item (click)="onAddLine(node, 'to')">Add Line to Here</button>
+    <button mat-menu-item (click)="onDeleteNode(node)">Delete</button>
+<!--     <button mat-menu-item (click)="onSwitchView('list')">Back to List</button>
+    <button mat-menu-item (click)="onSwitchView('graph')">Back to Graph</button> -->
+  </mat-menu>
+  <mat-card class="card-content">
+    <mat-card-title>
+      {{node?.description}}
+    </mat-card-title>
+    <mat-card-content>
+      Stuff about this node
+    </mat-card-content>
+  </mat-card>
+</section>

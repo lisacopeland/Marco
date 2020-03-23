@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { PlanNodeInterface, PlanMilestoneInterface, PlanTaskInterface, MilestoneLinkInterface } from '@shared/interfaces/node.interface';
+import { NodeInterface, MilestoneNodeInterface, ActionNodeInterface, LinkPointNodeInterface } from '@shared/interfaces/node.interface';
 import { FormGroup, FormControl, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { NodeService } from '@shared/services/node.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -13,7 +13,7 @@ import { delay, map, catchError, debounceTime, distinctUntilChanged } from 'rxjs
 // MilestoneLinks are edited in the MilestoneLinkEdit Component
 
 export interface NodeEditDataInterface {
-  node: PlanNodeInterface;
+  node: NodeInterface;
   parentId: string;
 }
 
@@ -26,16 +26,16 @@ export class NodeEditDialogComponent implements OnInit {
 
   editTitle = 'Add New Milestone or Task';
   nodeForm: FormGroup;
-  node: PlanNodeInterface;
-  nodeSelectList: PlanNodeInterface[];
-  successors: PlanNodeInterface[] = [];
-  predecessors: PlanNodeInterface[] = [];
+  node: NodeInterface;
+  nodeSelectList: NodeInterface[];
+  successors: NodeInterface[] = [];
+  predecessors: NodeInterface[] = [];
   nodeLink: string;
   parentId: string;
   editMode = false;
   nodeType = 'Milestone';
-  nodeTypes = ['Milestone', 'Task'];
-  milestoneTypes = ['Start', 'API', 'Feature', 'Service', 'Product'];
+  nodeTypes = ['Milestone', 'Action', 'LinkPoint'];
+  milestoneTypes = ['Start', 'Infrastructure', 'API', 'Feature', 'Service', 'Product', 'Internal', 'External'];
 
   constructor(
     private nodeService: NodeService,
@@ -49,9 +49,11 @@ export class NodeEditDialogComponent implements OnInit {
     this.parentId = this.data.parentId;
     if (this.editMode) {
       if (this.data.node.nodeType === 'Milestone') {
-        this.node = this.data.node as PlanMilestoneInterface;
+        this.node = this.data.node as MilestoneNodeInterface;
+      } else if (this.data.node.nodeType === 'LinkPoint') {
+        this.node = this.data.node as LinkPointNodeInterface;
       } else {
-        this.node = this.data.node as PlanTaskInterface;
+        this.node = this.data.node as ActionNodeInterface;
       }
       this.editTitle = 'Editing ' + this.node.name;
     }
@@ -88,9 +90,11 @@ export class NodeEditDialogComponent implements OnInit {
     if (this.editMode) {
       let currentNode;
       if (this.node.nodeType === 'Milestone') {
-        currentNode = this.node as PlanMilestoneInterface;
+        currentNode = this.node as MilestoneNodeInterface;
+      } else if (this.node.nodeType === 'LinkPoint') {
+        currentNode = this.data.node as LinkPointNodeInterface;
       } else {
-        currentNode = this.node as PlanTaskInterface;
+        currentNode = this.node as ActionNodeInterface;
       }
       // Get this nodes predecessors
       this.node.predecessors.forEach(predecessorId => {
@@ -231,7 +235,7 @@ export class NodeEditDialogComponent implements OnInit {
     }
 
     if (this.nodeType === 'Milestone') {
-      const currentNode = this.node as PlanMilestoneInterface;
+      const currentNode = this.node as MilestoneNodeInterface;
 
       node = {
         id: nodeId,
@@ -247,7 +251,7 @@ export class NodeEditDialogComponent implements OnInit {
         label: this.nodeForm.value.label,
         stateAnnounced: this.nodeForm.value.declaredStatus,
         spanningPredecessors: (this.editMode) ? currentNode.spanningPredecessors : [],
-      } as PlanMilestoneInterface;
+      } as MilestoneNodeInterface;
     } else {
       node = {
         id: nodeId,
@@ -263,7 +267,7 @@ export class NodeEditDialogComponent implements OnInit {
         taskData: this.nodeForm.value.taskData,
         inputs: null,
         expectedDurationMinutes: this.nodeForm.value.expectedDurationMinutes
-      } as PlanTaskInterface;
+      } as ActionNodeInterface;
     }
 
     this.dialogRef.close(node);

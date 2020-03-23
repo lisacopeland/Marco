@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { PlanNodeInterface } from '../interfaces/node.interface';
+import { NodeInterface } from '../interfaces/node.interface';
 import { environment } from '@environments/environment';
 import { Observable, of, BehaviorSubject, throwError } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
@@ -10,24 +10,24 @@ import { DatabaseInterface } from '@shared/interfaces/database.interface';
   providedIn: 'root'
 })
 export class NodeService {
-  nodes: PlanNodeInterface[] = [];
+  nodes: NodeInterface[] = [];
   apiUrl = environment.apiUrl;
-  private nodeSource = new BehaviorSubject<PlanNodeInterface[]>(this.nodes);
+  private nodeSource = new BehaviorSubject<NodeInterface[]>(this.nodes);
   nodeLookup = this.nodeSource.asObservable();
 
   constructor(private http: HttpClient) { }
 
-  cacheNodes(nodes: PlanNodeInterface[]) {
-    this.nodes = nodes as PlanNodeInterface[];
+  cacheNodes(nodes: NodeInterface[]) {
+    this.nodes = nodes as NodeInterface[];
     this.nodeSource.next(this.nodes.slice());
   }
 
-  addNodeCache(node: PlanNodeInterface) {
+  addNodeCache(node: NodeInterface) {
     this.nodes.push(node);
     this.nodeSource.next(this.nodes.slice());
   }
 
-  editNodeCache(node: PlanNodeInterface) {
+  editNodeCache(node: NodeInterface) {
     const idx = this.nodes.findIndex(x => x.id === node.id);
     if (idx !== -1) {
       this.nodes[idx] = node;
@@ -35,7 +35,7 @@ export class NodeService {
     }
   }
 
-  delNodeCache(node: PlanNodeInterface) {
+  delNodeCache(node: NodeInterface) {
     // First loop thru all nodes and remove this one from
     // the predecessor list of all nodes
     const successorNodes = this.nodes.filter(targetNode => {
@@ -53,7 +53,7 @@ export class NodeService {
     }
   }
 
-  delLineCache(sourceNode: PlanNodeInterface, targetNode: PlanNodeInterface) {
+  delLineCache(sourceNode: NodeInterface, targetNode: NodeInterface) {
     // TargetNode should have sourceNode as a predecessor
     const idx = this.nodes.findIndex(x => x.id === targetNode.id);
     const editNode = this.nodes[idx];
@@ -64,7 +64,7 @@ export class NodeService {
 
   getNodesHttp(nodeLink: string) {
     interface GetResponse {
-      nodes: PlanNodeInterface[];
+      nodes: NodeInterface[];
     }
 
     const url = this.apiUrl + '/' + nodeLink;
@@ -112,7 +112,7 @@ export class NodeService {
     };
 
     return this.http
-      .get<PlanNodeInterface>(url, httpOptions)
+      .get<NodeInterface>(url, httpOptions)
       .pipe(
         map(data => {
           return data;
@@ -131,7 +131,7 @@ export class NodeService {
     return of(result);
   }
 
-  addNodeHTTP(nodeLink: string, node: PlanNodeInterface) {
+  addNodeHTTP(nodeLink: string, node: NodeInterface) {
 
     const url = environment.apiUrl + '/' + nodeLink;
     const httpOptions = {
@@ -142,7 +142,7 @@ export class NodeService {
 
     const body = JSON.stringify(node);
     return this.http
-      .post<PlanNodeInterface>(url, body, httpOptions)
+      .post<NodeInterface>(url, body, httpOptions)
       .pipe(
         map(data => {
           this.nodes.push(node);
@@ -153,7 +153,7 @@ export class NodeService {
       );
   }
 
-  delNodeHTTP(node: PlanNodeInterface) {
+  delNodeHTTP(node: NodeInterface) {
 
     // TODO: If we ever use this we need to be sure to take
     // care of predecessors
@@ -164,7 +164,7 @@ export class NodeService {
       })
     };
     return this.http
-      .delete<PlanNodeInterface>(url, httpOptions)
+      .delete<NodeInterface>(url, httpOptions)
       .pipe(
         map(data => {
           const idx = this.nodes.findIndex(x => x.id === node.id);
@@ -179,7 +179,7 @@ export class NodeService {
 
   }
 
-  editNodeHTTP(node: PlanNodeInterface) {
+  editNodeHTTP(node: NodeInterface) {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'text/plain'
@@ -190,7 +190,7 @@ export class NodeService {
 
     const body = JSON.stringify(node);
     return this.http
-      .put<PlanNodeInterface>(url, body, httpOptions)
+      .put<NodeInterface>(url, body, httpOptions)
       .pipe(
         map(data => {
           const idx = this.nodes.findIndex(x => x.id === node.id);

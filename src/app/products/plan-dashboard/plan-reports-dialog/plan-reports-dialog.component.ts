@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { ReleasePlanInterface } from '@shared/interfaces/releaseplan.interface';
+import { ActionSequenceTemplateInterface } from '@shared/interfaces/actionsequencetemplate.interface';
 
 @Component({
   selector: 'app-plan-reports-dialog',
@@ -8,13 +8,13 @@ import { ReleasePlanInterface } from '@shared/interfaces/releaseplan.interface';
   styleUrls: ['./plan-reports-dialog.component.scss']
 })
 export class PlanReportsDialogComponent implements OnInit {
-  releasePlan: ReleasePlanInterface;
+  actionSequenceTemplate: ActionSequenceTemplateInterface;
 
   constructor(public dialogRef: MatDialogRef<PlanReportsDialogComponent>,
-              @Inject(MAT_DIALOG_DATA) public data: ReleasePlanInterface) { }
+              @Inject(MAT_DIALOG_DATA) public data: ActionSequenceTemplateInterface) { }
 
   ngOnInit(): void {
-    this.releasePlan = this.data;
+    this.actionSequenceTemplate = this.data;
   }
 
   onCancel(): void {

@@ -1,11 +1,11 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { PlanNodeInterface } from '@shared/interfaces/node.interface';
+import { NodeInterface } from '@shared/interfaces/node.interface';
 import { NodeService } from '@shared/services/node.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 export interface PlanLineEditDialogData {
-  node: PlanNodeInterface;
+  node: NodeInterface;
   direction: string;  // If from, add a line from this node, if to, add a line to this node
 }
 
@@ -19,10 +19,10 @@ export class PlanLineDialogComponent implements OnInit {
   // If direction is 'from' then you are making a line from the original node to the
   // one you are selecting, if the direction is 'to' then you are making a line to the
   // one you are selecting
-  node: PlanNodeInterface;
+  node: NodeInterface;
   direction = '';
   dialogTitle = '';
-  nodeSelectList: PlanNodeInterface[];
+  nodeSelectList: NodeInterface[];
   nodeForm: FormGroup;
 
   constructor(private nodeService: NodeService,
@@ -44,10 +44,7 @@ export class PlanLineDialogComponent implements OnInit {
           this.nodeSelectList.forEach(x => {
             console.log('node name ' + x.name);
           });
-          const idx = this.nodeSelectList.findIndex(x => x.name === this.node.name);
-          if (idx !== -1) {
-            this.nodeSelectList.splice(idx, 1);
-          }
+          this.pruneSelectList();
           this.nodeSelectList.forEach(x => {
             console.log('node name ' + x.name);
           });
@@ -62,11 +59,22 @@ export class PlanLineDialogComponent implements OnInit {
     });
   }
 
+  pruneSelectList() {
+    // First take myself out of the list
+    const idx = this.nodeSelectList.findIndex(x => x.name === this.node.name);
+    if (idx !== -1) {
+      this.nodeSelectList.splice(idx, 1);
+    }
+    // Then take anything out that is already one of my predecessors
+
+    // now take out anything that is a successor of me
+  }
+
   onSubmit() {
     if (this.direction === 'from') {
       // Add the original node to the predecessor array of the node
       // you chose
-      const node: PlanNodeInterface = this.nodeForm.value.newNode;
+      const node: NodeInterface = this.nodeForm.value.newNode;
       node.predecessors.push(this.node.id);
       this.dialogRef.close(node);
     } else {
