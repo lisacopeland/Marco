@@ -121,6 +121,7 @@ export class PlanEditDialogComponent implements OnInit {
         selfLink: '', // Assigned by Service
         view: 'Master',
         nodes: [],
+        verifyStatusLink: null,
         verifyLink: null,
         commitLink: null,
         saveLink: null,

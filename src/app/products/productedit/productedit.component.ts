@@ -17,31 +17,33 @@ export class ProductEditDialogComponent implements OnInit {
   editTitle = 'Add New Product';
   productForm: FormGroup;
   product: ProductInterface;
-  productName: string;
+  productId: string;
   editMode = false;
 
   constructor(private productService: ProductService,
-              private snackBar: MatSnackBar,
-              public dialogRef: MatDialogRef<ProductEditDialogComponent>,
-              @Inject(MAT_DIALOG_DATA) public data: ProductInterface) { }
+    private snackBar: MatSnackBar,
+    public dialogRef: MatDialogRef<ProductEditDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: ProductInterface) { }
 
   ngOnInit(): void {
-/*     this.editMode = this.data !== null;
+    this.editMode = this.data !== null;
     if (this.editMode) {
-      this.productName = this.data.namespace;
+      this.productId = this.data.id;
       this.product = this.data;
-      this.editTitle = 'Editing ' + this.product.namespace;
-    } */
+      this.editTitle = 'Editing ' + this.product.description;
+    }
     this.initForm();
   }
 
   initForm() {
     this.productForm = new FormGroup({
       name: new FormControl(''),
+      description: new FormControl('', [Validators.required, Validators.minLength(2)]),
     });
     if (this.editMode) {
       this.productForm.patchValue({
-        name: this.product.namespace
+        name: this.product.name,
+        description: this.product.description
       });
       this.productForm.get('name').disable();
     } else {
@@ -71,15 +73,15 @@ export class ProductEditDialogComponent implements OnInit {
   onNameChanges(): void {
     this.productForm.get('name').valueChanges.pipe
       (debounceTime(300),
-       distinctUntilChanged()).
+        distinctUntilChanged()).
       subscribe(val => {
         this.productForm.patchValue({
-        name: val.toUpperCase()
-      });
+          name: val.toUpperCase()
+        });
         if (this.productForm.get('name').hasError('nameTaken')) {
-        console.log('name is taken!');
-      }
-    });
+          console.log('name is taken!');
+        }
+      });
   }
 
   getErrorMessage() {
@@ -100,13 +102,18 @@ export class ProductEditDialogComponent implements OnInit {
       return;
     }
     if (this.editMode) {
+      this.product.description = this.productForm.value.description;
       this.productService.editProduct(this.product);
       this.snackBar.open('Product successfully updated', '', {
         duration: 2000,
       });
     } else {
       const product = {
-        namespace: this.productForm.value.name,
+        id: this.productForm.value.name,
+        description: this.productForm.value.description,
+        name: this.productForm.value.name,
+        parentId: '',
+        selfLink: '',
         automationTriggersLink: '',
         automationTemplatesLink: '',
         actionSequenceTemplatesLink: '',

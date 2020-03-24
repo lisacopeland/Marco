@@ -2,7 +2,7 @@
   <div class="sidebar-title">Product Dashboard</div>
   <mat-divider></mat-divider>
     <a class="menu-choices" matTooltip="Add a release plan for this product" (click)="onAdd()">Add Release Plan</a>
-<!--     <a class="menu-choices" matTooltip="Edit details like description" (click)="onEdit()">Edit Product Details</a>
- -->    <a class="menu-choices" matTooltip="Delete this product" (click)="onDelete()">Delete Product</a>
+    <a class="menu-choices" matTooltip="Edit details like description" (click)="onEdit()">Edit Product Details</a>
+    <a class="menu-choices" matTooltip="Delete this product" (click)="onDelete()">Delete Product</a>
     <a class="menu-choices" matTooltip="Return to the product list" [routerLink]="[{ outlets: { primary: ['products'], sidebar: ['productssidebar'] } }]">Return to Product List</a>
 </div>

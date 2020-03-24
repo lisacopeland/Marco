@@ -50,7 +50,7 @@ export class ProductSidebarComponent implements OnInit {
     });
   }
 
-/*   onEdit() {
+  onEdit() {
     const dialogRef = this.dialog.open(ProductEditDialogComponent, {
       width: '500px',
       data: this.product
@@ -60,7 +60,7 @@ export class ProductSidebarComponent implements OnInit {
         this.product = result;
       }
     });
-  } */
+  }
 
   onDelete() {
     const dialogRef = this.dialog.open(AlertDialogComponent, {

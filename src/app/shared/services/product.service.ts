@@ -84,8 +84,8 @@ export class ProductService {
   }
 
   // Returns true if the name is not taken, false if otherwise
-  checkNameNotTaken(name: string): Observable<boolean | null> {
-    const result = (this.products.find(x => x.namespace === name) === undefined) ? true : false;
+  checkNameNotTaken(id: string): Observable<boolean | null> {
+    const result = (this.products.find(x => x.id === id) === undefined) ? true : false;
     return of(result);
   }
 
@@ -114,7 +114,7 @@ export class ProductService {
       .delete<ProductInterface>(apiUrl, { observe: 'response', headers: this.headers })
       .pipe(
         map(response => {
-          const idx = this.products.findIndex(x => x.namespace === product.namespace);
+          const idx = this.products.findIndex(x => x.id === product.id);
           if (idx !== -1) {
             this.products.splice(idx, 1);
             this.productsSource.next(this.products);
@@ -135,7 +135,7 @@ export class ProductService {
       .put<ProductInterface>(apiUrl, body, { observe: 'response', headers: this.headers })
       .pipe(
         map(response => {
-          const idx = this.products.findIndex(x => x.namespace === product.namespace);
+          const idx = this.products.findIndex(x => x.id === product.id);
           if (idx !== -1) {
             this.products[idx] = product;
             this.productsSource.next(this.products);

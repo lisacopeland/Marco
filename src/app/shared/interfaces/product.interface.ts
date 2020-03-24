@@ -1,7 +1,6 @@
 import { DatabaseInterface } from './database.interface';
 
-export interface ProductInterface {
-  namespace: string;
+export interface ProductInterface extends DatabaseInterface {
   automationTriggersLink: string;
   automationTemplatesLink: string;
   actionSequenceTemplatesLink: string;

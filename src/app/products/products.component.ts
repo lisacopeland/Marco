@@ -20,7 +20,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   unsubscribe$: Subject<boolean> = new Subject();
   hasData = true;
   waiting = true;
-  displayedColumns: string[] = ['name', 'dashboard'];
+  displayedColumns: string[] = ['id', 'name', 'description', 'dashboard'];
   dataSource: MatTableDataSource<ProductInterface>;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -72,7 +72,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   onDashboard(row) {
     this.router.navigate(
-      [{ outlets: { primary: 'products/productdashboard', sidebar: 'productsidebar' }}], {queryParams: { name: row?.name }});
+      [{ outlets: { primary: 'products/productdashboard', sidebar: 'productsidebar' }}], {queryParams: { id: row?.id }});
   }
 
   ngOnDestroy() {

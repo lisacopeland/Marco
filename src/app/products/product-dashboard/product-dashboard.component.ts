@@ -24,7 +24,7 @@ export class ProductDashboardComponent implements OnInit, OnDestroy {
 
   unsubscribe$: Subject<boolean> = new Subject();
   product: ProductInterface;
-  productName = '';
+  productId = '';
   displayedColumns: string[] = ['planId', 'name', 'description', 'tags', 'dashboard'];
   dataSource: MatTableDataSource<ActionSequenceTemplateInterface>;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -40,9 +40,9 @@ export class ProductDashboardComponent implements OnInit, OnDestroy {
 
     this.route.queryParams
       .subscribe(params => {
-        this.productName = params.name;
-        if (this.productName) {
-          this.productService.getProductHttp(this.productName)
+        this.productId = params.id;
+        if (this.productId) {
+          this.productService.getProductHttp(this.productId)
             .pipe(
               switchMap(product => {
                 this.product = product;
