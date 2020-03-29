@@ -22,7 +22,7 @@
           <!-- Milestone nodes -->
           <svg:g
             *ngIf="node.data.node?.nodeType==='Milestone'"
-            [matTooltip]="node.data.node?.name + '-' + node.data.node?.description"
+            [matTooltip]="'Milestone: ' + node.data.node?.name"
             mat-button
             [matMenuTriggerFor]="clickMenu"
             class="node">
@@ -34,29 +34,29 @@
 
           <!-- Milestone Link nodes -->
           <svg:g
-            *ngIf="node.data.node.nodeType==='MilestoneLink'"
-            matTooltip="This is a milestone link"
+            *ngIf="node.data.node?.nodeType==='LinkPoint'"
+            [matTooltip]="'Linkpoint: ' + node.data.node?.name"
             class="node"
             mat-button
             [matMenuTriggerFor]="clickMenu">
 
           <svg:rect class="node-rect" [attr.width]=150 [attr.height]=55 [attr.rx]=5 [attr.ry]=5
-            [attr.fill]="milestoneLinkBackground" />
-          <svg:text dominant-baseline="middle" text-anchor="middle" [attr.fill]=milestoneLinkText [attr.x]="node.dimension.width / 2"
+            [attr.fill]="linkPointBackground" />
+          <svg:text dominant-baseline="middle" text-anchor="middle" [attr.fill]=linkPointText [attr.x]="node.dimension.width / 2"
             [attr.y]="node.dimension.height / 2">{{ node.label | slice:0:17 }}</svg:text>
           </svg:g>
 
           <!-- Task nodes -->
           <svg:g
-            *ngIf="node.data.node.nodeType==='Task'"
-            matTooltip="This is a task"
+            *ngIf="node.data.node.nodeType==='Action'"
+            [matTooltip]="'Action: ' + node.data.node?.name"
             class="node"
             mat-button
             [matMenuTriggerFor]="clickMenu">
 
             <svg:ellipse class="node-ellipse" [attr.width]=150 [attr.height]=65 [attr.cx]="node.dimension.width / 2"
-              [attr.cy]="node.dimension.height / 2" [attr.rx]=65 [attr.ry]=30 [attr.fill]="node.data.backgroundColor" />
-            <svg:text dominant-baseline="middle" text-anchor="middle" [attr.fill]="nodeText" [attr.x]="node.dimension.width / 2"
+              [attr.cy]="node.dimension.height / 2" [attr.rx]=65 [attr.ry]=30 [attr.fill]="actionBackground" />
+            <svg:text dominant-baseline="middle" text-anchor="middle" [attr.fill]="actionText" [attr.x]="node.dimension.width / 2"
               [attr.y]="node.dimension.height / 2">{{ node.label | slice:0:17 }}</svg:text>
           </svg:g>
 

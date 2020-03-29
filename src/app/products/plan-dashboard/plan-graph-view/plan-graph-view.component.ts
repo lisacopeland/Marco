@@ -20,11 +20,11 @@ export class PlanGraphViewComponent implements OnInit {
   milestoneBackground = '#99ccff';
   // milestoneText = '#ff0000';
   milestoneText = '#404040';
-  milestoneLinkBackground = '#80ffaa';
-  milestoneLinkText = '#404040';
-  nodeBackground = '#ff80ff';
+  linkPointBackground = '#80ffaa';
+  linkPointText = '#404040';
+  actionBackground = '#ff80ff';
   // nodeText = '#0000cc';
-  nodeText = '#404040';
+  actionText = '#404040';
   lineColor = '#333333';
   planNodes: NodeInterface[];
   curve: any = shape.curveLinear;
