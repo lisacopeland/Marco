@@ -107,7 +107,7 @@ export class PlanGraphViewComponent implements OnInit {
     // turn the planNodes into the nodes and edges of the graph
     const newNodes: Node[] = [];
     const newLinks: Edge[] = [];
-    let edgeCounter = 0;
+    let edgeCounter = 1;
     this.planNodes.forEach(node => {
       newNodes.push({
         id: node.id,

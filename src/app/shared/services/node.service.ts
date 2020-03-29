@@ -78,7 +78,7 @@ export class NodeService {
   getPredecessors(node: NodeInterface): NodeInterface[] {
     // Return an array of all of this node's predecessors
     const predecessorNodes = [];
-    if ((node === undefined) || (node === null)) {
+    if ((node === undefined) || (node === null) || !node.predecessors) {
       return [];
     }
     node.predecessors.forEach(predecessor => {
@@ -91,7 +91,6 @@ export class NodeService {
   }
 
   getSuccessors(node: NodeInterface): NodeInterface[] {
-
     const successorNodes = this.nodes.filter(targetNode => {
       if (targetNode.predecessors) {
         return (targetNode.predecessors.find(x => x === node.id) !== undefined);

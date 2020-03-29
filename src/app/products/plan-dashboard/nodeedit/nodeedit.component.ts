@@ -238,7 +238,7 @@ export class NodeEditDialogComponent implements OnInit {
       node = {
         id: nodeId,
         parentId: this.parentId,
-        name: this.nodeForm.value.name.toUpperCase(),
+        name: (this.editMode) ? this.node.name : this.nodeForm.value.name.toUpperCase(),
         description: this.nodeForm.value.description,
         selfLink: (this.editMode) ? this.node.selfLink : '',
         nodeType: this.nodeType,
@@ -255,7 +255,7 @@ export class NodeEditDialogComponent implements OnInit {
       node = {
         id: nodeId,
         parentId: this.parentId,
-        name: this.nodeForm.value.name.toUpperCase(),
+        name: (this.editMode) ? this.node.name : this.nodeForm.value.name.toUpperCase(),
         description: this.nodeForm.value.description,
         selfLink: (this.editMode) ? this.node.selfLink : '',
         nodeType: this.nodeType,
@@ -271,7 +271,7 @@ export class NodeEditDialogComponent implements OnInit {
       node = {
         id: nodeId,
         parentId: this.parentId,
-        name: this.nodeForm.value.name.toUpperCase(),
+        name: (this.editMode) ? this.node.name : this.nodeForm.value.name.toUpperCase(),
         description: this.nodeForm.value.description,
         selfLink: (this.editMode) ? this.node.selfLink : '',
         nodeType: this.nodeType,

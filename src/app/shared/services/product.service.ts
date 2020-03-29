@@ -43,7 +43,6 @@ export class ProductService {
       .get<GetResponse>(apiUrl, { observe: 'response', headers: this.headers })
       .pipe(
         map(response => {
-          console.log(response);
           this.products = response.body.namespaces;
           this.productsSource.next(this.products);
           return this.products.slice();

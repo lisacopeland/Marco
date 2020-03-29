@@ -40,7 +40,7 @@
           {{ successor.name }}
         </div>
       </div>
-      <div *ngIf="!predecessors.length" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="14px">
+      <div *ngIf="!successors.length" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="14px">
         <div>This node is not succeeded by any other nodes</div>
       </div>
       <div *ngIf="timerTrigger" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="14px">

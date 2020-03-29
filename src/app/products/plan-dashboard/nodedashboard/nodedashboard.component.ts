@@ -15,7 +15,6 @@ import { NodeActionInterface } from '../plan-dashboard.component';
 export class NodeDashboardComponent implements OnInit {
   @Input() node: NodeInterface;
   @Output() nodeAction = new EventEmitter<NodeActionInterface>();
-  planNodes: NodeInterface[];
   predecessors: NodeInterface[];
   successors: NodeInterface[];
   timerTrigger: NodeInterface = null;
@@ -25,27 +24,19 @@ export class NodeDashboardComponent implements OnInit {
 
   constructor(private nodeService: NodeService) { }
 
-
-
   ngOnInit(): void {
-    this.nodeService.nodeLookup
-      .subscribe(data => {
-        if (data.length) {
-          this.planNodes = data;
-          this.predecessors = this.nodeService.getPredecessors(this.node);
-          this.successors = this.nodeService.getSuccessors(this.node);
-          if (this.node.timerTrigger) {
-            this.timerTrigger = this.nodeService.getNodeById(this.node.timerTrigger);
-          }
-          if (this.node.nodeType === 'Action') {
-            this.action = this.node as ActionNodeInterface;
-          } else if (this.node.nodeType === 'Milestone') {
-            this.milestone = this.node as MilestoneNodeInterface;
-          } else if (this.node.nodeType === 'LinkPoint') {
-            this.linkPoint = this.node as LinkPointNodeInterface;
-          }
-        }
-      });
+    this.predecessors = this.nodeService.getPredecessors(this.node);
+    this.successors = this.nodeService.getSuccessors(this.node);
+    if (this.node.timerTrigger) {
+      this.timerTrigger = this.nodeService.getNodeById(this.node.timerTrigger);
+    }
+    if (this.node.nodeType === 'Action') {
+      this.action = this.node as ActionNodeInterface;
+    } else if (this.node.nodeType === 'Milestone') {
+      this.milestone = this.node as MilestoneNodeInterface;
+    } else if (this.node.nodeType === 'LinkPoint') {
+      this.linkPoint = this.node as LinkPointNodeInterface;
+    }
   }
 
   onEditNode(node: NodeInterface) {
@@ -73,8 +64,8 @@ export class NodeDashboardComponent implements OnInit {
   }
 
   onDelLine(sourceNodeId: string, targetNodeId: string) {
-    const sourceNode = this.planNodes.find(x => x.id === sourceNodeId);
-    const targetNode = this.planNodes.find(x => x.id === targetNodeId);
+    const sourceNode = this.nodeService.getNodeById(sourceNodeId);
+    const targetNode = this.nodeService.getNodeById(targetNodeId);
     this.nodeAction.emit({
       action: 'deleteLine',
       planNode: sourceNode,

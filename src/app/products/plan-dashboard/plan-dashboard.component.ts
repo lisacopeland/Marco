@@ -123,7 +123,6 @@ export class PlanDashboardComponent implements OnInit {
         });
         dialogRef.afterClosed().subscribe((result) => {
           if (result === 'Yes') {
-            console.log('result was yes');
             this.version = 'master';
             this.getReleasePlan(this.committedLink);
           }
@@ -158,15 +157,12 @@ export class PlanDashboardComponent implements OnInit {
 
       dialogRef.afterClosed().subscribe(result => {
         if (result) {
-          console.log('a planNode was edited or added');
           this.planDirty = true;
           if ($event.action === 'add') {
             this.nodeService.addNodeCache(result);
           } else if ($event.action === 'edit') {
             this.nodeService.editNodeCache(result);
           }
-        } else {
-          console.log('dialog was cancelled');
         }
       });
     } else if (($event.action === 'from') || ($event.action === 'to')) {
