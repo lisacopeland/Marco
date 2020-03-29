@@ -4,7 +4,7 @@
   <div fxLayout="column">
       <!-- Top row of header -->
     <div class="page-header" fxLayout="row" fxLayoutAlign="space-between center">
-      <div fxLayout="row" fxLayoutAlign="start center">
+      <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
         <h1 class="mat-h1">{{ actionSequenceTemplate?.name }}</h1>
         <p>{{ version }}</p>
       </div>
@@ -15,7 +15,7 @@
       <div fxLayout="row" fxLayoutAlign="start center">
         <button
           mat-flat-button
-          mat-tooltip="Edit plan details"
+          matTooltip="Edit plan details"
           fxLayoutAlign="start center"
           (click)="onEdit()">
           <mat-icon>edit</mat-icon>edit
@@ -24,24 +24,24 @@
       <div fxLayout="row" fxLayoutAlign="start center">
         <button
           mat-flat-button
-          mat-tooltip="Save the working copy"
+          matTooltip="Save the working copy"
           fxLayoutAlign="start center"
           (click)="onSave()"><mat-icon>save</mat-icon>save</button>
       </div>
       <div fxLayout="row" fxLayoutAlign="start center">
         <button
           mat-flat-button
-          mat-tooltip="Discard current changes to working copy"
+          matTooltip="Discard current changes to working copy"
           fxLayoutAlign="start center"
           (click)="onRefresh()"><mat-icon>refresh</mat-icon>refresh</button>
       </div>
       <div fxLayout="row" fxLayoutAlign="start center">
-        <button mat-flat-button mat-tooltip="Discard the changes to the working copy" fxLayoutAlign="start center"><mat-icon>cancel</mat-icon>reset</button>
+        <button mat-flat-button matTooltip="Discard the changes to the working copy" fxLayoutAlign="start center"><mat-icon>cancel</mat-icon>reset</button>
       </div>
       <div (click)="onChangeView()" fxLayout="row" fxLayoutAlign="start center">
-        <button *ngIf="nodeView==='graph'" mat-flat-button mat-tooltip="Toggle view to the node list" fxLayoutAlign="start center" ><mat-icon>view_list</mat-icon>view</button>
-        <button *ngIf="nodeView==='list'"  mat-flat-button mat-tooltip="Toggle view to the node graph" fxLayoutAlign="start center" ><mat-icon>satellite</mat-icon>view</button>
-        <button *ngIf="nodeView==='dashboard'" mat-flat-button mat-tooltip="Toggle view to the node list" fxLayoutAlign="start center" ><mat-icon>view_list</mat-icon>view</button>
+        <button *ngIf="nodeView==='graph'" mat-flat-button matTooltip="Toggle view to the node list" fxLayoutAlign="start center" ><mat-icon>view_list</mat-icon>view</button>
+        <button *ngIf="nodeView==='list'"  mat-flat-button matTooltip="Toggle view to the node graph" fxLayoutAlign="start center" ><mat-icon>satellite</mat-icon>view</button>
+        <button *ngIf="nodeView==='dashboard'" mat-flat-button matTooltip="Toggle view to the node list" fxLayoutAlign="start center" ><mat-icon>view_list</mat-icon>view</button>
       </div>
     </mat-toolbar>
     </div>

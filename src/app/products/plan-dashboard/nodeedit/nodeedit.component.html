@@ -72,8 +72,28 @@
       </mat-form-field>
     </div>
 
+    <!-- Fields for when nodeType is milestone -->
+    <div *ngIf="nodeType === 'LinkPoint'">
+      <mat-form-field class="input-75">
+        <mat-label>Linked Milestone Type</mat-label>
+        <mat-select formControlName="linkedMilestoneType">
+          <mat-option *ngFor="let milestoneType of milestoneTypes" [value]="milestoneType">
+            {{milestoneType}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="input-75">
+        <mat-label>Linked Label</mat-label>
+        <input matInput placeholder="" formControlName="linkedLabel">
+      </mat-form-field>
+      <mat-form-field class="input-75">
+        <mat-label>Linked State Announced</mat-label>
+        <input matInput placeholder="" formControlName="linkedStateAnnounced">
+      </mat-form-field>
+    </div>
+
     <!-- Fields for when nodeType is task -->
-    <div *ngIf="nodeType === 'Task'">
+    <div *ngIf="nodeType === 'Action'">
       <mat-form-field class="input-75">
         <mat-label>Task Type</mat-label>
         <input matInput placeholder="" formControlName="taskType">

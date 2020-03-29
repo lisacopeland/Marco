@@ -18,15 +18,15 @@ import { Router } from '@angular/router';
 export class ProductsComponent implements OnInit, OnDestroy {
 
   unsubscribe$: Subject<boolean> = new Subject();
-  hasData = true;
+  hasData = false;
   waiting = true;
   displayedColumns: string[] = ['id', 'name', 'description', 'dashboard'];
   dataSource: MatTableDataSource<ProductInterface>;
   @ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: true}) sort: MatSort;
 
-  constructor(private productService: ProductService,
-              private router: Router,
+  constructor(public productService: ProductService,
+              public router: Router,
               public dialog: MatDialog) { }
 
   ngOnInit(): void {

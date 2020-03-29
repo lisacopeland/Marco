@@ -27,6 +27,9 @@ export class NodeEditDialogComponent implements OnInit {
   editTitle = 'Add New Milestone or Task';
   nodeForm: FormGroup;
   node: NodeInterface;
+  action: ActionNodeInterface;
+  milestone: MilestoneNodeInterface;
+  linkPoint: LinkPointNodeInterface;
   nodeSelectList: NodeInterface[];
   successors: NodeInterface[] = [];
   predecessors: NodeInterface[] = [];
@@ -47,33 +50,36 @@ export class NodeEditDialogComponent implements OnInit {
 
     this.editMode = this.data.node !== null;
     this.parentId = this.data.parentId;
+    this.initForm();
     if (this.editMode) {
+      this.node = this.data.node;
       if (this.data.node.nodeType === 'Milestone') {
-        this.node = this.data.node as MilestoneNodeInterface;
+        this.milestone = this.data.node as MilestoneNodeInterface;
       } else if (this.data.node.nodeType === 'LinkPoint') {
-        this.node = this.data.node as LinkPointNodeInterface;
+        this.linkPoint = this.data.node as LinkPointNodeInterface;
       } else {
-        this.node = this.data.node as ActionNodeInterface;
+        this.action = this.data.node as ActionNodeInterface;
       }
       this.editTitle = 'Editing ' + this.node.name;
+      this.patchForm();
     }
     this.nodeService.nodeLookup
       .subscribe(data => {
         if (data.length) {
+          // Take the current node out of the selectlist for predecessors and successors
+          // and timertrigger
           this.nodeSelectList = data;
           if (this.editMode) {
             const idx = this.nodeSelectList.findIndex(x => x.name === this.node.name);
             this.nodeSelectList.splice(idx, 1);
           }
         }
-        this.initForm();
-      });
 
+      });
   }
 
   initForm() {
 
-    // TODO: timerTrigger should be a select of all of the other nodes in the releaseplan
     this.nodeForm = new FormGroup({
       name: new FormControl(
         '',
@@ -87,40 +93,24 @@ export class NodeEditDialogComponent implements OnInit {
       predecessor: new FormControl(''),
       successor: new FormControl('')
     });
-    if (this.editMode) {
-      let currentNode;
-      if (this.node.nodeType === 'Milestone') {
-        currentNode = this.node as MilestoneNodeInterface;
-      } else if (this.node.nodeType === 'LinkPoint') {
-        currentNode = this.data.node as LinkPointNodeInterface;
-      } else {
-        currentNode = this.node as ActionNodeInterface;
-      }
-      // Get this nodes predecessors
-      this.node.predecessors.forEach(predecessorId => {
-        const idx = this.nodeSelectList.findIndex(x => x.id === predecessorId);
-        if (idx !== -1) {
-          this.successors.push(this.nodeSelectList[idx]);
-        }
-      });
-      // Get this nodes successor
-      this.successors = [];
-      this.nodeSelectList.forEach(node => {
-        // See if the node being edited is in the list of predecessors of
-        // this nodes predecessors
-        const idx = node.predecessors.findIndex(x => x === node.id);
-        if (idx !== -1) {
-          // node is a predecessor of node being edited
-          this.successors.push(node);
-        }
-      });
+    if (!this.editMode) {
+      this.nodeType = 'Milestone';
+      this.nodeForm.get('nodeType').setValidators(Validators.required);
+      this.swapNodeTypeFields('Milestone', false);
+      this.onNodeTypeChanges();
+    }
+  }
+
+  patchForm() {
+      this.predecessors = this.nodeService.getPredecessors(this.node);
+      this.successors = this.nodeService.getSuccessors(this.node);
       this.nodeType = this.node.nodeType;
       this.nodeForm.patchValue({
         name: this.node.name,
         description: this.node.description,
         nodeType: this.node.nodeType,
         timerDurationMinutes: this.node.timerDurationMinutes,
-        timerTrigger: this.node.timerTrigger
+        timerTrigger: this.nodeService.getNodeById(this.node.timerTrigger)
       });
       if (this.predecessors.length) {
         this.nodeForm.patchValue({
@@ -132,57 +122,64 @@ export class NodeEditDialogComponent implements OnInit {
           successor: this.successors[0]
         });
       }
-
+      this.swapNodeTypeFields(this.nodeType, false);
       if (this.nodeType === 'Milestone') {
-        this.nodeForm.addControl('milestoneType', new FormControl(currentNode.milestoneType));
-        this.nodeForm.addControl('label', new FormControl(currentNode.label)),
-        this.nodeForm.addControl('stateAnnounced', new FormControl(currentNode.stateAnnounced));
-      } else {
-        this.nodeForm.addControl('taskType', new FormControl(currentNode.taskType));
-        this.nodeForm.addControl('taskData', new FormControl(currentNode.taskData));
-        this.nodeForm.addControl('expectedDurationMinutes', new FormControl(currentNode.expectedDurationMinutes));
+        this.nodeForm.patchValue({
+          milestoneType: this.milestone.milestoneType,
+          label: this.milestone.label,
+          stateAnnounced: this.milestone.stateAnnounced
+        });
+      } else if (this.nodeType === 'Action') {
+        this.nodeForm.patchValue({
+          taskType: this.action.taskType,
+          taskData: this.action.taskData,
+          expectedDurationMinutes: this.action.expectedDurationMinutes
+        });
+      } else if (this.nodeType === 'LinkPoint') {
+        this.nodeForm.patchValue({
+          linkedMilestoneType: this.linkPoint.linkedMilestoneType,
+          linkedLabel: this.linkPoint.linkedLabel,
+          linkedStateAnnounced: this.linkPoint.linkedStateAnnounced
+        });
       }
       this.nodeForm.get('name').disable();
       this.nodeForm.get('nodeType').disable();
-    } else {
-      this.nodeType = 'Milestone';
-      // this.nodeForm.get('name').setValidators(Validators.required);
-      // this.nodeForm.get('name').setAsyncValidators([
-      //   this.validateNameAvailability.bind(this)]);
-      // this.onNameChanges();
-      this.nodeForm.get('nodeType').setValidators(Validators.required);
-      this.swapNodeTypeFields('Milestone', false);
-      this.onNodeTypeChanges();
-    }
   }
 
   swapNodeTypeFields(newNodeTypeValue: string, removeOldControls: boolean) {
     // This is only for when the user is adding a brand new node
+    const oldNodeType = this.nodeType;
     this.nodeType = newNodeTypeValue;
       // Swtiching to Milestone or initializing the form
     if (newNodeTypeValue === 'Milestone') {
-        this.nodeForm.addControl('milestoneType', new FormControl(this.milestoneTypes[0], Validators.required));
-        this.nodeForm.addControl('label', new FormControl('', Validators.required));
-        this.nodeForm.addControl('stateAnnounced', new FormControl(''));
-        // If you are swapping from Milestone to Task
-        if (removeOldControls) {
-          this.nodeForm.removeControl('taskType');
-          this.nodeForm.removeControl('taskData');
-          // this.nodeForm.removeControl('inputs');
-          this.nodeForm.removeControl('expectedDurationMinutes');
-        }
-      } else {
-        // Swtiching from Milestone to task
-        this.nodeForm.addControl('taskType', new FormControl(''));
-        this.nodeForm.addControl('taskData', new FormControl(''));
-        // this.nodeForm.addControl('inputs', new FormControl(''));
-        this.nodeForm.addControl('expectedDurationMinutes', new FormControl(0));
-        if (removeOldControls) {
-          this.nodeForm.removeControl('milestoneType');
-          this.nodeForm.removeControl('label');
-          this.nodeForm.removeControl('stateAnnounced');
-        }
+      this.nodeForm.addControl('milestoneType', new FormControl(this.milestoneTypes[0]));
+      this.nodeForm.addControl('label', new FormControl('')),
+      this.nodeForm.addControl('stateAnnounced', new FormControl(''));
+    } else if (newNodeTypeValue === 'LinkPoint') {
+      this.nodeForm.addControl('linkedMilestoneType', new FormControl(this.milestoneTypes[0]));
+      this.nodeForm.addControl('linkedLabel', new FormControl('')),
+      this.nodeForm.addControl('linkedStateAnnounced', new FormControl(''));
+    } else if (newNodeTypeValue === 'Action' ) {
+      this.nodeForm.addControl('taskType', new FormControl(''));
+      this.nodeForm.addControl('taskData', new FormControl(''));
+      this.nodeForm.addControl('expectedDurationMinutes', new FormControl(0));
+    }
+
+    if (removeOldControls) {
+      if (oldNodeType === 'Milestone') {
+        this.nodeForm.removeControl('milestoneType');
+        this.nodeForm.removeControl('label');
+        this.nodeForm.removeControl('stateAnnounced');
+      } else if (oldNodeType === 'LinkPoint') {
+        this.nodeForm.removeControl('linkedMilestoneType');
+        this.nodeForm.removeControl('linkedLabel');
+        this.nodeForm.removeControl('linkedStateAnnounced');
+      } else if (oldNodeType === 'Action') {
+        this.nodeForm.removeControl('taskType');
+        this.nodeForm.removeControl('taskData');
+        this.nodeForm.removeControl('expectedDurationMinutes');
       }
+    }
 
   }
 
@@ -236,8 +233,8 @@ export class NodeEditDialogComponent implements OnInit {
       nodeId = this.node.id;
     }
 
+    // TODO: Add successors to other nodes
     if (this.nodeType === 'Milestone') {
-      const currentNode = this.node as MilestoneNodeInterface;
       node = {
         id: nodeId,
         parentId: this.parentId,
@@ -251,7 +248,7 @@ export class NodeEditDialogComponent implements OnInit {
         milestoneType: this.nodeForm.value.milestoneType,
         label: this.nodeForm.value.label,
         stateAnnounced: this.nodeForm.value.declaredStatus,
-        spanningPredecessors: (this.editMode) ? currentNode.spanningPredecessors : [],
+        spanningPredecessors: (this.editMode) ? this.milestone.spanningPredecessors : [],
       } as MilestoneNodeInterface;
 
     } else if (this.nodeType === 'Action') {
@@ -282,13 +279,11 @@ export class NodeEditDialogComponent implements OnInit {
         timerDurationMinutes: this.nodeForm.value.timerDurationMinutes,
         timerTrigger: this.nodeForm.value.timerTrigger,
         linkedId: '',
-        linkedMilestoneType: 'Start',
-        linkedLabel: '',
-        linkedStateAnnounced: ''
+        linkedMilestoneType: this.nodeForm.value.linkedMilestoneType,
+        linkedLabel: this.nodeForm.value.linkedLabel,
+        linkedStateAnnounced: this.nodeForm.value.linkedStateAnnounced
       } as LinkPointNodeInterface;
-
     }
-
     this.dialogRef.close(node);
   }
 

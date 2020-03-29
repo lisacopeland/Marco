@@ -21,9 +21,9 @@ export class ProductEditDialogComponent implements OnInit {
   editMode = false;
 
   constructor(private productService: ProductService,
-    private snackBar: MatSnackBar,
-    public dialogRef: MatDialogRef<ProductEditDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: ProductInterface) { }
+              private snackBar: MatSnackBar,
+              public dialogRef: MatDialogRef<ProductEditDialogComponent>,
+              @Inject(MAT_DIALOG_DATA) public data: ProductInterface) { }
 
   ngOnInit(): void {
     this.editMode = this.data !== null;
@@ -48,7 +48,6 @@ export class ProductEditDialogComponent implements OnInit {
       this.productForm.get('name').disable();
     } else {
       this.productForm.get('name').setValidators([Validators.required]);
-      // this.productForm.get('name').setValidators([Validators.required, Validators.pattern('[0 - 9A - Z] *')]);
       this.productForm.get('name').setAsyncValidators([
         this.validateNameAvailability.bind(this)]);
       this.onNameChanges();

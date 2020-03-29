@@ -12,15 +12,80 @@
     <button mat-menu-item (click)="onAddLine(node, 'from')">Add Line From Here</button>
     <button mat-menu-item (click)="onAddLine(node, 'to')">Add Line to Here</button>
     <button mat-menu-item (click)="onDeleteNode(node)">Delete</button>
-<!--     <button mat-menu-item (click)="onSwitchView('list')">Back to List</button>
-    <button mat-menu-item (click)="onSwitchView('graph')">Back to Graph</button> -->
   </mat-menu>
   <mat-card class="card-content">
     <mat-card-title>
-      {{node?.description}}
+      <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="14px">
+        <div>{{node?.name}}</div>
+        <div>{{node?.nodeType}}</div>
+      </div>
     </mat-card-title>
     <mat-card-content>
-      Stuff about this node
+      <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="14px">
+        <div>Description: </div>
+        <div>{{node?.description}}</div>
+      </div>
+      <div *ngIf="predecessors.length" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="14px">
+        <div>Predecessors: </div>
+        <div *ngFor="let predecessor of predecessors">
+          {{ predecessor.name }}
+        </div>
+      </div>
+      <div *ngIf="!predecessors.length" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="14px">
+        <div>This node is not preceeded by any other nodes</div>
+      </div>
+      <div *ngIf="successors.length" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="14px">
+        <div>Successors: </div>
+        <div *ngFor="let successor of successors">
+          {{ successor.name }}
+        </div>
+      </div>
+      <div *ngIf="!predecessors.length" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="14px">
+        <div>This node is not succeeded by any other nodes</div>
+      </div>
+      <div *ngIf="timerTrigger" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="14px">
+        <div>Timer Trigger: {{timerTrigger?.name}}</div>
+      </div>
+      <div *ngIf="node.timerDurationMinutes" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="14px">
+        <div>Timer Duration: {{node.timerDurationMinutes}} in minutes</div>
+      </div>
+      <!-- Milestones-->
+      <div *ngIf="node.nodeType === 'Milestone'">
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="14px">
+          <div>{{milestone?.milestoneType}}</div>
+          <div>{{milestone?.label}} </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="14px">
+          <div>State Announced {{milestone?.stateAnnounced}}</div>
+        </div>
+      </div>
+
+      <!-- LinkPoint-->
+      <div *ngIf="node.nodeType === 'LinkPoint'">
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="14px">
+          <div>{{linkPoint?.linkedMilestoneType}}</div>
+          <div>{{linkPoint?.linkedLabel}} </div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="14px">
+          <div>State Announced {{linkPoint?.linkedStateAnnounced}}</div>
+        </div>
+      </div>
+
+      <!-- Action Nodes-->
+      <div *ngIf="node.nodeType === 'Action'">
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="14px">
+          <div>Task Type {{action?.taskType}}</div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="14px">
+          <div>Task Data {{action?.taskData}}</div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="14px">
+          <div>Expected Duration {{action?.expectedDurationMinutes }} in minutes</div>
+        </div>
+
+      </div>
+
+
     </mat-card-content>
   </mat-card>
 </section>

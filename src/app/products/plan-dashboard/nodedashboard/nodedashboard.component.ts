@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, Input, Output, EventEmitter } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { NodeInterface, MilestoneNodeInterface, ActionNodeInterface } from '@interfaces/node.interface';
+import { NodeInterface, MilestoneNodeInterface, ActionNodeInterface, LinkPointNodeInterface } from '@interfaces/node.interface';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NodeService } from '@services/node.service';
@@ -16,13 +16,34 @@ export class NodeDashboardComponent implements OnInit {
   @Input() node: NodeInterface;
   @Output() nodeAction = new EventEmitter<NodeActionInterface>();
   planNodes: NodeInterface[];
+  predecessors: NodeInterface[];
+  successors: NodeInterface[];
+  timerTrigger: NodeInterface = null;
+  milestone: MilestoneNodeInterface;
+  action: ActionNodeInterface;
+  linkPoint: LinkPointNodeInterface;
+
   constructor(private nodeService: NodeService) { }
+
+
 
   ngOnInit(): void {
     this.nodeService.nodeLookup
       .subscribe(data => {
         if (data.length) {
           this.planNodes = data;
+          this.predecessors = this.nodeService.getPredecessors(this.node);
+          this.successors = this.nodeService.getSuccessors(this.node);
+          if (this.node.timerTrigger) {
+            this.timerTrigger = this.nodeService.getNodeById(this.node.timerTrigger);
+          }
+          if (this.node.nodeType === 'Action') {
+            this.action = this.node as ActionNodeInterface;
+          } else if (this.node.nodeType === 'Milestone') {
+            this.milestone = this.node as MilestoneNodeInterface;
+          } else if (this.node.nodeType === 'LinkPoint') {
+            this.linkPoint = this.node as LinkPointNodeInterface;
+          }
         }
       });
   }

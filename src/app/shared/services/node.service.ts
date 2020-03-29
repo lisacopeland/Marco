@@ -38,9 +38,7 @@ export class NodeService {
   delNodeCache(node: NodeInterface) {
     // First loop thru all nodes and remove this one from
     // the predecessor list of all nodes
-    const successorNodes = this.nodes.filter(targetNode => {
-      return (targetNode.predecessors.find(x => x === node.id) !== undefined);
-    });
+    const successorNodes = this.getSuccessors(node);
     successorNodes.forEach(targetNode => {
       const idx1 = targetNode.predecessors.findIndex(x => x === node.id);
       targetNode.predecessors.splice(idx1, 1);
@@ -62,14 +60,44 @@ export class NodeService {
     this.nodeSource.next(this.nodes);
   }
 
-  getNodeById(id: string) {
-    return this.nodes.find(x => x.id === id);
+  getNodeById(id: string): NodeInterface | null {
+    const idx = this.nodes.findIndex(x => x.id === id);
+    if (idx !== -1) {
+      return this.nodes.slice(idx, 1)[0];
+    } else {
+      return null;
+    }
   }
 
   // Returns true if the name is taken, false if otherwise
   isNameTaken(name: string): Observable<boolean | null> {
     const result = (this.nodes.find(x => x.name === name.toUpperCase()) !== undefined);
     return of(result);
+  }
+
+  getPredecessors(node: NodeInterface): NodeInterface[] {
+    // Return an array of all of this node's predecessors
+    const predecessorNodes = [];
+    if ((node === undefined) || (node === null)) {
+      return [];
+    }
+    node.predecessors.forEach(predecessor => {
+      const predecessorNode = this.nodes.find(x => x.id === predecessor);
+      if (predecessorNode) {
+        predecessorNodes.push(predecessorNode);
+      }
+    });
+    return predecessorNodes;
+  }
+
+  getSuccessors(node: NodeInterface): NodeInterface[] {
+
+    const successorNodes = this.nodes.filter(targetNode => {
+      if (targetNode.predecessors) {
+        return (targetNode.predecessors.find(x => x === node.id) !== undefined);
+      }
+    });
+    return successorNodes;
   }
 
 }
