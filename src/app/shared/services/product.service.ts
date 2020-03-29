@@ -37,7 +37,7 @@ export class ProductService {
       namespaces: ProductInterface[];
     }
 
-    const apiUrl = environment.apiUrl + '/api/v1/namespaces';
+    const apiUrl = environment.apiUrl + '/api/v1/data/namespace/region_build/namespaces';
 
     return this.http
       .get<GetResponse>(apiUrl, { observe: 'response', headers: this.headers })
@@ -71,7 +71,7 @@ export class ProductService {
   }
 
   getProductHttp(id: string) {
-    const apiUrl = environment.apiUrl + '/api/v1/namespaces/' + id;
+    const apiUrl = environment.apiUrl + '/api/v1/data/namespace/' + id;
 
     return this.http
       .get<ProductInterface>(apiUrl, { observe: 'response', headers: this.headers })
@@ -91,7 +91,7 @@ export class ProductService {
 
   addProduct(newProduct: ProductInterface) {
 
-    const apiUrl = environment.apiUrl + '/api/v1/namespaces';
+    const apiUrl = environment.apiUrl + '/api/v1/data/namespace/region_build/namespaces';
 
     const body = JSON.stringify(newProduct);
     return this.http
@@ -108,7 +108,7 @@ export class ProductService {
 
   delProduct(product: ProductInterface) {
 
-    const apiUrl = environment.apiUrl + '/api/v1/namespaces/product.name';
+    const apiUrl = environment.apiUrl + '/api/v1/data/namespace/product.name';
 
     return this.http
       .delete<ProductInterface>(apiUrl, { observe: 'response', headers: this.headers })
@@ -128,7 +128,7 @@ export class ProductService {
 
   editProduct(product: ProductInterface) {
 
-    const apiUrl = environment.apiUrl + '/api/v1/namespaces/product.name';
+    const apiUrl = environment.apiUrl + '/api/v1/data/namespace/product.name';
 
     const body = JSON.stringify(product);
     return this.http

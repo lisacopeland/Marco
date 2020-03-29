@@ -81,7 +81,7 @@ export class ProductDashboardComponent implements OnInit, OnDestroy {
       [{ outlets:
        { primary: 'products/newdashboard',
          sidebar: 'plandashboardsidebar' } }],
-       { queryParams: { id: row?.id, masterViewLink: row?.masterViewLink } });
+       { queryParams: { id: row?.id, committedLink: row?.committedLink } });
   }
 
   onAdd() {

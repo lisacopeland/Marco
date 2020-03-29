@@ -221,14 +221,16 @@ export class NodeEditDialogComponent implements OnInit {
       return;
     }
 
-    let node;
+    let node: NodeInterface;
     let nodeId = '';
     if (!this.editMode) {
       nodeId = this.parentId + '!';
-      if (this.nodeType === 'task') {
-        nodeId = nodeId + 'T.' + this.nodeForm.value.name;
-      } else {
-        nodeId = nodeId + 'M.' + this.nodeForm.value.name;
+      if (this.nodeType === 'Action') {
+        nodeId = nodeId + 'a.' + this.nodeForm.value.name;
+      } else if (this.nodeType === 'Milestone') {
+        nodeId = nodeId + 'm.' + this.nodeForm.value.name;
+      } else if (this.nodeType === 'Linkpoint') {
+        nodeId = nodeId + 'l.' + this.nodeForm.value.name;
       }
     } else {
       nodeId = this.node.id;
@@ -236,7 +238,6 @@ export class NodeEditDialogComponent implements OnInit {
 
     if (this.nodeType === 'Milestone') {
       const currentNode = this.node as MilestoneNodeInterface;
-
       node = {
         id: nodeId,
         parentId: this.parentId,
@@ -252,7 +253,8 @@ export class NodeEditDialogComponent implements OnInit {
         stateAnnounced: this.nodeForm.value.declaredStatus,
         spanningPredecessors: (this.editMode) ? currentNode.spanningPredecessors : [],
       } as MilestoneNodeInterface;
-    } else {
+
+    } else if (this.nodeType === 'Action') {
       node = {
         id: nodeId,
         parentId: this.parentId,
@@ -268,6 +270,23 @@ export class NodeEditDialogComponent implements OnInit {
         inputs: null,
         expectedDurationMinutes: this.nodeForm.value.expectedDurationMinutes
       } as ActionNodeInterface;
+    } else if (this.nodeType === 'LinkPoint') {
+      node = {
+        id: nodeId,
+        parentId: this.parentId,
+        name: this.nodeForm.value.name.toUpperCase(),
+        description: this.nodeForm.value.description,
+        selfLink: (this.editMode) ? this.node.selfLink : '',
+        nodeType: this.nodeType,
+        predecessors: [this.nodeForm.value.predecessor.id],
+        timerDurationMinutes: this.nodeForm.value.timerDurationMinutes,
+        timerTrigger: this.nodeForm.value.timerTrigger,
+        linkedId: '',
+        linkedMilestoneType: 'Start',
+        linkedLabel: '',
+        linkedStateAnnounced: ''
+      } as LinkPointNodeInterface;
+
     }
 
     this.dialogRef.close(node);

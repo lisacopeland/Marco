@@ -37,7 +37,7 @@ export class ActionSequenceTemplateService {
       actionSequenceTemplates: ActionSequenceTemplateInterface[];
     }
 
-    const url = environment.apiUrl + '/' + actionSequenceTemplatesLink;
+    const url = environment.apiUrl + actionSequenceTemplatesLink;
     return this.http
       .get<GetResponse>(url, { observe: 'response', headers: this.headers })
       .pipe(
@@ -54,7 +54,7 @@ export class ActionSequenceTemplateService {
 
   // Used to get the working or committed plan
   getActionSequenceTemplate(link: string) {
-    const url = environment.apiUrl + '/' + link;
+    const url = environment.apiUrl + link;
     return this.http
       .get<ActionSequenceTemplateInterface>(url, { observe: 'response', headers: this.headers })
       .pipe(
@@ -66,7 +66,7 @@ export class ActionSequenceTemplateService {
   }
 
   verifyOrCommitTemplate(link: string) {
-    const url = environment.apiUrl + '/' + link;
+    const url = environment.apiUrl + link;
     const body = JSON.stringify(link);
     return this.http
       .post<VerificationRequestInterface>(url, body, { observe: 'response', headers: this.headers })
@@ -80,7 +80,7 @@ export class ActionSequenceTemplateService {
 
   // Call the deleteAllLink or deleteWorkingLink
   deleteOrDeleteAll(link) {
-    const url = environment.apiUrl + '/' + link;
+    const url = environment.apiUrl + link;
     const body = JSON.stringify(link);
     return this.http
       .post<string>(url, body, { observe: 'response', headers: this.headers })
@@ -120,7 +120,7 @@ export class ActionSequenceTemplateService {
 
   addActionSequenceTemplate(actionSequenceTemplatesLink: string, newActionSequenceTemplate: ActionSequenceTemplateInterface) {
 
-    const url = environment.apiUrl + '/' + actionSequenceTemplatesLink;
+    const url = environment.apiUrl + actionSequenceTemplatesLink;
 
     const body = JSON.stringify(newActionSequenceTemplate);
     return this.http
@@ -138,7 +138,7 @@ export class ActionSequenceTemplateService {
   // Pass in the working copy and call the saveLink
   editActionSequenceTemplate(actionSequenceTemplate: ActionSequenceTemplateInterface) {
 
-    const url = environment.apiUrl + '/' + actionSequenceTemplate.saveLink;
+    const url = environment.apiUrl + actionSequenceTemplate.saveLink;
 
     const body = JSON.stringify(actionSequenceTemplate);
     return this.http

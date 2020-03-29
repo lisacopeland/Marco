@@ -16,7 +16,7 @@ import { NodeActionInterface } from '../plan-dashboard.component';
 export class PlanListViewComponent implements OnInit {
   @Output() nodeAction = new EventEmitter<NodeActionInterface>();
   planNodes: NodeInterface[];
-  filterValues = ['All', 'Milestone', 'Task'];
+  filterValues = ['All', 'Milestone', 'Action', 'LinkPoint'];
   displayedColumns: string[] = ['planNodeId', 'description', 'type', 'hasPredecessors', 'dashboard'];
   dataSource: MatTableDataSource<NodeInterface>;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;

@@ -29,8 +29,8 @@ export interface NodeActionInterface {
 export class PlanDashboardComponent implements OnInit {
   actionSequenceTemplate: ActionSequenceTemplateInterface;
   actionSequenceTemplateId: string;
-  masterViewLink: string;
-  workingViewLink: string;
+  committedLink: string;
+  workingLink: string;
   version = 'master';
   nodeView = 'graph';
   planDirty = false;
@@ -52,10 +52,10 @@ export class PlanDashboardComponent implements OnInit {
     this.route.queryParams
       .subscribe(params => {
         this.actionSequenceTemplateId = params.id;
-        this.masterViewLink = params.masterViewLink;  // The planLink from the parent record
-        console.log('link is ' + this.masterViewLink);
+        this.committedLink = params.committedLink;  // The planLink from the parent record
+        console.log('link is ' + this.committedLink);
         if (this.actionSequenceTemplateId) {
-          this.getReleasePlan(this.masterViewLink);
+          this.getReleasePlan(this.committedLink);
         }
       });
   }
@@ -74,7 +74,7 @@ export class PlanDashboardComponent implements OnInit {
           this.planDirty = false;
         }
         this.actionSequenceTemplate = data as ActionSequenceTemplateInterface;
-        this.workingViewLink = this.actionSequenceTemplate.workingLink;
+        this.workingLink = this.actionSequenceTemplate.workingLink;
         this.nodes = this.actionSequenceTemplate.nodes;
         this.nodeService.cacheNodes(this.nodes);
         this.subscribeToLookup();
@@ -108,7 +108,7 @@ export class PlanDashboardComponent implements OnInit {
   onChangeVersion($event) {
     if (this.version === 'master') {
       this.version = 'working';
-      this.getReleasePlan(this.workingViewLink);
+      this.getReleasePlan(this.workingLink);
     } else {
       // First see if the user has made changes
       if (this.planDirty) {
@@ -125,12 +125,12 @@ export class PlanDashboardComponent implements OnInit {
           if (result === 'Yes') {
             console.log('result was yes');
             this.version = 'master';
-            this.getReleasePlan(this.masterViewLink);
+            this.getReleasePlan(this.committedLink);
           }
         });
       } else {
         this.version = 'master';
-        this.getReleasePlan(this.masterViewLink);
+        this.getReleasePlan(this.committedLink);
       }
     }
 
