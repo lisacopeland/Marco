@@ -63,7 +63,7 @@ export class NodeService {
   getNodeById(id: string): NodeInterface | null {
     const idx = this.nodes.findIndex(x => x.id === id);
     if (idx !== -1) {
-      return this.nodes.slice(idx, 1)[0];
+      return this.nodes[idx];
     } else {
       return null;
     }

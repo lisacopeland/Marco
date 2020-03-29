@@ -104,13 +104,14 @@ export class NodeEditDialogComponent implements OnInit {
   patchForm() {
       this.predecessors = this.nodeService.getPredecessors(this.node);
       this.successors = this.nodeService.getSuccessors(this.node);
+      const currentTimerTrigger = this.nodeService.getNodeById(this.node.timerTrigger);
       this.nodeType = this.node.nodeType;
       this.nodeForm.patchValue({
         name: this.node.name,
         description: this.node.description,
         nodeType: this.node.nodeType,
         timerDurationMinutes: this.node.timerDurationMinutes,
-        timerTrigger: this.nodeService.getNodeById(this.node.timerTrigger)
+        timerTrigger: currentTimerTrigger
       });
       if (this.predecessors.length) {
         this.nodeForm.patchValue({
@@ -244,7 +245,7 @@ export class NodeEditDialogComponent implements OnInit {
         nodeType: this.nodeType,
         predecessors: [this.nodeForm.value.predecessor.id],
         timerDurationMinutes: this.nodeForm.value.timerDurationMinutes,
-        timerTrigger: this.nodeForm.value.timerTrigger,
+        timerTrigger: this.nodeForm.value.timerTrigger.id,
         milestoneType: this.nodeForm.value.milestoneType,
         label: this.nodeForm.value.label,
         stateAnnounced: this.nodeForm.value.declaredStatus,
@@ -261,7 +262,7 @@ export class NodeEditDialogComponent implements OnInit {
         nodeType: this.nodeType,
         predecessors: [this.nodeForm.value.predecessor.id],
         timerDurationMinutes: this.nodeForm.value.timerDurationMinutes,
-        timerTrigger: this.nodeForm.value.timerTrigger,
+        timerTrigger: this.nodeForm.value.timerTrigger.id,
         taskType: this.nodeForm.value.taskType,
         taskData: this.nodeForm.value.taskData,
         inputs: null,
@@ -277,7 +278,7 @@ export class NodeEditDialogComponent implements OnInit {
         nodeType: this.nodeType,
         predecessors: [this.nodeForm.value.predecessor.id],
         timerDurationMinutes: this.nodeForm.value.timerDurationMinutes,
-        timerTrigger: this.nodeForm.value.timerTrigger,
+        timerTrigger: this.nodeForm.value.timerTrigger.id,
         linkedId: '',
         linkedMilestoneType: this.nodeForm.value.linkedMilestoneType,
         linkedLabel: this.nodeForm.value.linkedLabel,
