@@ -237,7 +237,12 @@ export class PlanDashboardComponent implements OnInit {
       });
       return;
     }
-
+    console.log(this.actionSequenceTemplate);
+    this.actionSequenceTemplateService.saveWorkingTemplate(this.actionSequenceTemplate)
+      .subscribe(data => {
+        // nothing should change
+        console.log(data);
+      });
     // Saves the working copy as it has been changed during this editing session,
     // regardless of whether there are verification reports
   }

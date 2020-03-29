@@ -65,6 +65,19 @@ export class ActionSequenceTemplateService {
       );
   }
 
+  saveWorkingTemplate(template: ActionSequenceTemplateInterface) {
+    const url = environment.apiUrl + template.saveLink;
+    const body = JSON.stringify(template);
+    return this.http
+      .post<VerificationRequestInterface>(url, body, { observe: 'response', headers: this.headers })
+      .pipe(
+        map(response => {
+          return response.body;
+        }),
+        catchError(this.handleError)
+      );
+  }
+
   verifyOrCommitTemplate(link: string) {
     const url = environment.apiUrl + link;
     const body = JSON.stringify(link);
@@ -135,7 +148,7 @@ export class ActionSequenceTemplateService {
       );
   }
 
-  // Pass in the working copy and call the saveLink
+/*   this is not how you should 'edit' an action sequence
   editActionSequenceTemplate(actionSequenceTemplate: ActionSequenceTemplateInterface) {
 
     const url = environment.apiUrl + actionSequenceTemplate.saveLink;
@@ -154,7 +167,7 @@ export class ActionSequenceTemplateService {
         }),
         catchError(this.handleError)
       );
-  }
+  } */
 
   private handleError(error: HttpErrorResponse) {
     if (error.error instanceof ErrorEvent) {

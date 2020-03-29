@@ -19,8 +19,8 @@ export interface MilestoneNodeInterface extends NodeInterface {
 }
 
 export interface ActionNodeInterface extends NodeInterface {
-  taskType: string;
-  taskData: string;
+  actionType: string;
+  actionData: string;
   inputs: TaskTemplateInputInterface[];
   expectedDurationMinutes: number;
 }

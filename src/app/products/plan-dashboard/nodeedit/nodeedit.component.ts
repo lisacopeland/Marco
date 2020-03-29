@@ -132,8 +132,8 @@ export class NodeEditDialogComponent implements OnInit {
         });
       } else if (this.nodeType === 'Action') {
         this.nodeForm.patchValue({
-          taskType: this.action.taskType,
-          taskData: this.action.taskData,
+          actionType: this.action.actionType,
+          actionData: this.action.actionData,
           expectedDurationMinutes: this.action.expectedDurationMinutes
         });
       } else if (this.nodeType === 'LinkPoint') {
@@ -161,8 +161,8 @@ export class NodeEditDialogComponent implements OnInit {
       this.nodeForm.addControl('linkedLabel', new FormControl('')),
       this.nodeForm.addControl('linkedStateAnnounced', new FormControl(''));
     } else if (newNodeTypeValue === 'Action' ) {
-      this.nodeForm.addControl('taskType', new FormControl(''));
-      this.nodeForm.addControl('taskData', new FormControl(''));
+      this.nodeForm.addControl('actionType', new FormControl(''));
+      this.nodeForm.addControl('actionData', new FormControl(''));
       this.nodeForm.addControl('expectedDurationMinutes', new FormControl(0));
     }
 
@@ -176,8 +176,8 @@ export class NodeEditDialogComponent implements OnInit {
         this.nodeForm.removeControl('linkedLabel');
         this.nodeForm.removeControl('linkedStateAnnounced');
       } else if (oldNodeType === 'Action') {
-        this.nodeForm.removeControl('taskType');
-        this.nodeForm.removeControl('taskData');
+        this.nodeForm.removeControl('actionType');
+        this.nodeForm.removeControl('actionData');
         this.nodeForm.removeControl('expectedDurationMinutes');
       }
     }
@@ -263,8 +263,8 @@ export class NodeEditDialogComponent implements OnInit {
         predecessors: [this.nodeForm.value.predecessor.id],
         timerDurationMinutes: this.nodeForm.value.timerDurationMinutes,
         timerTrigger: this.nodeForm.value.timerTrigger.id,
-        taskType: this.nodeForm.value.taskType,
-        taskData: this.nodeForm.value.taskData,
+        actionType: this.nodeForm.value.actionType,
+        actionData: this.nodeForm.value.actionData,
         inputs: null,
         expectedDurationMinutes: this.nodeForm.value.expectedDurationMinutes
       } as ActionNodeInterface;

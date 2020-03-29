@@ -105,12 +105,7 @@ export class PlanEditDialogComponent implements OnInit {
     if (this.editMode) {
       this.actionSequenceTemplate.description = this.actionSequenceTemplateForm.value.description;
       this.actionSequenceTemplate.tags = this.actionSequenceTemplateForm.value.tags;
-      this.actionSequenceTemplateService.editActionSequenceTemplate(this.actionSequenceTemplate)
-        .subscribe(() => {
-          this.snackBar.open('Release plan successfully updated', '', {
-            duration: 2000,
-          });
-        });
+      this.dialogRef.close(this.actionSequenceTemplate);
     } else {
       const actionSequenceTemplate: ActionSequenceTemplateInterface = {
         description: this.actionSequenceTemplateForm.value.description,
@@ -130,6 +125,7 @@ export class PlanEditDialogComponent implements OnInit {
         committedLink: null,
         workingLink: null
       };
+      this.dialogRef.close(this.actionSequenceTemplate);
       this.actionSequenceTemplateService.addActionSequenceTemplate(this.planLink, actionSequenceTemplate)
         .subscribe(() => {
           this.snackBar.open('Release plan successfully added', '', {
@@ -137,7 +133,7 @@ export class PlanEditDialogComponent implements OnInit {
           });
         });
     }
-    this.dialogRef.close(this.actionSequenceTemplate);
+
   }
 
   onClose(): void {
