@@ -1,14 +1,14 @@
 <div fxLayout="column" fxFlex="0 1" class="page-wrapper">
 <!-- Toolbar -->
-<mat-toolbar class="menu-ribbon" color="primary" fxLayout="row" fxLayoutAlign="space-between center">
+<div class="menu-ribbon" fxLayout="row" fxLayoutAlign="space-between center">
   <div class="header-logo" fxLayout="row" fxLayoutAlign="space-between center">
     <img src="assets/images/Corgi.png" height="50" width="82">
-    <div>Welcome to {{ title }}</div>
+    <h1>Welcome to {{ title }}</h1>
   </div>
 <!--   <button mat-icon-button [matMenuTriggerFor]="appMenu">
     <mat-icon>more_vert</mat-icon>
   </button> -->
-</mat-toolbar>
+</div>
 
 <!-- <mat-menu #appMenu="matMenu">
   <button mat-menu-item routerLink="/products">Products</button>

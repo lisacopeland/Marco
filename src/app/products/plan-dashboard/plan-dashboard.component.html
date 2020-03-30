@@ -11,7 +11,7 @@
       <mat-slide-toggle (change)="onChangeVersion($event)" >{{ versionSelectString }}</mat-slide-toggle>
     </div>
 
-    <mat-toolbar class="plan-toolbar" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+    <mat-toolbar class="plan-toolbar" fxLayout="row" fxLayoutAlign="start center">
       <div fxLayout="row" fxLayoutAlign="start center">
         <button
           mat-flat-button
@@ -44,6 +44,7 @@
         <button *ngIf="nodeView==='dashboard'" mat-flat-button matTooltip="Toggle view to the node list" fxLayoutAlign="start center" ><mat-icon>view_list</mat-icon>view</button>
       </div>
     </mat-toolbar>
+    <mat-divider></mat-divider>
     </div>
 
   <div *ngIf="nodeView==='graph'">

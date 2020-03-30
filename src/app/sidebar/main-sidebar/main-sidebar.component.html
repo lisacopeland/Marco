@@ -1,5 +1,7 @@
 <div fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="24px" class="sidebar">
-  <div class="sidebar-title">Main Menu</div>
+  <div class="sidebar-title">
+  <h1>Main Menu</h1>
+  </div>
   <mat-divider></mat-divider>
   <a class="menu-choices" [routerLink]="[{ outlets: { primary: ['products'], sidebar: ['productssidebar'] } }]">Products</a>
   <a class="menu-choices" routerLink="/deployments">Deployments</a>

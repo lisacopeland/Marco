@@ -7,7 +7,10 @@
 
   <mat-card class="card-content" fxLayout="row">
     <div *ngIf="onReady" class="graph-frame">
-      <ngx-graph [layout]="layout" [links]=links [nodes]=nodes [curve]="curve"
+      <ngx-graph
+        [nodeWidth]="150"
+        [nodeHeight]="55"
+        [layout]="layout" [links]=links [nodes]=nodes [curve]="curve"
         [draggingEnabled]="draggingEnabled" [panningEnabled]="panningEnabled" [enableZoom]="zoomEnabled"
         [zoomSpeed]="zoomSpeed" [minZoomLevel]="minZoomLevel" [maxZoomLevel]="maxZoomLevel" [panOnZoom]="panOnZoom"
         [autoZoom]="autoZoom" [autoCenter]="autoCenter" [update$]="update$" [center$]="center$" [zoomToFit$]="zoomToFit$">

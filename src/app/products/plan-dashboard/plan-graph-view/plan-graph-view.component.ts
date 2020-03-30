@@ -17,12 +17,13 @@ export class PlanGraphViewComponent implements OnInit {
   @Output() nodeAction = new EventEmitter<NodeActionInterface>();
 
   onReady = true;
-  milestoneBackground = '#99ccff';
+   // milestoneBackground = '#e9433f';
+milestoneBackground = '#bfbfbf';
   // milestoneText = '#ff0000';
   milestoneText = '#404040';
-  linkPointBackground = '#80ffaa';
+  linkPointBackground = '#bfbfbf';
   linkPointText = '#404040';
-  actionBackground = '#ff80ff';
+  actionBackground = '#bfbfbf';
   // nodeText = '#0000cc';
   actionText = '#404040';
   lineColor = '#333333';
