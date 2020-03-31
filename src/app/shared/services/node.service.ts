@@ -51,13 +51,26 @@ export class NodeService {
     }
   }
 
+  addLineCache(sourceNode: NodeInterface, targetNode: NodeInterface) {
+    const editNode = this.getNodeById(targetNode.id);
+    if (editNode.predecessors) {
+      const idx = editNode.predecessors.findIndex(x => x === sourceNode.id);
+      if (idx === -1) {
+        targetNode.predecessors.push(sourceNode.id);
+      }
+    } else {
+      targetNode.predecessors = [sourceNode.id];
+    }
+  }
+
   delLineCache(sourceNode: NodeInterface, targetNode: NodeInterface) {
     // TargetNode should have sourceNode as a predecessor
-    const idx = this.nodes.findIndex(x => x.id === targetNode.id);
-    const editNode = this.nodes[idx];
-    const idx1 = editNode.predecessors.findIndex(x => x === sourceNode.id);
-    targetNode.predecessors.splice(idx1, 1);
-    this.nodeSource.next(this.nodes);
+    const editNode = this.getNodeById(targetNode.id);
+    if (editNode.predecessors) {
+      const idx1 = editNode.predecessors.findIndex(x => x === sourceNode.id);
+      targetNode.predecessors.splice(idx1, 1);
+      this.nodeSource.next(this.nodes);
+    }
   }
 
   getNodeById(id: string): NodeInterface | null {

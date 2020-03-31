@@ -31,7 +31,7 @@ export class NodeEditDialogComponent implements OnInit {
   milestone: MilestoneNodeInterface;
   linkPoint: LinkPointNodeInterface;
   nodeSelectList: NodeInterface[];
-  successors: NodeInterface[] = [];
+  // successors: NodeInterface[] = [];
   predecessors: NodeInterface[] = [];
   nodeLink: string;
   parentId: string;
@@ -78,6 +78,12 @@ export class NodeEditDialogComponent implements OnInit {
       });
   }
 
+
+  comparer(o1: any, o2: any): boolean {
+    // if possible compare by object's name property - and not by reference.
+    return o1 && o2 ? o1.id === o2.id : o2 === o2;
+  }
+
   initForm() {
 
     this.nodeForm = new FormGroup({
@@ -90,8 +96,8 @@ export class NodeEditDialogComponent implements OnInit {
       nodeType: new FormControl(this.nodeTypes[0]),
       timerDurationMinutes: new FormControl(0),
       timerTrigger: new FormControl(''),
-      predecessor: new FormControl(''),
-      successor: new FormControl('')
+      predecessors: new FormControl(''),
+      // successors: new FormControl('')
     });
     if (!this.editMode) {
       this.nodeType = 'Milestone';
@@ -103,7 +109,7 @@ export class NodeEditDialogComponent implements OnInit {
 
   patchForm() {
       this.predecessors = this.nodeService.getPredecessors(this.node);
-      this.successors = this.nodeService.getSuccessors(this.node);
+      // this.successors = this.nodeService.getSuccessors(this.node);
       const currentTimerTrigger = this.nodeService.getNodeById(this.node.timerTrigger);
       this.nodeType = this.node.nodeType;
       this.nodeForm.patchValue({
@@ -115,14 +121,14 @@ export class NodeEditDialogComponent implements OnInit {
       });
       if (this.predecessors.length) {
         this.nodeForm.patchValue({
-          predecessor: this.predecessors[0]
+          predecessors: this.predecessors
         });
       }
-      if (this.successors.length) {
-        this.nodeForm.patchValue({
-          successor: this.successors[0]
-        });
-      }
+      // if (this.successors.length) {
+      //   this.nodeForm.patchValue({
+      //     successors: this.successors
+      //   });
+      // }
       this.swapNodeTypeFields(this.nodeType, false);
       if (this.nodeType === 'Milestone') {
         this.nodeForm.patchValue({
@@ -221,6 +227,10 @@ export class NodeEditDialogComponent implements OnInit {
 
     let node: NodeInterface;
     let nodeId = '';
+    let timerTriggerId = '';
+    if (this.nodeForm.value.timerTrigger) {
+      timerTriggerId = this.nodeForm.value.timerTrigger.id;
+    }
     if (!this.editMode) {
       nodeId = this.parentId + '!';
       if (this.nodeType === 'Action') {
@@ -234,6 +244,10 @@ export class NodeEditDialogComponent implements OnInit {
       nodeId = this.node.id;
     }
 
+    const selectPredecessors = this.nodeForm.value.predecessors.map(x => {
+      return x.id;
+    });
+
     // TODO: Add successors to other nodes
     if (this.nodeType === 'Milestone') {
       node = {
@@ -243,9 +257,9 @@ export class NodeEditDialogComponent implements OnInit {
         description: this.nodeForm.value.description,
         selfLink: (this.editMode) ? this.node.selfLink : '',
         nodeType: this.nodeType,
-        predecessors: [this.nodeForm.value.predecessor.id],
+        predecessors: selectPredecessors,
         timerDurationMinutes: this.nodeForm.value.timerDurationMinutes,
-        timerTrigger: this.nodeForm.value.timerTrigger.id,
+        timerTrigger: timerTriggerId,
         milestoneType: this.nodeForm.value.milestoneType,
         label: this.nodeForm.value.label,
         stateAnnounced: this.nodeForm.value.declaredStatus,
@@ -260,9 +274,9 @@ export class NodeEditDialogComponent implements OnInit {
         description: this.nodeForm.value.description,
         selfLink: (this.editMode) ? this.node.selfLink : '',
         nodeType: this.nodeType,
-        predecessors: [this.nodeForm.value.predecessor.id],
+        predecessors: selectPredecessors,
         timerDurationMinutes: this.nodeForm.value.timerDurationMinutes,
-        timerTrigger: this.nodeForm.value.timerTrigger.id,
+        timerTrigger: timerTriggerId,
         actionType: this.nodeForm.value.actionType,
         actionData: this.nodeForm.value.actionData,
         inputs: null,
@@ -276,10 +290,10 @@ export class NodeEditDialogComponent implements OnInit {
         description: this.nodeForm.value.description,
         selfLink: (this.editMode) ? this.node.selfLink : '',
         nodeType: this.nodeType,
-        predecessors: [this.nodeForm.value.predecessor.id],
+        predecessors: selectPredecessors,
         timerDurationMinutes: this.nodeForm.value.timerDurationMinutes,
-        timerTrigger: this.nodeForm.value.timerTrigger.id,
-        linkedId: '',
+        timerTrigger: timerTriggerId,
+        linkedId: (this.editMode) ? this.linkPoint.linkedId : '',
         linkedMilestoneType: this.nodeForm.value.linkedMilestoneType,
         linkedLabel: this.nodeForm.value.linkedLabel,
         linkedStateAnnounced: this.nodeForm.value.linkedStateAnnounced

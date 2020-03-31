@@ -23,21 +23,21 @@
 
     <mat-form-field class="input-75">
       <mat-label>Node is preceded by</mat-label>
-      <mat-select formControlName="predecessor">
+      <mat-select formControlName="predecessors" multiple [compareWith]="comparer">
         <mat-option *ngFor="let node of nodeSelectList" [value]="node">
           {{node.name}}
         </mat-option>
       </mat-select>
     </mat-form-field>
 
-    <mat-form-field class="input-75">
+<!--     <mat-form-field class="input-75">
       <mat-label>Node is succeeded by</mat-label>
-      <mat-select formControlName="successor">
+      <mat-select formControlName="successors" multiple [compareWith]="comparer">
         <mat-option *ngFor="let node of nodeSelectList" [value]="node">
           {{node.name}}
         </mat-option>
       </mat-select>
-    </mat-form-field>
+    </mat-form-field> -->
 
     <mat-form-field class="input-75">
       <mat-label>Timer Duration in Minutes</mat-label>

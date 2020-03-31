@@ -74,7 +74,8 @@ export class PlanDashboardComponent implements OnInit {
           this.planDirty = false;
         }
         this.actionSequenceTemplate = data as ActionSequenceTemplateInterface;
-        this.workingLink = this.actionSequenceTemplate.workingLink;
+        // this.workingLink = this.actionSequenceTemplate.workingLink;
+        this.workingLink = this.actionSequenceTemplate.committedLink;
         this.nodes = this.actionSequenceTemplate.nodes;
         this.nodeService.cacheNodes(this.nodes);
         this.subscribeToLookup();
@@ -175,6 +176,8 @@ export class PlanDashboardComponent implements OnInit {
         data: editData
       });
       dialogRef.afterClosed().subscribe(result => {
+        // The result is the node that had a predecessor added to it,
+        // save in the cache
         if (result) {
           console.log('a plan line was added');
           this.planDirty = true;
