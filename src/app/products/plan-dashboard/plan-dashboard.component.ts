@@ -138,6 +138,7 @@ export class PlanDashboardComponent implements OnInit {
 
   // If either the plan-list-view or graph-view wants to modify a node
   // It emits an event and is handled here
+  // TODO: Bug in delete line
   onNodeAction($event: NodeActionInterface) {
     if (this.version === 'master') {
       this.snackBar.open('Switch to working copy to edit nodes', '', {

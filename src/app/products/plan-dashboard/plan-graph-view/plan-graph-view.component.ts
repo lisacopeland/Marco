@@ -95,8 +95,8 @@ milestoneBackground = '#bfbfbf';
   }
 
   onDelLine(sourceNodeId: string, targetNodeId: string) {
-    const sourceNode = this.planNodes.find(x => x.id === sourceNodeId);
-    const targetNode = this.planNodes.find(x => x.id === targetNodeId);
+    const sourceNode = this.nodeService.getNodeById(sourceNodeId);
+    const targetNode = this.nodeService.getNodeById(targetNodeId);
     this.nodeAction.emit({
       action: 'deleteLine',
       planNode: sourceNode,

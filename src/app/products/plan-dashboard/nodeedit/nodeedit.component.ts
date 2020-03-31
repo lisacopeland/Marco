@@ -48,6 +48,7 @@ export class NodeEditDialogComponent implements OnInit {
 
   ngOnInit(): void {
 
+    // TODO: Field validation, and action data
     this.editMode = this.data.node !== null;
     this.parentId = this.data.parentId;
     this.initForm();
