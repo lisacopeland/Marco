@@ -64,6 +64,7 @@ export class NodeEditDialogComponent implements OnInit {
       this.editTitle = 'Editing ' + this.node.name;
       this.patchForm();
     }
+    console.log(this.nodeForm);
     this.nodeService.nodeLookup
       .subscribe(data => {
         if (data.length) {
@@ -74,6 +75,10 @@ export class NodeEditDialogComponent implements OnInit {
             const idx = this.nodeSelectList.findIndex(x => x.name === this.node.name);
             this.nodeSelectList.splice(idx, 1);
           }
+          this.nodeForm.patchValue({
+            predecessors: ''
+          });
+          console.log(this.nodeForm.value.predecessors);
         }
 
       });

@@ -1,4 +1,5 @@
 import { DatabaseInterface } from './database.interface';
+import { InputInterface } from './actiontype.interface';
 
 // Format of nodeID: productName.planName:planNodeName
 // timerTrigger in edit form should be a select which allows
@@ -6,8 +7,8 @@ import { DatabaseInterface } from './database.interface';
 export interface NodeInterface extends DatabaseInterface {
   nodeType: 'Milestone' | 'Action' | 'LinkPoint'; // Node type - cannot be changed
   predecessors: string[];         // Ids of the predecessors of this node, not used if this is a MilestoneLink
-  timerDurationMinutes: number;   // Dunno - not used if this is a MilestoneLink
-  timerTrigger: string;           // this is typically a nodeid, not used if this is a MilestoneLink
+  timerDurationMinutes: number;   // Not for LinkPoint
+  timerTrigger: string;           // Not on LinkPoint this is typically a nodeid,
 }
 
 // The user uses these to show "state" like start
@@ -19,20 +20,18 @@ export interface MilestoneNodeInterface extends NodeInterface {
 }
 
 export interface ActionNodeInterface extends NodeInterface {
-  actionType: string;
-  actionData: string;
-  inputs: TaskTemplateInputInterface[];
-  expectedDurationMinutes: number;
-}
-
-export interface TaskTemplateInputInterface {
-  name: string;
-  description: string;
-  valueReference: string;
-  validation: string;
+  actionTypeId: string;   // From the ActionType
+  actionData: string;     // From the ActionType
+  inputs: InputInterface[];
+  expectedDurationMinutes: number; // Default value from action type
 }
 
 // Used for links external to this release plan
+// For UI - display other possible release plans and then
+// Display other possible milestones - alert user if 1) there
+// are no other release plans 2) if there are no milestones
+// LinkedId - the id of the linkedId, other fields are copied
+// from that milestone, just display, user cannot modify
 export interface LinkPointNodeInterface extends NodeInterface {
   linkedId: string;    // ReleasePlanNodeId
   linkedMilestoneType: 'Start' | 'API' | 'Feature' | 'Service' | 'Product';

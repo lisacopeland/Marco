@@ -17,8 +17,8 @@ export class PlanGraphViewComponent implements OnInit {
   @Output() nodeAction = new EventEmitter<NodeActionInterface>();
 
   onReady = true;
-   // milestoneBackground = '#e9433f';
-milestoneBackground = '#bfbfbf';
+  //  milestoneBackground = '#e9433f';
+  milestoneBackground = '#bfbfbf';
   // milestoneText = '#ff0000';
   milestoneText = '#404040';
   linkPointBackground = '#bfbfbf';

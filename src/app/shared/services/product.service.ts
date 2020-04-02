@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, throwError, of } from 'rxjs';
 import { environment } from '@environments/environment';
 import { HttpErrorResponse, HttpClient, HttpHeaders } from '@angular/common/http';
 import { take, map, catchError } from 'rxjs/operators';
+import { ActionTypeInterface } from '@shared/interfaces/actiontype.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -66,6 +67,23 @@ export class ProductService {
             return data;
           }
         })
+      );
+  }
+
+  getActionTypesHttp() {
+
+    interface ApiResponse {
+      actionTypes: ActionTypeInterface[];
+    }
+
+    const apiUrl = environment.apiUrl + '/api/v1/data/namespace/region_build/actiontypes';
+    return this.http
+      .get<ApiResponse>(apiUrl, { observe: 'response', headers: this.headers })
+      .pipe(
+        map(response => {
+          return response.body;
+        }),
+        catchError(this.handleError)
       );
   }
 
