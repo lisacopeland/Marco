@@ -23,6 +23,7 @@ export class PlanGraphViewComponent implements OnInit {
   milestoneText = '#404040';
   linkPointBackground = '#bfbfbf';
   linkPointText = '#404040';
+  linkPointDef = '0 50, 75 100, 150 50, 75 0';
   actionBackground = '#bfbfbf';
   // nodeText = '#0000cc';
   actionText = '#404040';

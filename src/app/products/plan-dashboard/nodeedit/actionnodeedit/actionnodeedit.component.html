@@ -1,0 +1,19 @@
+<form [formGroup]="actionNodeFormGroup">
+  <!-- Fields for when nodeType is task -->
+    <mat-form-field class="input-75">
+      <mat-label>Action Type</mat-label>
+      <mat-select formControlName="actionType">
+        <mat-option *ngFor="let actionType of actionTypes" comparer="comparer" [value]="actionType">
+          {{actionType.description}}
+        </mat-option>
+      </mat-select>
+      <input matInput placeholder="" formControlName="actionType">
+    </mat-form-field>
+</form>
+
+<div fxLayout="column">
+  <div fxLayout="row">Current Action Info</div>
+  <div fxLayout="row">{{ currentActionType.description }}</div>
+  <div fxLayout="row">{{ currentActionType.actionData }}</div>
+
+</div>
