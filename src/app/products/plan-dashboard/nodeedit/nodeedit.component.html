@@ -42,46 +42,10 @@
       </mat-select>
     </mat-form-field>
 
-    <!-- Fields for when nodeType is milestone -->
-    <div *ngIf="nodeType === 'Milestone'">
-      <mat-form-field class="input-75">
-        <mat-label>Milestone Type</mat-label>
-        <mat-select formControlName="milestoneType">
-          <mat-option *ngFor="let milestoneType of milestoneTypes" [value]="milestoneType">
-            {{milestoneType}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field class="input-75">
-        <mat-label>Label</mat-label>
-        <input matInput placeholder="" formControlName="label">
-      </mat-form-field>
-      <mat-form-field class="input-75">
-        <mat-label>State Announced</mat-label>
-        <input matInput placeholder="" formControlName="stateAnnounced">
-      </mat-form-field>
-    </div>
-
-    <!-- Fields for when nodeType is milestone -->
-    <div *ngIf="nodeType === 'LinkPoint'">
-      <mat-form-field class="input-75">
-        <mat-label>Linked Milestone Type</mat-label>
-        <mat-select formControlName="linkedMilestoneType">
-          <mat-option *ngFor="let milestoneType of milestoneTypes" [value]="milestoneType">
-            {{milestoneType}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field class="input-75">
-        <mat-label>Linked Label</mat-label>
-        <input matInput placeholder="" formControlName="linkedLabel">
-      </mat-form-field>
-      <mat-form-field class="input-75">
-        <mat-label>Linked State Announced</mat-label>
-        <input matInput placeholder="" formControlName="linkedStateAnnounced">
-      </mat-form-field>
-    </div>
   <app-actionnode-edit *ngIf="nodeType==='Action'" [parentForm]=nodeForm [node]=node></app-actionnode-edit>
+  <app-milestone-edit *ngIf="nodeType==='Milestone'" [parentForm]=nodeForm [node]=node></app-milestone-edit>
+  <app-linkpoint-edit *ngIf="nodeType==='Linkpoint'" [parentForm]=nodeForm [node]=node></app-linkpoint-edit>
+
   </mat-dialog-content>
 <mat-dialog-actions class="form-footer">
   <button mat-raised-button color="accent" type="submit">Save</button>

@@ -1,0 +1,16 @@
+<div *ngIf="onReady" [formGroup]="linkpointForm">
+  <mat-form-field class="input-75">
+    <mat-label>Linked Milestone</mat-label>
+    <mat-select formControlName="linkedMilestoneSelect">
+      <mat-option *ngFor="let choice of linkMilestoneChoices" [value]="choice">
+        {{choice.id}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <div fxLayout="column">
+    <div>Linked Milestone Id: {{ currentChoice?.id}}</div>
+    <div>Linked Milestone Type: {{ currentChoice?.milestoneType}}</div>
+    <div>Linked Milestone State Announced: {{ currentChoice?.stateAnnounced}}</div>
+  </div>
+</div>

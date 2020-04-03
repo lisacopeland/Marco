@@ -13,6 +13,8 @@ import { ProductDashboardComponent } from './product-dashboard/product-dashboard
 import { ProductEditDialogComponent } from './productedit/productedit.component';
 import { AlertDialogModule } from '../alert-dialog/alert-dialog.module';
 import { NodeEditDialogComponent } from './plan-dashboard/nodeedit/nodeedit.component';
+import { MilestoneEditComponent } from './plan-dashboard/nodeedit/milestoneedit/milestoneedit.component';
+import { LinkpointEditComponent } from './plan-dashboard/nodeedit/linkpointedit/linkpointedit.component';
 import { ActionNodeEditComponent } from './plan-dashboard/nodeedit/actionnodeedit/actionnodeedit.component';
 import { NgxGraphModule } from '@swimlane/ngx-graph';
 import { PlanListViewComponent } from './plan-dashboard/plan-list-view/plan-list-view.component';
@@ -30,6 +32,8 @@ import { PlanLineDialogComponent } from './plan-dashboard/plan-line-dialog/plan-
     ProductEditDialogComponent,
     NodeEditDialogComponent,
     ActionNodeEditComponent,
+    MilestoneEditComponent,
+    LinkpointEditComponent,
     PlanListViewComponent,
     PlanGraphViewComponent,
     PlanReportsDialogComponent,

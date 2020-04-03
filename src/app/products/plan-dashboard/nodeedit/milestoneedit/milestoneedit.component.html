@@ -1,0 +1,18 @@
+<div *ngIf="onReady" [formGroup]="milestoneForm">
+  <mat-form-field class="input-75">
+    <mat-label>Milestone Type</mat-label>
+    <mat-select formControlName="milestoneType">
+      <mat-option *ngFor="let milestoneType of milestoneTypes" [value]="milestoneType">
+        {{milestoneType}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field class="input-75">
+    <mat-label>Label</mat-label>
+    <input matInput placeholder="" formControlName="label">
+  </mat-form-field>
+  <mat-form-field class="input-75">
+    <mat-label>State Announced</mat-label>
+    <input matInput placeholder="" formControlName="stateAnnounced">
+  </mat-form-field>
+</div>

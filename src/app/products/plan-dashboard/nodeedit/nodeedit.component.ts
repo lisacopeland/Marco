@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, AfterViewInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { NodeInterface, MilestoneNodeInterface, ActionNodeInterface, LinkPointNodeInterface } from '@shared/interfaces/node.interface';
 import { FormGroup, FormControl, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { NodeService } from '@shared/services/node.service';
@@ -6,6 +6,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Observable, of } from 'rxjs';
 import { delay, map, catchError, debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { MilestoneEditComponent } from './milestoneedit/milestoneedit.component';
 
 // This dialog mutates the data or adds data but does not
 // Make database changes
@@ -22,8 +23,8 @@ export interface NodeEditDataInterface {
   templateUrl: './nodeedit.component.html',
   styleUrls: ['./nodeedit.component.scss']
 })
-export class NodeEditDialogComponent implements OnInit {
-
+export class NodeEditDialogComponent implements OnInit, AfterViewInit {
+  @ViewChild(MilestoneEditComponent) milestoneEditComponent: MilestoneEditComponent;
   editTitle = 'Add New Milestone or Task';
   nodeForm: FormGroup;
   node: NodeInterface;
@@ -36,11 +37,13 @@ export class NodeEditDialogComponent implements OnInit {
   nodeLink: string;
   parentId: string;
   editMode = false;
-  nodeType = 'Milestone';
+  // nodeType = 'Milestone';
+  nodeType = '';
   nodeTypes = ['Milestone', 'Action', 'LinkPoint'];
   milestoneTypes = ['Start', 'Infrastructure', 'API', 'Feature', 'Service', 'Product', 'Internal', 'External'];
 
   constructor(
+    private ref: ChangeDetectorRef,
     private nodeService: NodeService,
     private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<NodeEditDialogComponent>,
@@ -84,6 +87,15 @@ export class NodeEditDialogComponent implements OnInit {
       });
   }
 
+  ngAfterViewInit() {
+    if (this.nodeType === 'Milestone') {
+      this.milestoneEditComponent.initForm();
+      if (this.editMode) {
+        this.milestoneEditComponent.patchForm();
+      }
+    }
+    this.ref.detectChanges();
+  }
 
   comparer(o1: any, o2: any): boolean {
     // if possible compare by object's name property - and not by reference.
@@ -135,8 +147,8 @@ export class NodeEditDialogComponent implements OnInit {
       //     successors: this.successors
       //   });
       // }
-      this.swapNodeTypeFields(this.nodeType, false);
-      if (this.nodeType === 'Milestone') {
+      // this.swapNodeTypeFields(this.nodeType, false);
+/*       if (this.nodeType === 'Milestone') {
         this.nodeForm.patchValue({
           milestoneType: this.milestone.milestoneType,
           label: this.milestone.label,
@@ -157,6 +169,7 @@ export class NodeEditDialogComponent implements OnInit {
       }
       this.nodeForm.get('name').disable();
       this.nodeForm.get('nodeType').disable();
+      */
   }
 
   swapNodeTypeFields(newNodeTypeValue: string, removeOldControls: boolean) {
@@ -164,7 +177,7 @@ export class NodeEditDialogComponent implements OnInit {
     const oldNodeType = this.nodeType;
     this.nodeType = newNodeTypeValue;
       // Swtiching to Milestone or initializing the form
-    if (newNodeTypeValue === 'Milestone') {
+/*     if (newNodeTypeValue === 'Milestone') {
       this.nodeForm.addControl('milestoneType', new FormControl(this.milestoneTypes[0]));
       this.nodeForm.addControl('label', new FormControl('')),
       this.nodeForm.addControl('stateAnnounced', new FormControl(''));
@@ -176,9 +189,9 @@ export class NodeEditDialogComponent implements OnInit {
       this.nodeForm.addControl('actionType', new FormControl(''));
       this.nodeForm.addControl('actionData', new FormControl(''));
       this.nodeForm.addControl('expectedDurationMinutes', new FormControl(0));
-    }
+    } */
 
-    if (removeOldControls) {
+/*     if (removeOldControls) {
       if (oldNodeType === 'Milestone') {
         this.nodeForm.removeControl('milestoneType');
         this.nodeForm.removeControl('label');
@@ -192,7 +205,7 @@ export class NodeEditDialogComponent implements OnInit {
         this.nodeForm.removeControl('actionData');
         this.nodeForm.removeControl('expectedDurationMinutes');
       }
-    }
+    } */
 
   }
 
@@ -283,7 +296,7 @@ export class NodeEditDialogComponent implements OnInit {
         predecessors: selectPredecessors,
         timerDurationMinutes: this.nodeForm.value.timerDurationMinutes,
         timerTrigger: timerTriggerId,
-        actionType: this.nodeForm.value.actionType,
+        actionTypeId: this.nodeForm.get('actionNodeFormGroup').value.actionType,
         actionData: this.nodeForm.value.actionData,
         inputs: null,
         expectedDurationMinutes: this.nodeForm.value.expectedDurationMinutes

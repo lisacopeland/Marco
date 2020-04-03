@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, Input, OnChanges } from '@angular/core';
+import { Component, OnInit, Inject, OnChanges, Input, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { NodeInterface, MilestoneNodeInterface, ActionNodeInterface, LinkPointNodeInterface } from '@shared/interfaces/node.interface';
 import { FormGroup, FormControl, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { NodeService } from '@shared/services/node.service';
@@ -6,7 +6,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Observable, of } from 'rxjs';
 import { delay, map, catchError, debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { ActionTypeInterface } from '@shared/interfaces/actiontype.interface';
 import { ProductService } from '@shared/services/product.service';
 
 // This dialog mutates the data or adds data but does not
@@ -15,17 +14,18 @@ import { ProductService } from '@shared/services/product.service';
 // MilestoneLinks are edited in the MilestoneLinkEdit Component
 
 @Component({
-  selector: 'app-actionnode-edit',
-  templateUrl: './actionnodeedit.component.html',
-  styleUrls: ['./actionnodeedit.component.scss']
+  selector: 'app-milestone-edit',
+  templateUrl: './milestoneedit.component.html',
+  styleUrls: ['./milestoneedit.component.scss']
 })
-export class ActionNodeEditComponent implements OnInit, OnChanges {
+export class MilestoneEditComponent implements OnInit, OnChanges, OnDestroy {
   @Input() parentForm: FormGroup;
-  @Input() node: ActionNodeInterface;
-  actionNodeFormGroup: FormGroup;
-  actionTypes: ActionTypeInterface[];
-  currentActionType: ActionTypeInterface;
+  @Input() node: MilestoneNodeInterface;
+
+  milestoneForm: FormGroup;
   editMode = false;
+  onReady = false;
+  milestoneTypes = ['Start', 'Infrastructure', 'API', 'Feature', 'Service', 'Product', 'Internal', 'External'];
 
   constructor(private productService: ProductService,
               private nodeService: NodeService) { }
@@ -34,18 +34,18 @@ export class ActionNodeEditComponent implements OnInit, OnChanges {
 
   }
 
-
   ngOnChanges() {
-    this.initForm();
+    // this.ref.detectChanges();
+
+/*     this.initForm();
     if (this.node) {
       this.editMode = true;
-    }
-    this.productService.getActionTypesHttp()
-      .subscribe(data => {
-        this.actionTypes = data;
+      this.patchForm();
+    } */
+  }
 
-    });
-
+  ngOnDestroy() {
+    this.parentForm.removeControl('milestoneForm');
   }
 
   comparer(o1: any, o2: any): boolean {
@@ -54,16 +54,22 @@ export class ActionNodeEditComponent implements OnInit, OnChanges {
   }
 
   initForm() {
-
-    this.actionNodeFormGroup = new FormGroup({
-      actionType: new FormControl('', Validators.required),
+    this.milestoneForm = new FormGroup({
+      milestoneType: new FormControl(this.milestoneTypes[0]),
+      label: new FormControl(''),
+      stateAnnounced: new FormControl('')
     });
-    if (this.editMode) {
-      this.currentActionType = this.actionTypes.find(x => x.id === this.node.actionTypeId);
-      this.actionNodeFormGroup.patchValue({
-        actionType: this.currentActionType
-      });
-    }
-    this.parentForm.addControl('actionNodeForm', this.actionNodeFormGroup);
+    this.parentForm.addControl('milestoneForm', this.milestoneForm);
+    this.milestoneForm.setParent(this.parentForm);
+    this.onReady = true;
   }
+
+  patchForm() {
+    this.parentForm.get('milestoneForm').patchValue({
+      milestoneType: this.node.milestoneType,
+      label: this.node.label,
+      stateAnnounced: this.node.stateAnnounced
+    });
+  }
+
 }
