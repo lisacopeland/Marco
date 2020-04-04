@@ -66,6 +66,7 @@ export class LinkpointEditComponent implements OnInit {
     this.linkpointForm = new FormGroup({
       linkedMilestoneSelect: new FormControl('')
     });
+    this.onLinkSelectChanges();
     this.parentForm.addControl('linkpointForm', this.linkpointForm);
     this.linkpointForm.setParent(this.parentForm);
     this.onReady = true;
@@ -79,7 +80,7 @@ export class LinkpointEditComponent implements OnInit {
   }
 
   onLinkSelectChanges(): void {
-    this.linkpointForm.get('linkedMilestonSelect').valueChanges
+    this.linkpointForm.get('linkedMilestoneSelect').valueChanges
       .subscribe(val => {
         this.currentChoice = val;
       });

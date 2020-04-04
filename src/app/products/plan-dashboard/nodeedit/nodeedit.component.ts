@@ -274,7 +274,6 @@ export class NodeEditDialogComponent implements OnInit, AfterViewInit {
   }
 
   createLinkPointNode(nodeId: string, selectPredecessors: string[], timerTriggerId: string) {
-    const linkPointNode = this.nodeForm.get('linkPointForm').value.linkedMilestoneSelect;
     const linkPoint: LinkPointNodeInterface = {
       id: nodeId,
       parentId: this.parentId,
@@ -285,10 +284,10 @@ export class NodeEditDialogComponent implements OnInit, AfterViewInit {
       predecessors: selectPredecessors,
       timerDurationMinutes: this.nodeForm.value.timerDurationMinutes,
       timerTrigger: timerTriggerId,
-      linkedId: linkPointNode.linkedId,
-      linkedMilestoneType: linkPointNode.linkedMilestoneType,
-      linkedLabel: linkPointNode.linkedLabel,
-      linkedStateAnnounced: linkPointNode.linkedStateAnnounced
+      linkedId: this.nodeForm.get('linkpointForm').value.linkedMilestoneSelect.id,
+      linkedMilestoneType: this.nodeForm.get('linkpointForm').value.linkedMilestoneSelect.milestoneType,
+      linkedLabel: this.nodeForm.get('linkpointForm').value.linkedMilestoneSelect.label,
+      linkedStateAnnounced: this.nodeForm.get('linkpointForm').value.linkedMilestoneSelect.stateAnnounced
     };
     return linkPoint;
   }
