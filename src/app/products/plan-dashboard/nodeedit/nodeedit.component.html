@@ -21,7 +21,7 @@
       </mat-select>
     </mat-form-field>
 
-    <mat-form-field class="input-75">
+    <mat-form-field *ngIf="nodeType !== 'LinkPoint'" class="input-75">
       <mat-label>Node is preceded by</mat-label>
       <mat-select formControlName="predecessors" multiple [compareWith]="comparer">
         <mat-option *ngFor="let node of nodeSelectList" [value]="node">
@@ -42,9 +42,16 @@
       </mat-select>
     </mat-form-field>
 
-  <app-actionnode-edit *ngIf="nodeType==='Action'" [parentForm]=nodeForm [node]=node></app-actionnode-edit>
-  <app-milestone-edit *ngIf="nodeType==='Milestone'" [parentForm]=nodeForm [node]=node></app-milestone-edit>
-  <app-linkpoint-edit *ngIf="nodeType==='Linkpoint'" [parentForm]=nodeForm [node]=node></app-linkpoint-edit>
+  <app-actionnode-edit *ngIf="nodeType==='Action'"
+    [actionTypes]=actionTypes
+    [parentForm]=nodeForm
+    [node]=node></app-actionnode-edit>
+  <app-milestone-edit *ngIf="nodeType==='Milestone'"
+    [parentForm]=nodeForm
+    [node]=node></app-milestone-edit>
+  <app-linkpoint-edit *ngIf="nodeType==='LinkPoint'"
+    [parentForm]=nodeForm
+    [node]=node></app-linkpoint-edit>
 
   </mat-dialog-content>
 <mat-dialog-actions class="form-footer">

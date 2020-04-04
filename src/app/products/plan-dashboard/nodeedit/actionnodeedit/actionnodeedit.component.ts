@@ -1,19 +1,12 @@
-import { Component, OnInit, Inject, Input, OnChanges } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, Output, EventEmitter } from '@angular/core';
 import { NodeInterface, MilestoneNodeInterface, ActionNodeInterface, LinkPointNodeInterface } from '@shared/interfaces/node.interface';
-import { FormGroup, FormControl, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { FormGroup, FormControl, Validators, AbstractControl, ValidationErrors, FormArray } from '@angular/forms';
 import { NodeService } from '@shared/services/node.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Observable, of } from 'rxjs';
-import { delay, map, catchError, debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { ActionTypeInterface } from '@shared/interfaces/actiontype.interface';
+import { ActionTypeInterface, InputInterface } from '@shared/interfaces/actiontype.interface';
 import { ProductService } from '@shared/services/product.service';
 
-// This dialog mutates the data or adds data but does not
-// Make database changes
-// This dialog is for editing Tasks and Milestones,
-// MilestoneLinks are edited in the MilestoneLinkEdit Component
-
+// Creates a formgroup with the controls specific to an action node and attaches
+// itself to the passed in parentForm
 @Component({
   selector: 'app-actionnode-edit',
   templateUrl: './actionnodeedit.component.html',
@@ -22,10 +15,13 @@ import { ProductService } from '@shared/services/product.service';
 export class ActionNodeEditComponent implements OnInit, OnChanges {
   @Input() parentForm: FormGroup;
   @Input() node: ActionNodeInterface;
-  actionNodeFormGroup: FormGroup;
-  actionTypes: ActionTypeInterface[];
+  @Input() actionTypes: ActionTypeInterface[];
+  @Output() nodeDescription = new EventEmitter();
+  actionNodeForm: FormGroup;
+  inputs: FormArray;
   currentActionType: ActionTypeInterface;
   editMode = false;
+  onReady = false;
 
   constructor(private productService: ProductService,
               private nodeService: NodeService) { }
@@ -34,18 +30,7 @@ export class ActionNodeEditComponent implements OnInit, OnChanges {
 
   }
 
-
   ngOnChanges() {
-    this.initForm();
-    if (this.node) {
-      this.editMode = true;
-    }
-    this.productService.getActionTypesHttp()
-      .subscribe(data => {
-        this.actionTypes = data;
-
-    });
-
   }
 
   comparer(o1: any, o2: any): boolean {
@@ -55,15 +40,58 @@ export class ActionNodeEditComponent implements OnInit, OnChanges {
 
   initForm() {
 
-    this.actionNodeFormGroup = new FormGroup({
+    // Initialize the formgroup and attach it to the parentForm
+    this.actionNodeForm = new FormGroup({
       actionType: new FormControl('', Validators.required),
+      inputs: new FormArray([])
     });
+    this.parentForm.addControl('actionNodeForm', this.actionNodeForm);
+    this.actionNodeForm.setParent(this.parentForm);
+    this.onReady = true;
+  }
+
+  patchForm() {
+    // Editing an existing action node, get the current actiontype
+    // Initializing currentActionType will display all of the fields
+    // for the actionType
+    this.currentActionType = this.actionTypes.find(x => x.id === this.node.actionTypeId);
     if (this.editMode) {
-      this.currentActionType = this.actionTypes.find(x => x.id === this.node.actionTypeId);
-      this.actionNodeFormGroup.patchValue({
+      this.actionNodeForm.get('actionType').disable();
+      this.actionNodeForm.patchValue({
         actionType: this.currentActionType
       });
+      this.initializeInputArray(this.node.inputs);
     }
-    this.parentForm.addControl('actionNodeForm', this.actionNodeFormGroup);
   }
+
+  get inputControls(): FormArray {
+    return this.actionNodeForm.get('inputs') as FormArray;
+  }
+
+  addInput(input: InputInterface, inputArray: FormArray) {
+    const newElement = new FormGroup({
+      valueRef: new FormControl(input.valueRef)
+    });
+    inputArray.push(newElement);
+  }
+
+  initializeInputArray(inputs: InputInterface[]) {
+    const inputArray = this.actionNodeForm.get('inputs') as FormArray;
+    inputArray.patchValue([]);
+    inputs.forEach(element => {
+      this.addInput(element, inputArray);
+    });
+  }
+
+  // This is only possible for a new action node
+  onActionTypeChanges(): void {
+    this.actionNodeForm.get('actionType').valueChanges
+      .subscribe(val => {
+        this.currentActionType = val;
+        this.nodeDescription.emit(this.currentActionType.description);
+        // Now initialize the formArray
+        this.initializeInputArray(this.currentActionType.inputs);
+      });
+  }
+
 }

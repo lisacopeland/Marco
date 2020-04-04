@@ -18,7 +18,7 @@ import { ProductService } from '@shared/services/product.service';
   templateUrl: './linkpointedit.component.html',
   styleUrls: ['./linkpointedit.component.scss']
 })
-export class LinkpointEditComponent implements OnInit, OnChanges {
+export class LinkpointEditComponent implements OnInit {
   @Input() parentForm: FormGroup;
   @Input() node: LinkPointNodeInterface;
 
@@ -50,12 +50,12 @@ export class LinkpointEditComponent implements OnInit, OnChanges {
 
   }
 
-  ngOnChanges() {
+/*   ngOnChanges() {
     if (this.node) {
       this.editMode = true;
     }
     this.initForm();
-  }
+  } */
 
   comparer(o1: any, o2: any): boolean {
     // if possible compare by object's name property - and not by reference.
@@ -64,7 +64,7 @@ export class LinkpointEditComponent implements OnInit, OnChanges {
 
   initForm() {
     this.linkpointForm = new FormGroup({
-      linkedMilestoneSelect: new FormControl(this.linkMilestoneChoices)
+      linkedMilestoneSelect: new FormControl('')
     });
     this.parentForm.addControl('linkpointForm', this.linkpointForm);
     this.linkpointForm.setParent(this.parentForm);

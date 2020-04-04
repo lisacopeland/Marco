@@ -1,8 +1,8 @@
 export interface ActionTypeInterface {
   id: string;
-  description: string;
-  actionData: string;
-  inputs: InputInterface[];
+  description: string;             // once this is selected, it defaults the description field for the node
+  actionData: string;              // gets copied over, then
+  inputs: InputInterface[];        // 0 or more of these
   expectedDurationMinutes: number; // Default value for an action
 }
 
