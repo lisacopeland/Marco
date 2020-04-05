@@ -126,8 +126,8 @@ export class ActionSequenceTemplateService {
   }
 
   // Returns true if the name is taken, false if otherwise
-  checkNameNotTaken(id: string): Observable<boolean | null> {
-    const result = (this.actionSequenceTemplates.find(x => x.id === id) === undefined) ? true : false;
+  isNameTaken(name: string): Observable<boolean | null> {
+    const result = (this.actionSequenceTemplates.find(x => x.name === name.toUpperCase()) !== undefined);
     return of(result);
   }
 

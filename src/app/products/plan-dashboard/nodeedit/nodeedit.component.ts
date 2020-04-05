@@ -160,7 +160,7 @@ export class NodeEditDialogComponent implements OnInit, AfterViewInit {
   patchForm() {
     this.predecessors = this.nodeService.getPredecessors(this.node);
     const currentTimerTrigger = this.nodeService.getNodeById(this.node.timerTrigger);
-    this.nodeType = this.node.nodeType;
+    // this.nodeType = this.node.nodeType;
     this.nodeForm.get('name').disable();
     // this.nodeForm.get('nodeType').disable();
     this.nodeForm.patchValue({

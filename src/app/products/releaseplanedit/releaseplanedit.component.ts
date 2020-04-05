@@ -4,7 +4,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ActionSequenceTemplateInterface } from '@shared/interfaces/actionsequencetemplate.interface';
 import { ActionSequenceTemplateService } from '@shared/services/actionsequencetemplate.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { delay, map, catchError, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 export interface PlanEditDataInterface {
@@ -26,6 +26,7 @@ export class PlanEditDialogComponent implements OnInit {
   selfLink: string;
   parentId: string;
   editMode = false;
+  tagChoices = ['region_build', 'availability_zone', 'local_zone'];
 
   constructor(
     private actionSequenceTemplateService: ActionSequenceTemplateService,
@@ -46,39 +47,31 @@ export class PlanEditDialogComponent implements OnInit {
 
   initForm() {
     this.actionSequenceTemplateForm = new FormGroup({
-      name: new FormControl(''),
+      name: new FormControl(
+        '',
+        { validators: [Validators.required],
+          asyncValidators: [this.validateNameAvailability.bind(this)],
+          updateOn: 'blur' }),
       description: new FormControl('', [Validators.required, Validators.minLength(2)]),
       tags: new FormControl(''),
     });
     if (this.editMode) {
+      this.actionSequenceTemplateForm.get('name').disable();
       this.actionSequenceTemplateForm.patchValue({
         name: this.actionSequenceTemplate.name,
         description: this.actionSequenceTemplate.description,
         tags: this.actionSequenceTemplate.tags
       });
-      this.actionSequenceTemplateForm.get('name').disable();
     } else {
-      this.actionSequenceTemplateForm.get('name').setValidators(Validators.required);
-      this.actionSequenceTemplateForm.get('name').setAsyncValidators([
-        this.validateNameAvailability.bind(this)]);
       this.onNameChanges();
     }
   }
 
-  validateNameAvailability(control: AbstractControl): Observable<ValidationErrors | null> {
-    const planId = this.parentId + '.' + control.value;
-    return this.actionSequenceTemplateService.checkNameNotTaken(planId)
-      .pipe(
-        delay(1000),
-        map(res => {
-          if (!res) {
-            this.actionSequenceTemplateForm.get('name').setErrors({ nameTaken: true });
-            return;
-          }
-          return null;
-        }),
-        catchError(() => null)
-      );
+  validateNameAvailability(ctrl: AbstractControl): Promise<ValidationErrors | null> | Observable<ValidationErrors | null> {
+    return this.actionSequenceTemplateService.isNameTaken(ctrl.value).pipe(
+      map(isTaken => (isTaken ? { nameTaken: true } : null)),
+      catchError(() => of(null))
+    );
   }
 
   onNameChanges(): void {
@@ -89,9 +82,6 @@ export class PlanEditDialogComponent implements OnInit {
         this.actionSequenceTemplateForm.patchValue({
           name: val.toUpperCase()
         });
-        if (this.actionSequenceTemplateForm.get('name').hasError('nameTaken')) {
-          console.log('name is taken!');
-        }
       });
   }
 
@@ -112,7 +102,7 @@ export class PlanEditDialogComponent implements OnInit {
         id: this.parentId + '.' + this.actionSequenceTemplateForm.value.name,
         parentId: this.parentId,
         name: this.actionSequenceTemplateForm.value.name,
-        tags: ['tag1', 'tag2'],
+        tags: this.actionSequenceTemplateForm.value.tags,
         selfLink: '', // Assigned by Service
         view: 'Master',
         nodes: [],
