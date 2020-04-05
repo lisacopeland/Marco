@@ -14,4 +14,3 @@ export interface ActionSequenceTemplateInterface extends DatabaseInterface {
   committedLink: string | null; // Used to get the master plan
   workingLink: string | null; // Used to get the working plan
 }
-

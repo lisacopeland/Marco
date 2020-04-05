@@ -36,7 +36,7 @@
           (click)="onRefresh()"><mat-icon>refresh</mat-icon>refresh</button>
       </div>
       <div fxLayout="row" fxLayoutAlign="start center">
-        <button mat-flat-button matTooltip="Discard the changes to the working copy" fxLayoutAlign="start center"><mat-icon>cancel</mat-icon>reset</button>
+        <button mat-flat-button matTooltip="Remove the changes to the working copy so it is just like the master" fxLayoutAlign="start center"><mat-icon>cancel</mat-icon>reset</button>
       </div>
       <div (click)="onChangeView()" fxLayout="row" fxLayoutAlign="start center">
         <button *ngIf="nodeView==='graph'" mat-flat-button matTooltip="Toggle view to the node list" fxLayoutAlign="start center" ><mat-icon>view_list</mat-icon>view</button>

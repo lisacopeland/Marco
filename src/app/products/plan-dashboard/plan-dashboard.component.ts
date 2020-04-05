@@ -66,7 +66,6 @@ export class PlanDashboardComponent implements OnInit {
     this.actionSequenceTemplateService.getActionSequenceTemplate(link)
       .subscribe((data: any) => {
         if (this.version === 'master') {
-          this.version = 'master';
           this.versionSelectString = 'Switch to Working Copy';
           this.planDirty = false;
         } else {
@@ -234,6 +233,34 @@ export class PlanDashboardComponent implements OnInit {
   onReset() {
     // Throws away all the changes in the working copy so it looks just like
     // master, changes the view to Master
+    if (this.version === 'master') {
+      this.snackBar.open('Switch to working copy to reset the working copy back to master', '', {
+        duration: 2000,
+      });
+      return;
+    }
+    if (this.planDirty) {
+      const dialogRef = this.dialog.open(AlertDialogComponent, {
+        width: '400px',
+        data: {
+          header: 'You have made changes',
+          cancelTooltip: 'Return to dashboard',
+          message: 'Are you sure you want to remove your changes?',
+          buttons: ['Yes', 'No']
+        }
+      });
+      dialogRef.afterClosed().subscribe((result) => {
+        if (result === 'Yes') {
+          // Call the reset link, get the master link, go back to it
+        }
+      });
+    }
+  }
+
+  resetPlan() {
+    // call the reset link
+    // call the master link and reset to master
+    // User will then need to go back to working copy
   }
 
   onSave() {
@@ -256,12 +283,27 @@ export class PlanDashboardComponent implements OnInit {
   onRefresh() {
     // Only available while editing, throws away current changes in this editing
     // session and restores the data on the screen to the current working copy
-    if (this.version === 'master') {
+    if ((this.version === 'master') || (!this.planDirty)) {
       this.snackBar.open('There are no changes to discard', '', {
         duration: 2000,
       });
       return;
     }
+    const dialogRef = this.dialog.open(AlertDialogComponent, {
+      width: '400px',
+      data: {
+        header: 'You have made changes',
+        cancelTooltip: 'Return to dashboard',
+        message: 'Are you sure you want to remove your changes?',
+        buttons: ['Yes', 'No']
+      }
+    });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === 'Yes') {
+        this.version = 'working';
+        this.getReleasePlan(this.workingLink);
+      }
+    });
 
   }
 
