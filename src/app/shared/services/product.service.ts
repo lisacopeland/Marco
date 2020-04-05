@@ -23,6 +23,7 @@ export class ProductService {
   currentProductChanged = this.productSource.asObservable();
   currentProduct: ProductInterface;
   headers = new HttpHeaders().set('Content-Type', 'text/plain');
+  actionTypes: ActionTypeInterface[];
 
   constructor(private http: HttpClient) { }
 
@@ -74,6 +75,10 @@ export class ProductService {
       );
   }
 
+  getActionTypes() {
+    return this.actionTypes;
+  }
+
   getActionTypesHttp() {
 
     const apiUrl = environment.apiUrl + '/api/v1/data/namespace/region_build/actiontypes';
@@ -81,6 +86,7 @@ export class ProductService {
       .get<ActionApiResponse>(apiUrl, { observe: 'response', headers: this.headers })
       .pipe(
         map(response => {
+          this.actionTypes = response.body.actionTypes;
           return response.body.actionTypes;
         }),
         catchError(this.handleError)

@@ -65,6 +65,7 @@ export class MilestoneEditComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   patchForm() {
+    this.editMode = true;
     this.parentForm.get('milestoneForm').patchValue({
       milestoneType: this.node.milestoneType,
       label: this.node.label,

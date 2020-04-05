@@ -17,6 +17,7 @@ import { PlanLineEditDialogData, PlanLineDialogComponent } from './plan-line-dia
 
 export interface NodeActionInterface {
   action: string;
+  nodeType: 'Action' | 'Milestone' | 'LinkPoint';
   planNode: NodeInterface|null;
   targetNode: NodeInterface|null;
 }
@@ -149,6 +150,7 @@ export class PlanDashboardComponent implements OnInit {
     // User wants to add or edit an existing node
     if (($event.action === 'add') || ($event.action === 'edit')) {
       const editData: NodeEditDataInterface = {
+        nodeType: $event.nodeType,
         parentId: this.actionSequenceTemplate.id,
         node: ($event.action === 'edit') ? $event.planNode : null
       };

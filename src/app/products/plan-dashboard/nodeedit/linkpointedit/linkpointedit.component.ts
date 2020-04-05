@@ -50,13 +50,6 @@ export class LinkpointEditComponent implements OnInit {
 
   }
 
-/*   ngOnChanges() {
-    if (this.node) {
-      this.editMode = true;
-    }
-    this.initForm();
-  } */
-
   comparer(o1: any, o2: any): boolean {
     // if possible compare by object's name property - and not by reference.
     return o1 && o2 ? o1.id === o2.id : o2 === o2;
@@ -73,8 +66,9 @@ export class LinkpointEditComponent implements OnInit {
   }
 
   patchForm() {
-      this.currentChoice = this.linkMilestoneChoices.find(x => x.id === this.node.linkedId) as MilestoneNodeInterface;
-      this.linkpointForm.patchValue({
+    this.editMode = true;
+    this.currentChoice = this.linkMilestoneChoices.find(x => x.id === this.node.linkedId) as MilestoneNodeInterface;
+    this.linkpointForm.patchValue({
       linkedMilestoneSelect: this.currentChoice,
     });
   }

@@ -14,7 +14,7 @@ import { NodeActionInterface } from '../plan-dashboard.component';
 })
 export class NodeDashboardComponent implements OnInit {
   @Input() node: NodeInterface;
-  @Output() nodeAction = new EventEmitter<NodeActionInterface>();
+  @Output() nodeAction = new EventEmitter<any>();
   predecessors: NodeInterface[];
   successors: NodeInterface[];
   timerTrigger: NodeInterface = null;
@@ -42,8 +42,8 @@ export class NodeDashboardComponent implements OnInit {
   onEditNode(node: NodeInterface) {
     this.nodeAction.emit({
       action: 'edit',
+      nodeType: node.nodeType,
       planNode: node,
-      targetNode: null
     });
   }
 

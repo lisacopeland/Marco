@@ -20,7 +20,7 @@ export interface MilestoneNodeInterface extends NodeInterface {
 }
 
 export interface ActionNodeInterface extends NodeInterface {
-  actionTypeId: string;   // From the ActionType
+  actionType: string;   // From the ActionType
   actionData: string;     // From the ActionType
   inputs: InputInterface[];
   expectedDurationMinutes: number; // Default value from action type

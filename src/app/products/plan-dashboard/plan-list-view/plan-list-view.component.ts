@@ -14,7 +14,7 @@ import { NodeActionInterface } from '../plan-dashboard.component';
   styleUrls: ['./plan-list-view.component.scss']
 })
 export class PlanListViewComponent implements OnInit {
-  @Output() nodeAction = new EventEmitter<NodeActionInterface>();
+  @Output() nodeAction = new EventEmitter<any>();
   planNodes: NodeInterface[];
   filterValues = ['All', 'Milestone', 'Action', 'LinkPoint'];
   displayedColumns: string[] = ['planNodeId', 'description', 'type', 'hasPredecessors', 'dashboard'];
@@ -68,20 +68,19 @@ export class PlanListViewComponent implements OnInit {
     });
   }
 
-  onAddPlanNode() {
+  onAddPlanNode(nodeType) {
     // Send a message to the dashboard to add a node
     this.nodeAction.emit({
       action: 'add',
-      planNode: null,
-      targetNode: null,
+      nodeType
     });
   }
 
-  onEditNode(row) {
+  onEditNode(row: NodeInterface) {
     this.nodeAction.emit({
       action: 'edit',
-      planNode: row,
-      targetNode: null
+      nodeType: row.nodeType,
+      planNode: row
     });
   }
 

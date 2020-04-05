@@ -9,6 +9,6 @@ export interface ActionTypeInterface {
 export interface InputInterface {
   name: string;         // For example, the name of the service
   description: string;  // Fro example, Whitelisting this service
-  valueRef: string;     // User filled in when user adds/edits an action node - How to get this input, a default value
+  valueReference: string;     // User filled in when user adds/edits an action node - How to get this input, a default value
   validation: string;   // What should this input look like
 }

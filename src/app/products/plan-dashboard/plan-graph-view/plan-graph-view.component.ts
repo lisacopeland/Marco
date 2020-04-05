@@ -14,7 +14,8 @@ import { MatMenuTrigger } from '@angular/material/menu';
   styleUrls: ['./plan-graph-view.component.scss']
 })
 export class PlanGraphViewComponent implements OnInit {
-  @Output() nodeAction = new EventEmitter<NodeActionInterface>();
+  // @Output() nodeAction = new EventEmitter<NodeActionInterface>();
+  @Output() nodeAction = new EventEmitter<any>();
 
   onReady = true;
   //  milestoneBackground = '#e9433f';
@@ -62,20 +63,19 @@ export class PlanGraphViewComponent implements OnInit {
       });
   }
 
-  onAddPlanNode() {
+  onAddPlanNode(nodeType) {
     // Send a message to the dashboard to add a node
     this.nodeAction.emit({
       action: 'add',
-      planNode: null,
-      targetNode: null
+      nodeType
     });
   }
 
   onEditNode(node: NodeInterface) {
     this.nodeAction.emit({
       action: 'edit',
-      planNode: node,
-      targetNode: null
+      nodeType: node.nodeType,
+      planNode: node
     });
   }
 

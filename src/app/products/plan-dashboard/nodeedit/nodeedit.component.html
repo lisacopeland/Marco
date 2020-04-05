@@ -12,14 +12,14 @@
       <mat-label>Description</mat-label>
       <input matInput placeholder="Description of this node" formControlName="description" required>
     </mat-form-field>
-    <mat-form-field class="input-75">
+<!--     <mat-form-field class="input-75">
       <mat-label>Node Type</mat-label>
       <mat-select formControlName="nodeType">
         <mat-option *ngFor="let nodeType of nodeTypes" [value]="nodeType">
           {{nodeType}}
         </mat-option>
       </mat-select>
-    </mat-form-field>
+    </mat-form-field> -->
 
     <mat-form-field *ngIf="nodeType !== 'LinkPoint'" class="input-75">
       <mat-label>Node is preceded by</mat-label>
@@ -43,7 +43,7 @@
     </mat-form-field>
 
   <app-actionnode-edit *ngIf="nodeType==='Action'"
-    [actionTypes]=actionTypes
+    (nodeDescription)="getActionDescription($event)"
     [parentForm]=nodeForm
     [node]=node></app-actionnode-edit>
   <app-milestone-edit *ngIf="nodeType==='Milestone'"

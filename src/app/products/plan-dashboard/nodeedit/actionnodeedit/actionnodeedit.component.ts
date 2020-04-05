@@ -15,7 +15,8 @@ import { ProductService } from '@shared/services/product.service';
 export class ActionNodeEditComponent implements OnInit, OnChanges {
   @Input() parentForm: FormGroup;
   @Input() node: ActionNodeInterface;
-  @Input() actionTypes: ActionTypeInterface[];
+  // @Input() actionTypes: ActionTypeInterface[];
+  actionTypes: ActionTypeInterface[];
   @Output() nodeDescription = new EventEmitter();
   actionNodeForm: FormGroup;
   inputs: FormArray;
@@ -31,6 +32,7 @@ export class ActionNodeEditComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
+    console.log('action Types in ngonChanges ' + this.actionTypes);
   }
 
   comparer(o1: any, o2: any): boolean {
@@ -39,12 +41,14 @@ export class ActionNodeEditComponent implements OnInit, OnChanges {
   }
 
   initForm() {
-
+    this.actionTypes = this.productService.getActionTypes();
+    console.log('action types in initform ' + this.actionTypes);
     // Initialize the formgroup and attach it to the parentForm
     this.actionNodeForm = new FormGroup({
       actionType: new FormControl('', Validators.required),
       inputs: new FormArray([])
     });
+    this.onActionTypeChanges();
     this.parentForm.addControl('actionNodeForm', this.actionNodeForm);
     this.actionNodeForm.setParent(this.parentForm);
     this.onReady = true;
@@ -54,33 +58,34 @@ export class ActionNodeEditComponent implements OnInit, OnChanges {
     // Editing an existing action node, get the current actiontype
     // Initializing currentActionType will display all of the fields
     // for the actionType
-    this.currentActionType = this.actionTypes.find(x => x.id === this.node.actionTypeId);
-    if (this.editMode) {
-      this.actionNodeForm.get('actionType').disable();
-      this.actionNodeForm.patchValue({
-        actionType: this.currentActionType
-      });
-      this.initializeInputArray(this.node.inputs);
-    }
+    this.editMode = true;
+    this.currentActionType = this.actionTypes.find(x => x.id === this.node.actionType);
+    this.actionNodeForm.get('actionType').disable();
+    this.actionNodeForm.patchValue({
+      actionType: this.currentActionType
+    });
+    this.initializeInputArray(this.node.inputs);
   }
 
-  get inputControls(): FormArray {
+  get inputsArray(): FormArray {
     return this.actionNodeForm.get('inputs') as FormArray;
   }
 
   addInput(input: InputInterface, inputArray: FormArray) {
     const newElement = new FormGroup({
-      valueRef: new FormControl(input.valueRef)
+      valueReference: new FormControl(input.valueReference)
     });
     inputArray.push(newElement);
   }
 
   initializeInputArray(inputs: InputInterface[]) {
-    const inputArray = this.actionNodeForm.get('inputs') as FormArray;
-    inputArray.patchValue([]);
-    inputs.forEach(element => {
-      this.addInput(element, inputArray);
-    });
+    if (inputs && inputs.length) {
+      const inputArray = this.actionNodeForm.get('inputs') as FormArray;
+      inputArray.patchValue([]);
+      inputs.forEach(element => {
+        this.addInput(element, inputArray);
+      });
+    }
   }
 
   // This is only possible for a new action node

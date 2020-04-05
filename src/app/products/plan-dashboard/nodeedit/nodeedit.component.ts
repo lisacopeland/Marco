@@ -19,6 +19,7 @@ import { environment } from '@environments/environment';
 // MilestoneLinks are edited in the MilestoneLinkEdit Component
 
 export interface NodeEditDataInterface {
+  nodeType: 'Action' | 'Milestone' | 'LinkPoint';
   node: NodeInterface;
   parentId: string;
 }
@@ -33,14 +34,14 @@ export class NodeEditDialogComponent implements OnInit, AfterViewInit {
   @ViewChild(LinkpointEditComponent) linkpointEditComponent: LinkpointEditComponent;
   @ViewChild(ActionNodeEditComponent) actionNodeEditComponent: ActionNodeEditComponent;
 
-  editTitle = 'Add New Milestone or Task';
+  editTitle = 'Add New Node';
+  onReady = false;
   nodeForm: FormGroup;
   node: NodeInterface;
   action: ActionNodeInterface;
   milestone: MilestoneNodeInterface;
   linkPoint: LinkPointNodeInterface;
   nodeSelectList: NodeInterface[];
-  // successors: NodeInterface[] = [];
   predecessors: NodeInterface[] = [];
   nodeLink: string;
   parentId: string;
@@ -63,17 +64,19 @@ export class NodeEditDialogComponent implements OnInit, AfterViewInit {
     this.initForm();
     this.editMode = this.data.node !== null;
     this.parentId = this.data.parentId;
+    this.nodeType = this.data.nodeType;
     if (this.editMode) {
       this.node = this.data.node;
-      this.nodeType = this.data.node.nodeType;
-      if (this.data.node.nodeType === 'Milestone') {
+      if (this.nodeType === 'Milestone') {
         this.milestone = this.data.node as MilestoneNodeInterface;
-      } else if (this.data.node.nodeType === 'LinkPoint') {
+      } else if (this.nodeType === 'LinkPoint') {
         this.linkPoint = this.data.node as LinkPointNodeInterface;
       } else {
         this.action = this.data.node as ActionNodeInterface;
       }
       this.editTitle = 'Editing ' + this.node.name;
+    } else {
+      this.editTitle = 'Creating new ' + this.nodeType;
     }
     this.nodeService.nodeLookup
       .pipe(
@@ -90,8 +93,13 @@ export class NodeEditDialogComponent implements OnInit, AfterViewInit {
           return this.productService.getActionTypesHttp();
         }))
         .subscribe(actionTypes => {
-          this.actionTypes = actionTypes;
-          this.patchForm();
+          this.actionTypes = [...actionTypes];
+          console.log('in nodeedit, action types are ' + this.actionTypes);
+          // this.onReady = true;
+          if (this.editMode) {
+            this.patchForm();
+          }
+          this.initChildForms();
         },
         error => {
           if (!environment.production) {
@@ -101,6 +109,10 @@ export class NodeEditDialogComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
+    this.ref.detectChanges();
+  }
+
+  initChildForms() {
     if (this.nodeType === 'Milestone') {
       this.milestoneEditComponent.initForm();
       if (this.editMode) {
@@ -117,7 +129,7 @@ export class NodeEditDialogComponent implements OnInit, AfterViewInit {
         this.actionNodeEditComponent.patchForm();
       }
     }
-    this.ref.detectChanges();
+
   }
 
   comparer(o1: any, o2: any): boolean {
@@ -133,15 +145,16 @@ export class NodeEditDialogComponent implements OnInit, AfterViewInit {
           asyncValidators: [this.validateNameAvailability.bind(this)],
           updateOn: 'blur' }),
       description: new FormControl('', [Validators.required, Validators.minLength(2)]),
-      nodeType: new FormControl(this.nodeTypes[0]),
+      // nodeType: new FormControl(this.nodeTypes[0]),
       timerDurationMinutes: new FormControl(0),
       timerTrigger: new FormControl(''),
       predecessors: new FormControl(''),
     });
-    if (!this.editMode) {
+/*     if (!this.editMode) {
       this.nodeType = 'Milestone';
       this.nodeForm.get('nodeType').setValidators(Validators.required);
-    }
+      this.onNodeTypeChanges();
+    } */
   }
 
   patchForm() {
@@ -149,11 +162,11 @@ export class NodeEditDialogComponent implements OnInit, AfterViewInit {
     const currentTimerTrigger = this.nodeService.getNodeById(this.node.timerTrigger);
     this.nodeType = this.node.nodeType;
     this.nodeForm.get('name').disable();
-    this.nodeForm.get('nodeType').disable();
+    // this.nodeForm.get('nodeType').disable();
     this.nodeForm.patchValue({
       name: this.node.name,
       description: this.node.description,
-      nodeType: this.node.nodeType,
+      // nodeType: this.node.nodeType,
       timerDurationMinutes: this.node.timerDurationMinutes,
       timerTrigger: currentTimerTrigger
     });
@@ -182,13 +195,29 @@ export class NodeEditDialogComponent implements OnInit, AfterViewInit {
       });
   }
 
-  onNodeTypeChanges(): void {
+/*   onNodeTypeChanges(): void {
     // This is only possible on !editMode
     this.nodeForm.get('nodeType').valueChanges
       .subscribe(val => {
+        // First remove the current formgroup
+        if (this.nodeType === 'Milestone') {
+          this.nodeForm.removeControl('milestoneForm');
+        } else if (this.nodeType === 'LinkPoint') {
+          this.nodeForm.removeControl('linkpointForm');
+        } else {
+          this.nodeForm.removeControl('actionNodeForm');
+        }
         this.nodeType = val;
+        // Now initform on the new formgroup
+        if (this.nodeType === 'Milestone') {
+          this.milestoneEditComponent.initForm();
+        } else if (this.nodeType === 'LinkPoint') {
+          this.linkpointEditComponent.initForm();
+        } else if (this.nodeType === 'Action') {
+          this.actionNodeEditComponent.initForm();
+        }
       });
-  }
+  } */
 
   onSubmit() {
     if (this.nodeForm.invalid) {
@@ -235,6 +264,15 @@ export class NodeEditDialogComponent implements OnInit, AfterViewInit {
 
   }
 
+  getActionDescription($event) {
+    // The actionNodeEdit component uses this event handler to
+    // tell this component that the action type has changed and
+    // tells this component to update the description of the node
+    this.nodeForm.patchValue({
+      description: $event
+    });
+  }
+
   createActionNode(nodeId: string, selectPredecessors: string[], timerTriggerId: string) {
     const actionNode: ActionNodeInterface = {
       id: nodeId,
@@ -246,10 +284,10 @@ export class NodeEditDialogComponent implements OnInit, AfterViewInit {
       predecessors: selectPredecessors,
       timerDurationMinutes: this.nodeForm.value.timerDurationMinutes,
       timerTrigger: timerTriggerId,
-      actionTypeId: this.nodeForm.get('actionNodeForm').value.actionType,
-      actionData: this.nodeForm.value.actionData,
+      actionType: this.nodeForm.get('actionNodeForm').value.actionType.id,
+      actionData: this.nodeForm.get('actionNodeForm').value.actionType.actionData,
       inputs: null,
-      expectedDurationMinutes: this.nodeForm.value.expectedDurationMinutes
+      expectedDurationMinutes: this.nodeForm.get('actionNodeForm').value.actionType.expectedDurationMinutes
     };
     return actionNode;
   }

@@ -9,21 +9,13 @@
       </mat-select>
       <input matInput placeholder="" formControlName="actionType">
     </mat-form-field>
-    <div formArrayName="inputs">
-    <div *ngFor="let input of inputControls; let i = index">
-      <div [formGroupName]="i">
-        <mat-form-field class="input-75">
-          <mat-label>Value Reference</mat-label>
-          <input matInput placeholder="ValueRef" formControlName="valueRef">
-        </mat-form-field>
+    <div fxLayout="column" formArrayName="inputs">
+    <div *ngFor="let input of inputsArray.controls; let i = index">
+      <div class="input-100" fxLayout="row" fxLayoutGap="10px" [formGroupName]="i">
+        <div fxLayout="row" class="inputs-field">Name: {{currentActionType.inputs[i].name | slice:0:15 }}</div>
+        <div fxLayout="row" class="inputs-field">Validation: {{currentActionType.inputs[i].validation | slice:0:5}}</div>
+        <input placeholder="Value Reference" formControlName="valueReference">
       </div>
     </div>
   </div>
-</div>
-
-<div fxLayout="column">
-  <div fxLayout="row">Current Action Info</div>
-  <div fxLayout="row">{{ currentActionType?.description }}</div>
-  <div fxLayout="row">{{ currentActionType?.actionData }}</div>
-
 </div>
