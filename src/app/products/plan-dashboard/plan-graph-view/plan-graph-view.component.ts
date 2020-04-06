@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, Output, EventEmitter, ViewChild } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, Output, EventEmitter, ViewChild, OnDestroy } from '@angular/core';
 import { NodeInterface } from '@shared/interfaces/node.interface';
 import { Edge, Node, Layout } from '@swimlane/ngx-graph';
 import * as shape from 'd3-shape';
@@ -6,6 +6,7 @@ import { Subject } from 'rxjs';
 import { NodeService } from '@shared/services/node.service';
 import { NodeActionInterface } from '../plan-dashboard.component';
 import { MatMenuTrigger } from '@angular/material/menu';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-plan-graph-view',
@@ -13,10 +14,11 @@ import { MatMenuTrigger } from '@angular/material/menu';
   templateUrl: './plan-graph-view.component.html',
   styleUrls: ['./plan-graph-view.component.scss']
 })
-export class PlanGraphViewComponent implements OnInit {
+export class PlanGraphViewComponent implements OnInit, OnDestroy {
   // @Output() nodeAction = new EventEmitter<NodeActionInterface>();
   @Output() nodeAction = new EventEmitter<any>();
 
+  unsubscribe$: Subject<void> = new Subject<void>();
   onReady = true;
   //  milestoneBackground = '#e9433f';
   milestoneBackground = '#bfbfbf';
@@ -55,9 +57,10 @@ export class PlanGraphViewComponent implements OnInit {
 
   ngOnInit(): void {
     this.nodeService.nodeLookup
-      .subscribe(data => {
+      .pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
         if (data.length) {
           this.planNodes = data;
+          console.log('there are now # nodes ' + this.planNodes.length);
           this.redrawGraph();
         }
       });
@@ -129,7 +132,23 @@ export class PlanGraphViewComponent implements OnInit {
         });
       }
     });
+    console.log('new nodes:');
+    newNodes.forEach(x => {
+      console.log(x.id);
+      if (x.data.predecessors) {
+        console.log('Predecessors: ' + x.data.predecessors);
+      }
+    });
+    console.log('new links:');
+    newLinks.forEach(l => {
+      console.log('source: ' + l.source + ' target: ' + l.target);
+    });
     this.nodes = newNodes;
     this.links = newLinks;
+  }
+
+  ngOnDestroy() {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 }

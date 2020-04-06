@@ -1,11 +1,11 @@
-import { Component, OnInit, Inject, AfterViewInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Inject, AfterViewInit, ViewChild, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { NodeInterface, MilestoneNodeInterface, ActionNodeInterface, LinkPointNodeInterface } from '@shared/interfaces/node.interface';
 import { FormGroup, FormControl, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { NodeService } from '@shared/services/node.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Observable, of } from 'rxjs';
-import { delay, map, catchError, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { Observable, of, Subject } from 'rxjs';
+import { delay, map, catchError, debounceTime, distinctUntilChanged, switchMap, takeUntil } from 'rxjs/operators';
 import { MilestoneEditComponent } from './milestoneedit/milestoneedit.component';
 import { LinkpointEditComponent } from './linkpointedit/linkpointedit.component';
 import { ActionNodeEditComponent } from './actionnodeedit/actionnodeedit.component';
@@ -29,12 +29,13 @@ export interface NodeEditDataInterface {
   templateUrl: './nodeedit.component.html',
   styleUrls: ['./nodeedit.component.scss']
 })
-export class NodeEditDialogComponent implements OnInit, AfterViewInit {
+export class NodeEditDialogComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MilestoneEditComponent) milestoneEditComponent: MilestoneEditComponent;
   @ViewChild(LinkpointEditComponent) linkpointEditComponent: LinkpointEditComponent;
   @ViewChild(ActionNodeEditComponent) actionNodeEditComponent: ActionNodeEditComponent;
 
   editTitle = 'Add New Node';
+  unsubscribe$: Subject<void> = new Subject<void>();
   onReady = false;
   nodeForm: FormGroup;
   node: NodeInterface;
@@ -80,6 +81,7 @@ export class NodeEditDialogComponent implements OnInit, AfterViewInit {
     }
     this.nodeService.nodeLookup
       .pipe(
+        takeUntil(this.unsubscribe$),
         switchMap(data => {
           if (data.length) {
             // Take the current node out of the selectlist for predecessors and successors
@@ -110,6 +112,11 @@ export class NodeEditDialogComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.ref.detectChanges();
+  }
+
+  ngOnDestroy() {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
   initChildForms() {

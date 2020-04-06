@@ -1,8 +1,10 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { NodeInterface } from '@shared/interfaces/node.interface';
 import { NodeService } from '@shared/services/node.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 export interface PlanLineEditDialogData {
   node: NodeInterface;
@@ -14,7 +16,7 @@ export interface PlanLineEditDialogData {
   templateUrl: './plan-line-dialog.component.html',
   styleUrls: ['./plan-line-dialog.component.scss']
 })
-export class PlanLineDialogComponent implements OnInit {
+export class PlanLineDialogComponent implements OnInit, OnDestroy {
 
   // If direction is 'from' then you are making a line from the original node to the
   // one you are selecting, if the direction is 'to' then you are making a line to the
@@ -24,6 +26,7 @@ export class PlanLineDialogComponent implements OnInit {
   dialogTitle = '';
   nodeSelectList: NodeInterface[];
   nodeForm: FormGroup;
+  unsubscribe$: Subject<void> = new Subject<void>();
 
   constructor(private nodeService: NodeService,
               public dialogRef: MatDialogRef<PlanLineDialogComponent>,
@@ -38,7 +41,7 @@ export class PlanLineDialogComponent implements OnInit {
       this.dialogTitle = 'Create a line to ' + this.node.name;
     }
     this.nodeService.nodeLookup
-      .subscribe(data => {
+      .pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
         if (data.length) {
           this.nodeSelectList = data;
           this.nodeSelectList.forEach(x => {
@@ -85,6 +88,11 @@ export class PlanLineDialogComponent implements OnInit {
 
   onCancel(): void {
     this.dialogRef.close();
+  }
+
+  ngOnDestroy() {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
 }

@@ -10,6 +10,13 @@
       </div>
       <mat-slide-toggle (change)="onChangeVersion($event)" >{{ versionSelectString }}</mat-slide-toggle>
     </div>
+    <div class="template-details" fxLayout="row" fxLayoutGap="10px">
+      <p>{{actionSequenceTemplate?.description}}</p>
+      <div fxLayout="row">
+        <p>Tags:</p>
+        <p *ngFor="let tag of actionSequenceTemplate?.tags">{{tag}}</p>
+      </div>
+    </div>
 
     <mat-toolbar class="plan-toolbar" fxLayout="row" fxLayoutAlign="start center">
       <div fxLayout="row" fxLayoutAlign="start center">

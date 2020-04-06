@@ -60,10 +60,11 @@ export class ActionNodeEditComponent implements OnInit, OnChanges {
     // for the actionType
     this.editMode = true;
     this.currentActionType = this.actionTypes.find(x => x.id === this.node.actionType);
-    this.actionNodeForm.get('actionType').disable();
-    this.actionNodeForm.patchValue({
-      actionType: this.currentActionType
-    });
+    this.actionNodeForm.removeControl('actionType');
+    // this.actionNodeForm.get('actionType').disable();
+    // this.actionNodeForm.patchValue({
+    //   actionType: this.currentActionType
+    // });
     this.initializeInputArray(this.node.inputs);
   }
 

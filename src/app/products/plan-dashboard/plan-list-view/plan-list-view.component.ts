@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, OnChanges, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, ViewChild, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { NodeInterface } from '@shared/interfaces/node.interface';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
@@ -7,15 +7,18 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { NodeService } from '@shared/services/node.service';
 import { MatDialog } from '@angular/material/dialog';
 import { NodeActionInterface } from '../plan-dashboard.component';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-plan-list-view',
   templateUrl: './plan-list-view.component.html',
   styleUrls: ['./plan-list-view.component.scss']
 })
-export class PlanListViewComponent implements OnInit {
+export class PlanListViewComponent implements OnInit, OnDestroy {
   @Output() nodeAction = new EventEmitter<any>();
   planNodes: NodeInterface[];
+  unsubscribe$: Subject<void> = new Subject<void>();
   filterValues = ['All', 'Milestone', 'Action', 'LinkPoint'];
   displayedColumns: string[] = ['planNodeId', 'description', 'type', 'hasPredecessors', 'dashboard'];
   dataSource: MatTableDataSource<NodeInterface>;
@@ -37,7 +40,7 @@ export class PlanListViewComponent implements OnInit {
       this.applyFilter(this.filterValue, this.dataSource);
     });
     this.nodeService.nodeLookup
-      .subscribe(data => {
+      .pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
         if (data.length) {
           this.planNodes = data;
           this.displayList();
@@ -108,5 +111,10 @@ export class PlanListViewComponent implements OnInit {
       this.dataSource.paginator = this.paginator;
       this.dataSource.sort = this.sort;
     }
+  }
+
+  ngOnDestroy() {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 }

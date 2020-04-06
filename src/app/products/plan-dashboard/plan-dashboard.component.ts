@@ -74,8 +74,8 @@ export class PlanDashboardComponent implements OnInit {
           this.planDirty = false;
         }
         this.actionSequenceTemplate = data as ActionSequenceTemplateInterface;
-        // this.workingLink = this.actionSequenceTemplate.workingLink;
-        this.workingLink = this.actionSequenceTemplate.committedLink;
+        this.workingLink = this.actionSequenceTemplate.workingLink;
+        // this.workingLink = this.actionSequenceTemplate.committedLink;
         this.nodes = this.actionSequenceTemplate.nodes;
         this.nodeService.cacheNodes(this.nodes);
         this.subscribeToLookup();
@@ -169,6 +169,12 @@ export class PlanDashboardComponent implements OnInit {
         }
       });
     } else if (($event.action === 'from') || ($event.action === 'to')) {
+      if (($event.planNode.nodeType === 'LinkPoint') && ($event.action === 'to')) {
+        this.snackBar.open('Linkpoints cannot have predecessors', '', {
+          duration: 2000,
+        });
+        return;
+      }
       const editData: PlanLineEditDialogData = {
         node: $event.planNode,
         direction: $event.action

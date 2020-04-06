@@ -10,7 +10,7 @@
   <mat-menu #clickMenu="matMenu">
     <button mat-menu-item (click)="onEditNode(node)">Edit</button>
     <button mat-menu-item (click)="onAddLine(node, 'from')">Add Line From Here</button>
-    <button mat-menu-item (click)="onAddLine(node, 'to')">Add Line to Here</button>
+    <button mat-menu-item [disabled]="node.nodeType === 'LinkPoint'" (click)="onAddLine(node, 'to')">Add Line to Here</button>
     <button mat-menu-item (click)="onDeleteNode(node)">Delete</button>
   </mat-menu>
   <mat-card class="card-content">

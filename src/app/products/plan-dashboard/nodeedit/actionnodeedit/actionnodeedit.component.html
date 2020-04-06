@@ -1,6 +1,8 @@
 <div *ngIf="onReady" [formGroup]="actionNodeForm">
   <!-- Fields for when nodeType is task -->
-    <mat-form-field class="input-75">
+
+  <!-- Only for new action types -->
+    <mat-form-field *ngIf="!editMode" class="input-75">
       <mat-label>Action Type</mat-label>
       <mat-select formControlName="actionType">
         <mat-option *ngFor="let actionType of actionTypes" comparer="comparer" [value]="actionType">
@@ -9,6 +11,11 @@
       </mat-select>
       <input matInput placeholder="" formControlName="actionType">
     </mat-form-field>
+
+    <div *ngIf="editMode">
+      {{currentActionType.description}}
+    </div>
+
     <div fxLayout="column" formArrayName="inputs">
     <div *ngFor="let input of inputsArray.controls; let i = index">
       <div class="input-100" fxLayout="row" fxLayoutGap="10px" [formGroupName]="i">
