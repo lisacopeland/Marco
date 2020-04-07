@@ -47,7 +47,7 @@ export class NodeService {
     const idx = this.nodes.findIndex(x => x.id === node.id);
     if (idx !== -1) {
       this.nodes.splice(idx, 1);
-      this.nodeSource.next(this.nodes);
+      this.nodeSource.next(this.nodes.slice());
     }
   }
 
@@ -56,11 +56,12 @@ export class NodeService {
     if (editNode.predecessors) {
       const idx = editNode.predecessors.findIndex(x => x === sourceNode.id);
       if (idx === -1) {
-        targetNode.predecessors.push(sourceNode.id);
+        editNode.predecessors.push(sourceNode.id);
       }
     } else {
-      targetNode.predecessors = [sourceNode.id];
+      editNode.predecessors = [sourceNode.id];
     }
+    this.nodeSource.next(this.nodes.slice());
   }
 
   delLineCache(sourceNode: NodeInterface, targetNode: NodeInterface) {
@@ -68,8 +69,8 @@ export class NodeService {
     const editNode = this.getNodeById(targetNode.id);
     if (editNode.predecessors) {
       const idx1 = editNode.predecessors.findIndex(x => x === sourceNode.id);
-      targetNode.predecessors.splice(idx1, 1);
-      this.nodeSource.next(this.nodes);
+      editNode.predecessors.splice(idx1, 1);
+      this.nodeSource.next(this.nodes.slice());
     }
   }
 
@@ -100,7 +101,7 @@ export class NodeService {
         predecessorNodes.push(predecessorNode);
       }
     });
-    return predecessorNodes;
+    return predecessorNodes.slice();
   }
 
   getSuccessors(node: NodeInterface): NodeInterface[] {
@@ -109,7 +110,7 @@ export class NodeService {
         return (targetNode.predecessors.find(x => x === node.id) !== undefined);
       }
     });
-    return successorNodes;
+    return successorNodes.slice();
   }
 
 }

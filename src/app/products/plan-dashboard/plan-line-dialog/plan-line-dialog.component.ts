@@ -77,12 +77,16 @@ export class PlanLineDialogComponent implements OnInit, OnDestroy {
     if (this.direction === 'from') {
       // Add the original node to the predecessor array of the node
       // you chose
-      const node: NodeInterface = this.nodeForm.value.newNode;
-      node.predecessors.push(this.node.id);
-      this.dialogRef.close(node);
+      const targetNode: NodeInterface = this.nodeForm.value.newNode;
+      this.dialogRef.close({
+        source: this.node,
+        target: targetNode});
     } else {
-      this.node.predecessors.push(this.nodeForm.value.node.id);
-      this.dialogRef.close(this.node);
+      const sourceNode: NodeInterface = this.nodeForm.value.newNode;
+      this.dialogRef.close({
+        source: sourceNode,
+        target: this.node
+      });
     }
   }
 

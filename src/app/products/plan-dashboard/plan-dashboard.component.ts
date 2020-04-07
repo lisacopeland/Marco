@@ -187,9 +187,8 @@ export class PlanDashboardComponent implements OnInit {
         // The result is the node that had a predecessor added to it,
         // save in the cache
         if (result) {
-          console.log('a plan line was added');
+          this.nodeService.addLineCache(result.source, result.target);
           this.planDirty = true;
-          this.nodeService.editNodeCache(result);
         } else {
           console.log('dialog was cancelled');
         }
